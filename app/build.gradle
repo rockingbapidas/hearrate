@@ -1,0 +1,71 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion rootProject.ext.compileSdkVersion
+    buildToolsVersion rootProject.ext.buildToolsVersion
+    defaultConfig {
+        applicationId rootProject.ext.applicationId
+        minSdkVersion rootProject.ext.minSdkVersion
+        targetSdkVersion rootProject.ext.targetSdkVersion
+        versionCode rootProject.ext.versionCode
+        versionName rootProject.ext.versionName
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    signingConfigs {
+        release {
+            keyAlias rootProject.ext.keyAlias
+            keyPassword rootProject.ext.keyPassword
+            storePassword rootProject.ext.storePassword
+            //storeFile file('I:/Android_Projects/HeartRate/heart_rate_key.jks')
+            storeFile file('/Users/bapidas/AndroidStudioProjects/HeartRate/heart_rate_key.jks')
+        }
+    }
+    buildTypes {
+        debug {
+            minifyEnabled false
+            shrinkResources false
+            useProguard false
+            debuggable true
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            useProguard true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+        }
+    }
+}
+
+dependencies {
+    compile fileTree(dir: 'libs', include: ['*.jar'])
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
+    //android support dependency
+    compile "com.android.support:appcompat-v7:${rootProject.ext.supportLibVersion}"
+    compile "com.android.support:design:${rootProject.ext.supportLibVersion}"
+    compile "com.android.support:recyclerview-v7:${rootProject.ext.supportLibVersion}"
+    compile "com.android.support:cardview-v7:${rootProject.ext.supportLibVersion}"
+    compile "com.android.support:support-v4:${rootProject.ext.supportLibVersion}"
+    compile "com.android.support.constraint:constraint-layout:${rootProject.ext.constraintLayoutVersion}"
+
+    //Dagger dependency
+    compile "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
+    annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
+    compile "com.google.android.gms:play-services-auth:${rootProject.ext.googleVersion}"
+    compile "com.google.guava:guava:${rootProject.ext.googleGuavaVersion}"
+    compile "com.google.auto.factory:auto-factory:${rootProject.ext.googleFactoryVersion}"
+    provided "org.glassfish:javax.annotation:${rootProject.ext.javaxAnnotationVersion}"
+
+    //butter knife dependency
+    compile "com.jakewharton:butterknife:${rootProject.ext.butterKnifeVersion}"
+    annotationProcessor "com.jakewharton:butterknife-compiler:${rootProject.ext.butterKnifeVersion}"
+
+    //all test compile dependency
+    testCompile "junit:junit:${rootProject.ext.jUnitVersion}"
+    testCompile "com.squareup:javawriter:${rootProject.ext.javaWriterVersion}"
+
+    androidTestCompile "junit:junit:${rootProject.ext.jUnitVersion}"
+    androidTestCompile "com.squareup:javawriter:${rootProject.ext.javaWriterVersion}"
+}
