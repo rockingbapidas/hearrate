@@ -1,9 +1,11 @@
-package com.vantagecircle.heartrate;
+package com.vantagecircle.heartrate.activity;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 
-public class MainActivity extends AppCompatActivity {
+import com.vantagecircle.heartrate.R;
+
+public class HeartActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
