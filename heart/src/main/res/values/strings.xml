@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">HeartRate</string>
+    <string name="check_your_heart_rate">Check your Heart rate</string>
 </resources>

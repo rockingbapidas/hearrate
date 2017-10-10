@@ -2,6 +2,8 @@ package com.vantagecircle.heartrate.module;
 
 import android.app.Application;
 
+import com.vantagecircle.heartrate.scope.ApplicationScope;
+
 import javax.inject.Singleton;
 
 import dagger.Module;
@@ -16,5 +18,12 @@ public class AppModule {
 
     public AppModule(Application application) {
         this.application = application;
+    }
+
+    @Provides
+    @ApplicationScope
+    Application
+    provideApplication() {
+        return application;
     }
 }

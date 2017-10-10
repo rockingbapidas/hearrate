@@ -1,9 +1,9 @@
 package com.vantagecircle.heartrate.component;
 
-import com.vantagecircle.heartrate.activity.WelcomeComponent;
+import com.vantagecircle.heartrate.activity.component.WelcomeActivityComponent;
 import com.vantagecircle.heartrate.module.AppModule;
-import com.vantagecircle.heartrate.module.HeartModule;
-import com.vantagecircle.heartrate.activity.WelcomeModule;
+import com.vantagecircle.heartrate.module.UserModule;
+import com.vantagecircle.heartrate.activity.module.WelcomeActivityModule;
 
 import javax.inject.Singleton;
 
@@ -19,6 +19,6 @@ import dagger.Component;
         }
 )
 public interface AppComponent {
-    WelcomeComponent plus(WelcomeModule welcomeModule);
-    HeartComponent plus(HeartModule heartModule);
+    WelcomeActivityComponent plus(WelcomeActivityModule welcomeActivityModule);
+    UserComponent plus(UserModule userModule);
 }
