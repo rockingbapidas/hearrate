@@ -36,11 +36,4 @@ public class WelcomeActivityModule {
     provideWelcomeActivityPresenter(WelcomeActivity welcomeActivity){
         return new WelcomeActivityPresenter(welcomeActivity);
     }
-
-    @Provides
-    @ActivityScope
-    WelcomeEventHandlers
-    provideWelcomeEventHandler(WelcomeActivityPresenter welcomeActivityPresenter){
-        return new WelcomeEventHandlers(welcomeActivityPresenter);
-    }
 }

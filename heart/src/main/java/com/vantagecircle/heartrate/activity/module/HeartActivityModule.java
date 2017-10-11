@@ -1,9 +1,14 @@
 package com.vantagecircle.heartrate.activity.module;
 
+import android.util.Log;
+
 import com.vantagecircle.heartrate.activity.handlers.HeartEventHandlers;
 import com.vantagecircle.heartrate.activity.presenter.HeartActivityPresenter;
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.scope.ActivityScope;
+import com.vantagecircle.heartrate.scope.UserScope;
+import com.vantagecircle.heartrate.utils.ImageProcessing;
+import com.vantagecircle.heartrate.utils.ToolsUtils;
 
 import dagger.Module;
 import dagger.Provides;
@@ -13,12 +18,13 @@ import dagger.Provides;
  */
 @Module
 public class HeartActivityModule {
+    private final static String TAG = HeartActivityModule.class.getSimpleName();
     private HeartActivity heartActivity;
 
     public HeartActivityModule(HeartActivity heartActivity) {
+        Log.d(TAG, "HeartActivityModule");
         this.heartActivity = heartActivity;
     }
-
 
     @Provides
     @ActivityScope
@@ -32,12 +38,5 @@ public class HeartActivityModule {
     HeartActivityPresenter
     provideHeartActivityPresenter(HeartActivity heartActivity){
         return new HeartActivityPresenter(heartActivity);
-    }
-
-    @Provides
-    @ActivityScope
-    HeartEventHandlers
-    provideEventHandler(HeartActivityPresenter heartActivityPresenter){
-        return new HeartEventHandlers(heartActivityPresenter);
     }
 }

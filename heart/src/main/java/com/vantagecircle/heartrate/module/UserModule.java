@@ -3,6 +3,7 @@ package com.vantagecircle.heartrate.module;
 import com.vantagecircle.heartrate.data.UserM;
 import com.vantagecircle.heartrate.scope.UserScope;
 import com.vantagecircle.heartrate.utils.ImageProcessing;
+import com.vantagecircle.heartrate.utils.ToolsUtils;
 
 import dagger.Module;
 import dagger.Provides;
@@ -23,12 +24,5 @@ public class UserModule {
     UserM
     provideUser() {
         return userM;
-    }
-
-    @Provides
-    @UserScope
-    ImageProcessing
-    provideImageProcessing() {
-        return new ImageProcessing();
     }
 }

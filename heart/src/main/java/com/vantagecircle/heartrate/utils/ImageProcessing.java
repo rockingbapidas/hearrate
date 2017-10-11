@@ -1,8 +1,27 @@
 package com.vantagecircle.heartrate.utils;
 
 public class ImageProcessing {
+    private static ImageProcessing mInstance;
 
-    public int decodeYUV420SPtoRedSum(byte[] yuv420sp, int width, int height) {
+    public static ImageProcessing getInstance(){
+        if (mInstance == null) {
+            synchronized (ImageProcessing.class) {
+                if (mInstance == null) {
+                    mInstance = new ImageProcessing();
+                }
+            }
+        }
+        return mInstance;
+    }
+
+    public int decodeYUV420SPtoRedAvg(byte[] yuv420sp, int width, int height) {
+        if (yuv420sp == null) return 0;
+        final int frameSize = width * height;
+        int sum = decodeYUV420SPtoRedSum(yuv420sp, width, height);
+        return (sum / frameSize);
+    }
+
+    private int decodeYUV420SPtoRedSum(byte[] yuv420sp, int width, int height) {
         if (yuv420sp == null) return 0;
         final int frameSize = width * height;
         int sum = 0;
@@ -31,12 +50,5 @@ public class ImageProcessing {
             }
         }
         return sum;
-    }
-
-    public int decodeYUV420SPtoRedAvg(byte[] yuv420sp, int width, int height) {
-        if (yuv420sp == null) return 0;
-        final int frameSize = width * height;
-        int sum = decodeYUV420SPtoRedSum(yuv420sp, width, height);
-        return (sum / frameSize);
     }
 }

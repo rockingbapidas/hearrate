@@ -5,5 +5,5 @@ package com.vantagecircle.heartrate.utils;
  */
 
 public enum TYPE {
-    GREEN, RED, BLACK, BLUE
+    GREEN, RED, BLUE
 }

@@ -16,4 +16,8 @@ public abstract class BaseActivity extends AppCompatActivity {
     }
 
     protected abstract void setupActivityComponent();
+
+    protected void init() {
+
+    }
 }

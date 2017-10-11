@@ -23,14 +23,12 @@ public class WelcomeActivity extends BaseActivity{
     private final String TAG = WelcomeActivity.class.getSimpleName();
     @Inject
     WelcomeActivityPresenter welcomeActivityPresenter;
-    @Inject
-    WelcomeEventHandlers welcomeEventHandlers;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         WelcomeActivityBinding mBinding = DataBindingUtil.setContentView(this, R.layout.welcome_activity);
-        //mBinding.setWelcomeHandlers(welcomeEventHandlers);
+        mBinding.setWelcomeHandlers(new WelcomeEventHandlers(welcomeActivityPresenter));
     }
 
     @Override
