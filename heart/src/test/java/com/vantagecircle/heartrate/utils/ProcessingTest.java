@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 /**
  * Created by bapidas on 10/10/17.
  */
-public class ImageProcessingTest {
+public class ProcessingTest {
     @Test
     public void decodeYUV420SPtoRedSum() throws Exception {
 

@@ -20,6 +20,6 @@ public class WelcomeEventHandlers {
 
     public void onCheckClick() {
         Log.d(TAG, "onCheckClick");
-        welcomeActivityPresenter.createUser(new UserM("10000", "1000", "2000"));
+        welcomeActivityPresenter.createUser(new UserM("0944", "Bapi Das", "77"));
     }
 }

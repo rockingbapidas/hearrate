@@ -1,13 +1,13 @@
-package com.vantagecircle.heartrate.utils;
+package com.vantagecircle.heartrate.processing;
 
-public class ImageProcessing {
-    private static ImageProcessing mInstance;
+public class Processing {
+    private static Processing mInstance;
 
-    public static ImageProcessing getInstance(){
+    public static Processing getInstance(){
         if (mInstance == null) {
-            synchronized (ImageProcessing.class) {
+            synchronized (Processing.class) {
                 if (mInstance == null) {
-                    mInstance = new ImageProcessing();
+                    mInstance = new Processing();
                 }
             }
         }

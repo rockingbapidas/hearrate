@@ -2,13 +2,9 @@ package com.vantagecircle.heartrate.activity.module;
 
 import android.util.Log;
 
-import com.vantagecircle.heartrate.activity.handlers.HeartEventHandlers;
 import com.vantagecircle.heartrate.activity.presenter.HeartActivityPresenter;
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.scope.ActivityScope;
-import com.vantagecircle.heartrate.scope.UserScope;
-import com.vantagecircle.heartrate.utils.ImageProcessing;
-import com.vantagecircle.heartrate.utils.ToolsUtils;
 
 import dagger.Module;
 import dagger.Provides;
