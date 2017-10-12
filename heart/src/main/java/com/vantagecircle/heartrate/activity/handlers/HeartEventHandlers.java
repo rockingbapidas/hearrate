@@ -13,7 +13,6 @@ public class HeartEventHandlers {
     private final static String TAG = HeartEventHandlers.class.getSimpleName();
     private HeartActivityPresenter heartActivityPresenter;
     public ObservableField<Boolean> isStarted = new ObservableField<>(false);
-    public ObservableField<String> hearRate = new ObservableField<>("---");
 
     public HeartEventHandlers(HeartActivityPresenter heartActivityPresenter) {
         Log.d(TAG, "HeartEventHandlers");
