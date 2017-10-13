@@ -1,12 +1,16 @@
 package com.vantagecircle.heartrate.activity.presenter;
 
 import android.content.Context;
+import android.databinding.ObservableField;
 import android.hardware.Camera;
+import android.os.Build;
 import android.os.PowerManager;
 import android.os.Vibrator;
 import android.util.Log;
 
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
+import com.vantagecircle.heartrate.camera.CameraNew;
+import com.vantagecircle.heartrate.data.HeartM;
 import com.vantagecircle.heartrate.processing.Processing;
 import com.vantagecircle.heartrate.utils.TYPE;
 
@@ -20,22 +24,20 @@ public class HeartActivityPresenter {
     private final String TAG = HeartActivityPresenter.class.getSimpleName();
     private HeartActivity heartActivity;
 
-    private final AtomicBoolean processing = new AtomicBoolean(false);
     private Camera camera = null;
     private PowerManager.WakeLock wakeLock = null;
-    private Vibrator v;
-    private PowerManager pm;
 
-    private String beatsPerMinuteValue = "";
     private int averageIndex = 0;
     private final int averageArraySize = 4;
     private final int[] averageArray = new int[averageArraySize];
+
     private int beatsIndex = 0;
     private final int beatsArraySize = 3;
     private final int[] beatsArray = new int[beatsArraySize];
     private double beats = 0;
+
+    private final AtomicBoolean processing = new AtomicBoolean(false);
     private long startTime = 0;
-    private final String FLAG = "DoNotDimScreen";
     private TYPE currentType = TYPE.GREEN;
 
     public HeartActivityPresenter(HeartActivity heartActivity) {
@@ -43,12 +45,15 @@ public class HeartActivityPresenter {
     }
 
     public void load() {
-        v = (Vibrator) heartActivity.getSystemService(Context.VIBRATOR_SERVICE);
-        pm = (PowerManager) heartActivity.getSystemService(Context.POWER_SERVICE);
-        wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, FLAG);
+        Vibrator v = (Vibrator) heartActivity.getSystemService(Context.VIBRATOR_SERVICE);
+        PowerManager pm = (PowerManager) heartActivity.getSystemService(Context.POWER_SERVICE);
+        wakeLock = pm.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
     }
 
     public void start() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            new CameraNew(heartActivity).open(0);
+        }
         wakeLock.acquire();
         camera = Camera.open();
         startTime = System.currentTimeMillis();
@@ -162,7 +167,7 @@ public class HeartActivityPresenter {
                 }
                 int beatsAvg = (beatsArrayAvg / beatsArrayCnt);
                 Log.e(TAG, "beatsAvg ==== " + beatsAvg);
-                beatsPerMinuteValue = String.valueOf(beatsAvg);
+                String beatsPerMinuteValue = String.valueOf(beatsAvg);
                 Log.e(TAG, "beatsPerMinuteValue ==== " + beatsPerMinuteValue);
                 startTime = System.currentTimeMillis();
                 beats = 0;

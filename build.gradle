@@ -45,4 +45,5 @@ ext{
     googleVersion = "11.0.4"
     googleFactoryVersion = "1.0-beta3"
     javaxAnnotationVersion = "10.0-b28"
+    mockitoVersion = "1.9.5"
 }

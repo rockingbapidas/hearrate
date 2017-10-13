@@ -1,5 +1,6 @@
 package com.vantagecircle.heartrate.activity.handlers;
 
+import android.os.Parcel;
 import android.util.Log;
 
 import com.vantagecircle.heartrate.activity.presenter.WelcomeActivityPresenter;
@@ -20,6 +21,6 @@ public class WelcomeEventHandlers {
 
     public void onCheckClick() {
         Log.d(TAG, "onCheckClick");
-        welcomeActivityPresenter.createUser(new UserM("0944", "Bapi Das", "77"));
+        welcomeActivityPresenter.createUser(new UserM("0944", "Bapi Das"));
     }
 }

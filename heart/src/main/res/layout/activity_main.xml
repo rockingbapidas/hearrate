@@ -8,6 +8,9 @@
         <variable
             name="mainHandlers"
             type="com.vantagecircle.heartrate.activity.handlers.HeartEventHandlers" />
+        <variable
+            name="heart"
+            type="com.vantagecircle.heartrate.data.HeartM" />
     </data>
 
     <LinearLayout
@@ -21,7 +24,7 @@
             android:id="@+id/heartRate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Hello World!"
+            android:text="@{heart.getBeatsPerMinuteValue()}"
             android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
