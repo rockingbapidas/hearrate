@@ -153,7 +153,7 @@ public class CameraNew implements CameraSupport {
                 }
                 // For still image captures, we use the largest available size.
                 Size largest = Collections.max(Arrays.asList(map.getOutputSizes(ImageFormat.JPEG)), new CompareSizesByArea());
-                mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(), ImageFormat.JPEG, /*maxImages*/2);
+                mImageReader = ImageReader.newInstance(largest.getWidth(), largest.getHeight(), ImageFormat.JPEG, /*maxImages*/1);
                 mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
 
                 // Find out if we need to swap dimension to get the preview size relative to sensor
@@ -287,7 +287,7 @@ public class CameraNew implements CameraSupport {
         try {
             mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
             mPreviewRequestBuilder.addTarget(mImageReader.getSurface());
-            mCameraDevice.createCaptureSession(Arrays.asList(mImageReader.getSurface()), mSessionStateCallBack, null);
+            mCameraDevice.createCaptureSession(Collections.singletonList(mImageReader.getSurface()), mSessionStateCallBack, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
@@ -337,10 +337,10 @@ public class CameraNew implements CameraSupport {
     private CameraCaptureSession.StateCallback mSessionStateCallBack = new CameraCaptureSession.StateCallback() {
         @Override
         public void onConfigured(@NonNull CameraCaptureSession session) {
-            if (null == mCameraDevice) {
-                return;
-            }
             try {
+                if (null == mCameraDevice) {
+                    return;
+                }
                 mCaptureSession = session;
                 mPreviewRequestBuilder.set(CaptureRequest.CONTROL_AF_MODE, CaptureRequest.CONTROL_AF_MODE_CONTINUOUS_PICTURE);
                 setAutoFlash(mPreviewRequestBuilder);
@@ -361,18 +361,18 @@ public class CameraNew implements CameraSupport {
 
         @Override
         public void onCaptureProgressed(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull CaptureResult partialResult) {
-            Log.e(TAG, "mCaptureCallback onCaptureProgressed");
+            //Log.e(TAG, "mCaptureCallback onCaptureProgressed");
             process(partialResult);
         }
 
         @Override
         public void onCaptureCompleted(@NonNull CameraCaptureSession session, @NonNull CaptureRequest request, @NonNull TotalCaptureResult result) {
-            Log.e(TAG, "mCaptureCallback onCaptureCompleted");
+            //Log.e(TAG, "mCaptureCallback onCaptureCompleted");
             process(result);
         }
 
         private void process(CaptureResult result) {
-            Log.e(TAG, "mCaptureCallback process");
+            //Log.e(TAG, "mCaptureCallback process");
             switch (mState) {
                 case STATE_PREVIEW: {
                     // We have nothing to do when the camera preview is working normally.
@@ -503,22 +503,20 @@ public class CameraNew implements CameraSupport {
         }
     }
 
-    private final ImageReader.OnImageAvailableListener mOnImageAvailableListener = new ImageReader.OnImageAvailableListener() {
+    private ImageReader.OnImageAvailableListener mOnImageAvailableListener = new ImageReader.OnImageAvailableListener() {
 
         @Override
         public void onImageAvailable(ImageReader reader) {
-            Log.e(TAG, "mOnImageAvailableListener onImageAvailable");
-            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage(), new File(mContext.getExternalFilesDir(null), "pic.jpg")));
+            //Log.e(TAG, "mOnImageAvailableListener onImageAvailable");
+            mBackgroundHandler.post(new ImageSaver(reader.acquireNextImage()));
         }
     };
 
-    private static class ImageSaver implements Runnable {
+    private class ImageSaver implements Runnable {
         private final Image mImage;
-        private final File mFile;
 
-        ImageSaver(Image image, File file) {
+        ImageSaver(Image image) {
             mImage = image;
-            mFile = file;
         }
 
         @Override
@@ -526,7 +524,12 @@ public class CameraNew implements CameraSupport {
             ByteBuffer buffer = mImage.getPlanes()[0].getBuffer();
             byte[] bytes = new byte[buffer.remaining()];
             buffer.get(bytes);
+            mCameraCallBack.onFrameCallback(bytes, mPreviewSize.getWidth(), mPreviewSize.getHeight());
+        }
+
+        private void save(byte[] bytes){
             FileOutputStream output = null;
+            File mFile = new File(mContext.getExternalFilesDir(null), "pic.jpg");
             try {
                 output = new FileOutputStream(mFile);
                 output.write(bytes);

@@ -11,52 +11,52 @@ import android.util.Log;
 @SuppressWarnings("deprecation")
 public class CameraOld implements CameraSupport {
     private final String TAG = CameraOld.class.getSimpleName();
-    private Camera camera;
-    private PowerManager.WakeLock wakeLock;
-    private CameraCallBack cameraCallBack;
+    private Camera mCamera;
+    private PowerManager.WakeLock mWakeLock;
+    private CameraCallBack mCameraCallBack;
 
     public CameraOld(Context mContext) {
         PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
-        wakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
+        mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
     }
 
     @Override
     public CameraSupport open() {
-        wakeLock.acquire();
-        this.camera = Camera.open();
+        mWakeLock.acquire();
+        this.mCamera = Camera.open();
         setCamera(480, 320);
         return this;
     }
 
     @Override
     public void close() {
-        wakeLock.release();
-        camera.setPreviewCallback(null);
-        camera.stopPreview();
-        camera.release();
-        camera = null;
+        mWakeLock.release();
+        mCamera.setPreviewCallback(null);
+        mCamera.stopPreview();
+        mCamera.release();
+        mCamera = null;
     }
 
     @Override
     public void setPreviewCallBack(CameraCallBack callBack) {
-        this.cameraCallBack = callBack;
+        this.mCameraCallBack = callBack;
     }
 
     private void setCamera(int width, int height){
         try {
-            if(null == camera){
+            if(null == mCamera){
                 return;
             }
-            camera.setPreviewCallback(mPreviewCallback);
-            Camera.Parameters parameters = camera.getParameters();
+            mCamera.setPreviewCallback(mPreviewCallback);
+            Camera.Parameters parameters = mCamera.getParameters();
             parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
             Camera.Size size = getSmallestPreviewSize(width, height, parameters);
             if (size != null) {
                 parameters.setPreviewSize(size.width, size.height);
                 Log.d(TAG, "Using width = " + size.width + " height = " + size.height);
             }
-            camera.setParameters(parameters);
-            camera.startPreview();
+            mCamera.setParameters(parameters);
+            mCamera.startPreview();
         } catch (Exception e){
             e.printStackTrace();
         }
@@ -85,7 +85,7 @@ public class CameraOld implements CameraSupport {
             if (data == null) throw new NullPointerException();
             Camera.Size size = cam.getParameters().getPreviewSize();
             if (size == null) throw new NullPointerException();
-            cameraCallBack.onFrameCallback(data, size.width, size.height);
+            mCameraCallBack.onFrameCallback(data, size.width, size.height);
         }
     };
 }

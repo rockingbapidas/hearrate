@@ -16,6 +16,7 @@ import com.vantagecircle.heartrate.data.HeartM;
 import com.vantagecircle.heartrate.processing.Processing;
 import com.vantagecircle.heartrate.utils.TYPE;
 
+import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -53,6 +54,9 @@ public class HeartActivityPresenter {
             cameraNew.open().setPreviewCallBack(new CameraCallBack() {
                 @Override
                 public void onFrameCallback(byte[] data, int width, int height) {
+                    Log.v(TAG, "onFrameCallback == " + Arrays.toString(data));
+                    Log.v(TAG, "onFrameCallback == " + width);
+                    Log.v(TAG, "onFrameCallback == " + height);
                     //calculateHeartRate(data, width, height);
                 }
             });
