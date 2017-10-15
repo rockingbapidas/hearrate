@@ -79,9 +79,9 @@ public class CameraNew implements CameraSupport {
     private static final int MAX_PREVIEW_HEIGHT = 1080;
     private Size mPreviewSize;
     private int mSensorOrientation;
-    private CaptureRequest mPreviewRequest;
     private int mState = STATE_PREVIEW;
-    private CameraCallBack cameraCallBack;
+    private CaptureRequest mPreviewRequest;
+    private CameraCallBack mCameraCallBack;
 
     public CameraNew(Context context) {
         this.mContext = context;
@@ -136,7 +136,7 @@ public class CameraNew implements CameraSupport {
 
     @Override
     public void setPreviewCallBack(CameraCallBack callBack) {
-        this.cameraCallBack = callBack;
+        this.mCameraCallBack = callBack;
     }
 
     private void setCameraOutputs(int width, int height) {
@@ -513,13 +513,7 @@ public class CameraNew implements CameraSupport {
     };
 
     private static class ImageSaver implements Runnable {
-        /**
-         * The JPEG image
-         */
         private final Image mImage;
-        /**
-         * The file we save the image into.
-         */
         private final File mFile;
 
         ImageSaver(Image image, File file) {
