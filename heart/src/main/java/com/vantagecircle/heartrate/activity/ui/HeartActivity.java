@@ -51,14 +51,12 @@ public class HeartActivity extends BaseActivity  {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             if (ToolsUtils.getInstance().isHasPermissions(this, Manifest.permission.CAMERA)) {
                 Log.d(TAG, "Permission already accepted");
-                heartActivityPresenter.load();
             } else {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
                         Constant.REQUEST_CAMERA_PERMISSION);
             }
         } else {
             Log.d(TAG, "No need permission");
-            heartActivityPresenter.load();
         }
     }
 
@@ -69,7 +67,6 @@ public class HeartActivity extends BaseActivity  {
         if (requestCode == Constant.REQUEST_CAMERA_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.d(TAG, "Permission granted");
-                heartActivityPresenter.load();
             } else {
                 Log.d(TAG, "Permission not granted");
                 Toast.makeText(getApplicationContext(), "You have to give permission to access this window",

@@ -5,6 +5,7 @@ package com.vantagecircle.heartrate.camera;
  */
 
 public interface CameraSupport {
-    CameraSupport open(int cameraId);
-    int getOrientation(int cameraId);
+    CameraSupport open();
+    void close();
+    void setPreviewCallBack(CameraCallBack callBack);
 }

@@ -75,4 +75,7 @@ dependencies {
     androidTestCompile "junit:junit:${rootProject.ext.jUnitVersion}"
     androidTestCompile "com.squareup:javawriter:${rootProject.ext.javaWriterVersion}"
     androidTestCompile "org.mockito:mockito-core:${rootProject.ext.mockitoVersion}"
+    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
+        exclude group: 'com.android.support', module: 'support-annotations'
+    })
 }
