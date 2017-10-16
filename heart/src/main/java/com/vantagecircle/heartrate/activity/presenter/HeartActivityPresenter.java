@@ -54,10 +54,8 @@ public class HeartActivityPresenter {
             cameraNew.open().setPreviewCallBack(new CameraCallBack() {
                 @Override
                 public void onFrameCallback(byte[] data, int width, int height) {
-                    Log.v(TAG, "onFrameCallback == " + Arrays.toString(data));
-                    Log.v(TAG, "onFrameCallback == " + width);
-                    Log.v(TAG, "onFrameCallback == " + height);
-                    //calculateHeartRate(data, width, height);
+                    Log.d(TAG, "Using width = " + width + " height = " + height);
+                    calculateHeartRate(data, width, height);
                 }
             });
         } else {
@@ -66,6 +64,7 @@ public class HeartActivityPresenter {
             cameraOld.open().setPreviewCallBack(new CameraCallBack() {
                 @Override
                 public void onFrameCallback(byte[] data, int width, int height) {
+                    Log.d(TAG, "Using width = " + width + " height = " + height);
                     calculateHeartRate(data, width, height);
                 }
             });

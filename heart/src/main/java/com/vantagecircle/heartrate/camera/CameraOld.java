@@ -24,7 +24,7 @@ public class CameraOld implements CameraSupport {
     public CameraSupport open() {
         mWakeLock.acquire();
         this.mCamera = Camera.open();
-        setCamera(480, 320);
+        setCamera(176, 144);
         return this;
     }
 
@@ -53,7 +53,6 @@ public class CameraOld implements CameraSupport {
             Camera.Size size = getSmallestPreviewSize(width, height, parameters);
             if (size != null) {
                 parameters.setPreviewSize(size.width, size.height);
-                Log.d(TAG, "Using width = " + size.width + " height = " + size.height);
             }
             mCamera.setParameters(parameters);
             mCamera.startPreview();

@@ -35,7 +35,7 @@
             android:id="@+id/btnStart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{mainHandlers.isStarted.get() ? @string/stop : @string/start}"
+            android:text="@{mainHandlers.isStarted ? @string/stop : @string/start}"
             android:layout_marginTop="20dp"
             android:onClick="@{(view) -> mainHandlers.onStartClick()}"/>
 
