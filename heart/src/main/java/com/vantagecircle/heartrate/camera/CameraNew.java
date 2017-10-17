@@ -368,7 +368,6 @@ public class CameraNew implements CameraSupport {
             } catch (IOException e) {
                 e.printStackTrace();
             } finally {
-                mImage.close();
                 if (null != output) {
                     try {
                         output.close();
