@@ -17,10 +17,4 @@ public class CameraNewTest {
     public void close() throws Exception {
 
     }
-
-    @Test
-    public void setPreviewCallBack() throws Exception {
-
-    }
-
 }

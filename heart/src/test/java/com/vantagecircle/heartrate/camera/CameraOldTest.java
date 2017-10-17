@@ -1,38 +1,30 @@
 package com.vantagecircle.heartrate.camera;
 
-import android.content.Context;
 import android.hardware.Camera;
 import android.os.PowerManager;
 
 import org.junit.Test;
-import org.mockito.Mock;
 
-import static org.junit.Assert.*;
+import static org.mockito.Mockito.mock;
 
 /**
  * Created by bapidas on 17/10/17.
  */
 public class CameraOldTest {
-
-    @Mock
     private Camera mCamera;
-    @Mock
     private PowerManager.WakeLock mWakeLock;
-
-    @Mock
-    private Context mContext;
 
     @Test
     public void open() throws Exception {
-        PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
-        mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
-        mWakeLock.acquire();
-        this.mCamera = Camera.open();
+        mWakeLock = mock(PowerManager.WakeLock.class);
+        mCamera = mock(Camera.class);
         setCamera(176, 144);
     }
 
     @Test
     public void close() throws Exception {
+        mWakeLock = mock(PowerManager.WakeLock.class);
+        mCamera = mock(Camera.class);
         mWakeLock.release();
         mCamera.setPreviewCallback(null);
         mCamera.stopPreview();
@@ -42,10 +34,12 @@ public class CameraOldTest {
 
     private void setCamera(int width, int height){
         try {
+            mCamera = mock(Camera.class);
+            mWakeLock = mock(PowerManager.WakeLock.class);
             if(null == mCamera){
                 return;
             }
-            Camera.Parameters parameters = mCamera.getParameters();
+            Camera.Parameters parameters = mock(Camera.Parameters.class);
             parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
             Camera.Size size = getSmallestPreviewSize(width, height, parameters);
             if (size != null) {

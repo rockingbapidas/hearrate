@@ -1,19 +1,19 @@
 package com.vantagecircle.heartrate.activity.presenter;
 
-import android.hardware.Camera;
+import com.vantagecircle.heartrate.camera.CameraNew;
+import com.vantagecircle.heartrate.camera.CameraOld;
+import com.vantagecircle.heartrate.utils.TYPE;
 
 import org.junit.Test;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import static org.mockito.Mockito.mock;
+import static org.junit.Assert.*;
 
 /**
- * Created by bapidas on 12/10/17.
+ * Created by bapidas on 17/10/17.
  */
 public class HeartActivityPresenterTest {
-    private final AtomicBoolean processing = new AtomicBoolean(false);
-
     private int averageIndex = 0;
     private final int averageArraySize = 4;
     private final int[] averageArray = new int[averageArraySize];
@@ -23,51 +23,25 @@ public class HeartActivityPresenterTest {
     private final int[] beatsArray = new int[beatsArraySize];
     private double beats = 0;
 
+    private final AtomicBoolean processing = new AtomicBoolean(false);
     private long startTime = 0;
-    private enum TYPE {
-        GREEN, RED, BLUE
-    }
     private TYPE currentType = TYPE.GREEN;
+
+    private CameraNew cameraNew;
+    private CameraOld cameraOld;
 
     @Test
     public void start() throws Exception {
-        Camera camera = mock(Camera.class);
-        startTime = System.currentTimeMillis();
-        Camera.Parameters parameters = mock(Camera.Parameters.class);
-        parameters.setFlashMode(Camera.Parameters.FLASH_MODE_TORCH);
-        Camera.Size size = getSmallestPreviewSize(176, 144, parameters);
-        if (size != null) {
-            parameters.setPreviewSize(size.width, size.height);
-        }
-        camera.setParameters(parameters);
-        camera.startPreview();
-    }
 
-    private Camera.Size getSmallestPreviewSize(int width, int height, Camera.Parameters parameters) {
-        Camera.Size result = null;
-        for (Camera.Size size : parameters.getSupportedPreviewSizes()) {
-            if (size.width <= width && size.height <= height) {
-                if (result == null) {
-                    result = size;
-                } else {
-                    int resultArea = result.width * result.height;
-                    int newArea = size.width * size.height;
-                    if (newArea < resultArea) result = size;
-                }
-            }
-        }
-        return result;
     }
 
     @Test
     public void stop() throws Exception {
-        Camera camera = mock(Camera.class);
-        camera.stopPreview();
-        camera.release();
+
     }
 
     @Test
-    public void calculate(){
+    public void calculateHeartRate() {
         if (!processing.compareAndSet(false, true))
             return;
         int imgAvg = 200;
