@@ -5,4 +5,5 @@ package com.vantagecircle.heartrate.processing;
  */
 
 public interface ProcessingSupport {
+    String heartRate(byte[] data, int width, int height);
 }
