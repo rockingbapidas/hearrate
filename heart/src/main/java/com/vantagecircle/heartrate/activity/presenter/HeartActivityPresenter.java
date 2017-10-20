@@ -1,12 +1,12 @@
 package com.vantagecircle.heartrate.activity.presenter;
 
-import android.os.Build;
 import android.util.Log;
 
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.camera.CameraCallBack;
 import com.vantagecircle.heartrate.camera.CameraNew;
 import com.vantagecircle.heartrate.camera.CameraOld;
+import com.vantagecircle.heartrate.camera.CameraSupport;
 import com.vantagecircle.heartrate.data.HeartM;
 import com.vantagecircle.heartrate.processing.Processing;
 import com.vantagecircle.heartrate.utils.TYPE;
@@ -34,46 +34,28 @@ public class HeartActivityPresenter {
     private long startTime = 0;
     private TYPE currentType = TYPE.GREEN;
 
-    private CameraNew cameraNew;
-    private CameraOld cameraOld;
     private HeartM heartM;
+    private CameraSupport cameraSupport;
 
-    public HeartActivityPresenter(HeartActivity heartActivity) {
+    public HeartActivityPresenter(HeartActivity heartActivity, CameraSupport cameraSupport) {
         this.heartActivity = heartActivity;
+        this.cameraSupport = cameraSupport;
     }
 
     public void start() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            startTime = System.currentTimeMillis();
-            heartM = new HeartM();
-            cameraNew = new CameraNew(heartActivity);
-            cameraNew.open().setPreviewCallBack(new CameraCallBack() {
-                @Override
-                public void onFrameCallback(byte[] data, int width, int height) {
-                    Log.d(TAG, "Using width = " + width + " height = " + height);
-                    calculateHeartRate(data, width, height);
-                }
-            });
-        } else {
-            startTime = System.currentTimeMillis();
-            heartM = new HeartM();
-            cameraOld = new CameraOld(heartActivity);
-            cameraOld.open().setPreviewCallBack(new CameraCallBack() {
-                @Override
-                public void onFrameCallback(byte[] data, int width, int height) {
-                    Log.d(TAG, "Using width = " + width + " height = " + height);
-                    calculateHeartRate(data, width, height);
-                }
-            });
-        }
+        startTime = System.currentTimeMillis();
+        heartM = new HeartM();
+        cameraSupport.open().setPreviewCallBack(new CameraCallBack() {
+            @Override
+            public void onFrameCallback(byte[] data, int width, int height) {
+                Log.d(TAG, "Using width = " + width + " height = " + height);
+                calculateHeartRate(data, width, height);
+            }
+        });
     }
 
     public void stop() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            cameraNew.close();
-        } else {
-            cameraOld.close();
-        }
+        cameraSupport.close();
     }
 
     private void calculateHeartRate(byte[] data, int width, int height){

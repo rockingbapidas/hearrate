@@ -1,9 +1,13 @@
 package com.vantagecircle.heartrate.activity.module;
 
+import android.os.Build;
 import android.util.Log;
 
 import com.vantagecircle.heartrate.activity.presenter.HeartActivityPresenter;
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
+import com.vantagecircle.heartrate.camera.CameraNew;
+import com.vantagecircle.heartrate.camera.CameraOld;
+import com.vantagecircle.heartrate.camera.CameraSupport;
 import com.vantagecircle.heartrate.scope.ActivityScope;
 
 import dagger.Module;
@@ -31,8 +35,19 @@ public class HeartActivityModule {
 
     @Provides
     @ActivityScope
+    CameraSupport
+    provideCamera(HeartActivity heartActivity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+            return new CameraNew(heartActivity);
+        } else {
+            return new CameraOld(heartActivity);
+        }
+    }
+
+    @Provides
+    @ActivityScope
     HeartActivityPresenter
-    provideHeartActivityPresenter(HeartActivity heartActivity){
-        return new HeartActivityPresenter(heartActivity);
+    provideHeartActivityPresenter(HeartActivity heartActivity, CameraSupport cameraSupport){
+        return new HeartActivityPresenter(heartActivity, cameraSupport);
     }
 }

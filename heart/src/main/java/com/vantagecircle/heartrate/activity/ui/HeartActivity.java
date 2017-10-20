@@ -3,7 +3,6 @@ package com.vantagecircle.heartrate.activity.ui;
 import android.Manifest;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
-import android.graphics.drawable.GradientDrawable;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -70,7 +69,7 @@ public class HeartActivity extends BaseActivity {
                 Log.d(TAG, "Permission granted");
             } else {
                 Log.d(TAG, "Permission not granted");
-                Toast.makeText(getApplicationContext(), "You have to give permission to access this window",
+                Toast.makeText(this, "You have to give permission to access this window",
                         Toast.LENGTH_SHORT).show();
                 finish();
             }
