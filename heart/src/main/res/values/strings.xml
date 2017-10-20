@@ -3,4 +3,5 @@
     <string name="check_your_heart_rate">Check your Heart rate</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
+    <string name="blank">-----</string>
 </resources>

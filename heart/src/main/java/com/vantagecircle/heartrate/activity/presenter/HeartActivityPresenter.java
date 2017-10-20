@@ -1,11 +1,6 @@
 package com.vantagecircle.heartrate.activity.presenter;
 
-import android.content.Context;
-import android.databinding.ObservableField;
-import android.hardware.Camera;
 import android.os.Build;
-import android.os.PowerManager;
-import android.os.Vibrator;
 import android.util.Log;
 
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
@@ -16,7 +11,6 @@ import com.vantagecircle.heartrate.data.HeartM;
 import com.vantagecircle.heartrate.processing.Processing;
 import com.vantagecircle.heartrate.utils.TYPE;
 
-import java.util.Arrays;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -42,6 +36,7 @@ public class HeartActivityPresenter {
 
     private CameraNew cameraNew;
     private CameraOld cameraOld;
+    private HeartM heartM;
 
     public HeartActivityPresenter(HeartActivity heartActivity) {
         this.heartActivity = heartActivity;
@@ -50,6 +45,7 @@ public class HeartActivityPresenter {
     public void start() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             startTime = System.currentTimeMillis();
+            heartM = new HeartM();
             cameraNew = new CameraNew(heartActivity);
             cameraNew.open().setPreviewCallBack(new CameraCallBack() {
                 @Override
@@ -60,6 +56,7 @@ public class HeartActivityPresenter {
             });
         } else {
             startTime = System.currentTimeMillis();
+            heartM = new HeartM();
             cameraOld = new CameraOld(heartActivity);
             cameraOld.open().setPreviewCallBack(new CameraCallBack() {
                 @Override
@@ -143,9 +140,9 @@ public class HeartActivityPresenter {
                 }
             }
             int beatsAvg = (beatsArrayAvg / beatsArrayCnt);
-            Log.e(TAG, "beatsAvg ==== " + beatsAvg);
             String beatsPerMinuteValue = String.valueOf(beatsAvg);
-            Log.e(TAG, "beatsPerMinuteValue ==== " + beatsPerMinuteValue);
+            heartM.setBeatsPerMinuteValue(beatsPerMinuteValue);
+            heartActivity.updateHeartRate(heartM);
             startTime = System.currentTimeMillis();
             beats = 0;
         }

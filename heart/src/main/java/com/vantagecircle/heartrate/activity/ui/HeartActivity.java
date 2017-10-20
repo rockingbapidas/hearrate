@@ -17,21 +17,23 @@ import com.vantagecircle.heartrate.activity.BaseActivity;
 import com.vantagecircle.heartrate.activity.handlers.HeartEventHandlers;
 import com.vantagecircle.heartrate.activity.module.HeartActivityModule;
 import com.vantagecircle.heartrate.activity.presenter.HeartActivityPresenter;
+import com.vantagecircle.heartrate.data.HeartM;
 import com.vantagecircle.heartrate.databinding.ActivityMainBinding;
 import com.vantagecircle.heartrate.utils.Constant;
 import com.vantagecircle.heartrate.utils.ToolsUtils;
 
 import javax.inject.Inject;
 
-public class HeartActivity extends BaseActivity  {
+public class HeartActivity extends BaseActivity {
     private final String TAG = HeartActivity.class.getSimpleName();
     @Inject
     HeartActivityPresenter heartActivityPresenter;
+    private ActivityMainBinding binding;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        ActivityMainBinding binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
         binding.setMainHandlers(new HeartEventHandlers(heartActivityPresenter));
         init();
     }
@@ -61,8 +63,7 @@ public class HeartActivity extends BaseActivity  {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull
-            String[] permissions, @NonNull int[] grantResults) {
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == Constant.REQUEST_CAMERA_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
@@ -74,6 +75,10 @@ public class HeartActivity extends BaseActivity  {
                 finish();
             }
         }
+    }
+
+    public void updateHeartRate(HeartM heartM) {
+        binding.setHeart(heartM);
     }
 
     @Override
