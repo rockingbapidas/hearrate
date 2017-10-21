@@ -2,8 +2,6 @@ package com.vantagecircle.heartrate.data;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
-import android.os.Parcel;
-import android.os.Parcelable;
 
 import com.vantagecircle.heartrate.BR;
 
