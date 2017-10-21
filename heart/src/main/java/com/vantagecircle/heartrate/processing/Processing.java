@@ -1,117 +1,45 @@
 package com.vantagecircle.heartrate.processing;
 
-import com.vantagecircle.heartrate.utils.TYPE;
+import android.media.Image;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.nio.ByteBuffer;
 
-public class Processing {
-    private static Processing mInstance;
+public class Processing implements ProcessingSupport {
 
-    public static Processing getInstance() {
-        if (mInstance == null) {
-            synchronized (Processing.class) {
-                if (mInstance == null) {
-                    mInstance = new Processing();
-                }
-            }
-        }
-        return mInstance;
+    @Override
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+    public byte[] YUV_420_888toNV21(Image image) {
+        byte[] nv21;
+        ByteBuffer yBuffer = image.getPlanes()[0].getBuffer();
+        ByteBuffer uBuffer = image.getPlanes()[1].getBuffer();
+        ByteBuffer vBuffer = image.getPlanes()[2].getBuffer();
+
+        int ySize = yBuffer.remaining();
+        int uSize = uBuffer.remaining();
+        int vSize = vBuffer.remaining();
+
+        nv21 = new byte[ySize + uSize + vSize];
+
+        //U and V are swapped
+        yBuffer.get(nv21, 0, ySize);
+        vBuffer.get(nv21, ySize, vSize);
+        uBuffer.get(nv21, ySize + vSize, uSize);
+
+        return nv21;
     }
 
-    private int averageIndex = 0;
-    private final int averageArraySize = 4;
-    private final int[] averageArray = new int[averageArraySize];
-
-    private int beatsIndex = 0;
-    private final int beatsArraySize = 3;
-    private final int[] beatsArray = new int[beatsArraySize];
-    private double beats = 0;
-
-    private final AtomicBoolean processing = new AtomicBoolean(false);
-    private long startTime = 0;
-    private TYPE currentType = TYPE.GREEN;
-
-    private void calculateHeartRate(byte[] data, int width, int height){
-        if (!processing.compareAndSet(false, true))
-            return;
-        int imgAvg = decodeYUV420SPtoRedAvg(data.clone(), width, height);
-        if (imgAvg == 0 || imgAvg == 255) {
-            processing.set(false);
-            return;
-        }
-        int averageArrayAvg = 0;
-        int averageArrayCnt = 0;
-        for (int anAverageArray : averageArray) {
-            if (anAverageArray > 0) {
-                averageArrayAvg += anAverageArray;
-                averageArrayCnt++;
-            }
-        }
-        int rollingAverage = (averageArrayCnt > 0) ? (averageArrayAvg / averageArrayCnt) : 0;
-        TYPE newType = currentType;
-        if (imgAvg < rollingAverage) {
-            newType = TYPE.RED;
-            if (newType != currentType) {
-                beats++;
-            }
-        } else if (imgAvg > rollingAverage) {
-            newType = TYPE.GREEN;
-        }
-
-        if (averageIndex == averageArraySize)
-            averageIndex = 0;
-        averageArray[averageIndex] = imgAvg;
-        averageIndex++;
-
-        // Transitioned from one state to another to the same
-        if (newType != currentType) {
-            currentType = newType;
-        }
-
-        long endTime = System.currentTimeMillis();
-        double totalTimeInSecs = (endTime - startTime) / 1000d;
-
-        if (totalTimeInSecs >= 10) {
-            double bps = (beats / totalTimeInSecs);
-            int dpm = (int) (bps * 60d);
-            if (dpm < 30 || dpm > 180) {
-                startTime = System.currentTimeMillis();
-                beats = 0;
-                processing.set(false);
-                return;
-            }
-
-            if (beatsIndex == beatsArraySize)
-                beatsIndex = 0;
-            beatsArray[beatsIndex] = dpm;
-            beatsIndex++;
-
-            int beatsArrayAvg = 0;
-            int beatsArrayCnt = 0;
-            for (int aBeatsArray : beatsArray) {
-                if (aBeatsArray > 0) {
-                    beatsArrayAvg += aBeatsArray;
-                    beatsArrayCnt++;
-                }
-            }
-            int beatsAvg = (beatsArrayAvg / beatsArrayCnt);
-            String beatsPerMinuteValue = String.valueOf(beatsAvg);
-            //callback here
-            //and return beats value
-            startTime = System.currentTimeMillis();
-            beats = 0;
-        }
-        processing.set(false);
-    }
-
-    public int decodeYUV420SPtoRedAvg(byte[] yuv420sp, int width, int height) {
+    @Override
+    public int YUV420SPtoRedAvg(byte[] yuv420sp, int width, int height) {
         if (yuv420sp == null) return 0;
         final int frameSize = width * height;
-        int sum = decodeYUV420SPtoRedSum(yuv420sp, width, height);
+        int sum = YUV420SPtoRedSum(yuv420sp, width, height);
         return (sum / frameSize);
     }
 
-    private int decodeYUV420SPtoRedSum(byte[] yuv420sp, int width, int height) {
+    @Override
+    public int YUV420SPtoRedSum(byte[] yuv420sp, int width, int height) {
         if (yuv420sp == null) return 0;
         final int frameSize = width * height;
         int sum = 0;

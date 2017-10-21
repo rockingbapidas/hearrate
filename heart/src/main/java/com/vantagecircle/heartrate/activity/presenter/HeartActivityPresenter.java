@@ -1,14 +1,9 @@
 package com.vantagecircle.heartrate.activity.presenter;
 
-import android.util.Log;
-
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.camera.CameraCallBack;
-import com.vantagecircle.heartrate.camera.CameraNew;
-import com.vantagecircle.heartrate.camera.CameraOld;
 import com.vantagecircle.heartrate.camera.CameraSupport;
 import com.vantagecircle.heartrate.data.HeartM;
-import com.vantagecircle.heartrate.processing.Processing;
 import com.vantagecircle.heartrate.utils.TYPE;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -20,6 +15,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class HeartActivityPresenter {
     private final String TAG = HeartActivityPresenter.class.getSimpleName();
     private HeartActivity heartActivity;
+    private CameraSupport cameraSupport;
 
     private int averageIndex = 0;
     private final int averageArraySize = 4;
@@ -35,7 +31,6 @@ public class HeartActivityPresenter {
     private TYPE currentType = TYPE.GREEN;
 
     private HeartM heartM;
-    private CameraSupport cameraSupport;
 
     public HeartActivityPresenter(HeartActivity heartActivity, CameraSupport cameraSupport) {
         this.heartActivity = heartActivity;
@@ -47,9 +42,8 @@ public class HeartActivityPresenter {
         heartM = new HeartM();
         cameraSupport.open().setPreviewCallBack(new CameraCallBack() {
             @Override
-            public void onFrameCallback(byte[] data, int width, int height) {
-                Log.d(TAG, "Using width = " + width + " height = " + height);
-                calculateHeartRate(data, width, height);
+            public void onFrameCallback(int pixelAverageCount) {
+                calculateHeartRate(pixelAverageCount);
             }
         });
     }
@@ -58,10 +52,9 @@ public class HeartActivityPresenter {
         cameraSupport.close();
     }
 
-    private void calculateHeartRate(byte[] data, int width, int height){
+    private void calculateHeartRate(int imgAvg){
         if (!processing.compareAndSet(false, true))
             return;
-        int imgAvg = Processing.getInstance().decodeYUV420SPtoRedAvg(data.clone(), width, height);
         if (imgAvg == 0 || imgAvg == 255) {
             processing.set(false);
             return;

@@ -5,5 +5,5 @@ package com.vantagecircle.heartrate.camera;
  */
 
 public interface CameraCallBack {
-    void onFrameCallback(byte[] data, int width, int height);
+    void onFrameCallback(int pixelAverageCount);
 }

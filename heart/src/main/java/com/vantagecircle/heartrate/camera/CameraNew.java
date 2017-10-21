@@ -20,6 +20,9 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.view.Surface;
 
+import com.vantagecircle.heartrate.processing.Processing;
+import com.vantagecircle.heartrate.processing.ProcessingSupport;
+
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +34,6 @@ import java.util.concurrent.TimeUnit;
  */
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class CameraNew implements CameraSupport {
-    private final String TAG = CameraNew.class.getSimpleName();
     private Context mContext;
     private CameraDevice mCameraDevice;
     private CameraManager mCameraManager;
@@ -44,10 +46,12 @@ public class CameraNew implements CameraSupport {
     private String mCameraId;
     private boolean mFlashSupported;
     private CameraCallBack mCameraCallBack;
+    private ProcessingSupport processingSupport;
 
-    public CameraNew(Context context) {
+    public CameraNew(Context context, ProcessingSupport processingSupport) {
         this.mContext = context;
         this.mCameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+        this.processingSupport = processingSupport;
     }
 
     @Override
@@ -158,26 +162,6 @@ public class CameraNew implements CameraSupport {
         }
     }
 
-    private byte[] YUV_420_888toNV21(Image image) {
-        byte[] nv21;
-        ByteBuffer yBuffer = image.getPlanes()[0].getBuffer();
-        ByteBuffer uBuffer = image.getPlanes()[1].getBuffer();
-        ByteBuffer vBuffer = image.getPlanes()[2].getBuffer();
-
-        int ySize = yBuffer.remaining();
-        int uSize = uBuffer.remaining();
-        int vSize = vBuffer.remaining();
-
-        nv21 = new byte[ySize + uSize + vSize];
-
-        //U and V are swapped
-        yBuffer.get(nv21, 0, ySize);
-        vBuffer.get(nv21, ySize, vSize);
-        uBuffer.get(nv21, ySize + vSize, uSize);
-
-        return nv21;
-    }
-
     private CameraDevice.StateCallback mStateCallback = new CameraDevice.StateCallback() {
 
         @Override
@@ -228,10 +212,12 @@ public class CameraNew implements CameraSupport {
 
         @Override
         public void onImageAvailable(ImageReader reader) {
+            //pixel calculation done here
             Image image = reader.acquireLatestImage();
             if (image != null) {
-                byte[] data = YUV_420_888toNV21(image);
-                mCameraCallBack.onFrameCallback(data, image.getWidth(), image.getHeight());
+                byte[] data = processingSupport.YUV_420_888toNV21(image);
+                int value = processingSupport.YUV420SPtoRedAvg(data, image.getWidth(), image.getHeight());
+                mCameraCallBack.onFrameCallback(value);
                 image.close();
             }
         }

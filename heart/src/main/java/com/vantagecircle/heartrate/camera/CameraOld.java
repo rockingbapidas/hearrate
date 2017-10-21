@@ -5,19 +5,22 @@ import android.hardware.Camera;
 import android.os.PowerManager;
 import android.util.Log;
 
+import com.vantagecircle.heartrate.processing.ProcessingSupport;
+
 /**
  * Created by bapidas on 12/10/17.
  */
 @SuppressWarnings("deprecation")
 public class CameraOld implements CameraSupport {
-    private final String TAG = CameraOld.class.getSimpleName();
     private Camera mCamera;
     private PowerManager.WakeLock mWakeLock;
     private CameraCallBack mCameraCallBack;
+    private ProcessingSupport processingSupport;
 
-    public CameraOld(Context mContext) {
+    public CameraOld(Context mContext, ProcessingSupport processingSupport) {
         PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
-        mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
+        this.mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
+        this.processingSupport = processingSupport;
     }
 
     @Override
@@ -81,10 +84,12 @@ public class CameraOld implements CameraSupport {
 
         @Override
         public void onPreviewFrame(byte[] data, Camera cam) {
+            //pixel calculation done here
             if (data == null) throw new NullPointerException();
             Camera.Size size = cam.getParameters().getPreviewSize();
             if (size == null) throw new NullPointerException();
-            mCameraCallBack.onFrameCallback(data, size.width, size.height);
+            int value = processingSupport.YUV420SPtoRedAvg(data, size.width, size.height);
+            mCameraCallBack.onFrameCallback(value);
         }
     };
 }

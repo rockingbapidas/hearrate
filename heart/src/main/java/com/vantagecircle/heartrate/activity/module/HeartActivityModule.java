@@ -8,6 +8,8 @@ import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.camera.CameraNew;
 import com.vantagecircle.heartrate.camera.CameraOld;
 import com.vantagecircle.heartrate.camera.CameraSupport;
+import com.vantagecircle.heartrate.processing.Processing;
+import com.vantagecircle.heartrate.processing.ProcessingSupport;
 import com.vantagecircle.heartrate.scope.ActivityScope;
 
 import dagger.Module;
@@ -35,12 +37,19 @@ public class HeartActivityModule {
 
     @Provides
     @ActivityScope
+    ProcessingSupport
+    provideProcessingSupport(){
+        return new Processing();
+    }
+
+    @Provides
+    @ActivityScope
     CameraSupport
-    provideCamera(HeartActivity heartActivity) {
+    provideCameraSupport(HeartActivity heartActivity, ProcessingSupport processingSupport) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
-            return new CameraNew(heartActivity);
+            return new CameraNew(heartActivity, processingSupport);
         } else {
-            return new CameraOld(heartActivity);
+            return new CameraOld(heartActivity, processingSupport);
         }
     }
 
