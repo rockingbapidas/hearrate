@@ -38,8 +38,8 @@ public class Processing implements ProcessingSupport {
         return (sum / frameSize);
     }
 
-    @Override
-    public int YUV420SPtoRedSum(byte[] yuv420sp, int width, int height) {
+
+    private int YUV420SPtoRedSum(byte[] yuv420sp, int width, int height) {
         if (yuv420sp == null) return 0;
         final int frameSize = width * height;
         int sum = 0;
