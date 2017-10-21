@@ -117,7 +117,7 @@ public class HeartActivityPresenter {
             int beatsAvg = (beatsArrayAvg / beatsArrayCnt);
             String beatsPerMinuteValue = String.valueOf(beatsAvg);
             heartM.setBeatsPerMinuteValue(beatsPerMinuteValue);
-            heartActivity.updateHeartRate(heartM);
+            heartActivity.bindHeartRate(heartM);
             startTime = System.currentTimeMillis();
             beats = 0;
         }

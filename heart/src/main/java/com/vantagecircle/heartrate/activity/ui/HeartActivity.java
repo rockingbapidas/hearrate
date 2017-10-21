@@ -76,7 +76,7 @@ public class HeartActivity extends BaseActivity {
         }
     }
 
-    public void updateHeartRate(HeartM heartM) {
+    public void bindHeartRate(HeartM heartM) {
         binding.setHeart(heartM);
     }
 
