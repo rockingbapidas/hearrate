@@ -4,10 +4,13 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <data class="com.vantagecircle.heartrate.databinding.ActivityMainBinding">
+
         <import type="android.view.View" />
+
         <variable
             name="mainHandlers"
             type="com.vantagecircle.heartrate.activity.handlers.HeartEventHandlers" />
+
         <variable
             name="heart"
             type="com.vantagecircle.heartrate.data.HeartM" />
@@ -35,9 +38,9 @@
             android:id="@+id/btnStart"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{mainHandlers.isStarted ? @string/stop : @string/start}"
             android:layout_marginTop="20dp"
-            android:onClick="@{(view) -> mainHandlers.onStartClick()}"/>
+            android:onClick="@{(view) -> mainHandlers.onStartClick()}"
+            android:text="@{mainHandlers.isStarted ? @string/stop : @string/start}" />
 
     </LinearLayout>
 </layout>

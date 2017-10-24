@@ -1,5 +1,7 @@
 package com.vantagecircle.heartrate.activity.presenter;
 
+import android.util.Log;
+
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.camera.CameraCallBack;
 import com.vantagecircle.heartrate.camera.CameraSupport;
@@ -52,7 +54,7 @@ public class HeartActivityPresenter {
         cameraSupport.close();
     }
 
-    private void calculateHeartRate(int imgAvg){
+    private void calculateHeartRate(int imgAvg) {
         if (!processing.compareAndSet(false, true))
             return;
         if (imgAvg == 0 || imgAvg == 255) {
@@ -87,6 +89,8 @@ public class HeartActivityPresenter {
         if (newType != currentType) {
             currentType = newType;
         }
+
+        Log.e(TAG, "Color freq ======   " + beats);
 
         long endTime = System.currentTimeMillis();
         double totalTimeInSecs = (endTime - startTime) / 1000d;
