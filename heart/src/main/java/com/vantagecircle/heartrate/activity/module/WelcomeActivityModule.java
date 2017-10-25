@@ -19,7 +19,6 @@ public class WelcomeActivityModule {
     private WelcomeActivity welcomeActivity;
 
     public WelcomeActivityModule(WelcomeActivity welcomeActivity) {
-        Log.d(TAG, "WelcomeActivityModule");
         this.welcomeActivity = welcomeActivity;
     }
 

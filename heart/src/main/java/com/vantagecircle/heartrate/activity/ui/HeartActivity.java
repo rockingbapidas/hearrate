@@ -28,18 +28,19 @@ public class HeartActivity extends BaseActivity {
     @Inject
     HeartActivityPresenter heartActivityPresenter;
     private ActivityMainBinding binding;
+    private HeartEventHandlers heartEventHandlers;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = DataBindingUtil.setContentView(this, R.layout.activity_main);
-        binding.setMainHandlers(new HeartEventHandlers(heartActivityPresenter));
+        heartEventHandlers = new HeartEventHandlers(heartActivityPresenter);
+        binding.setMainHandlers(heartEventHandlers);
         init();
     }
 
     @Override
     protected void setupActivityComponent() {
-        Log.d(TAG, "setupActivityComponent");
         HeartApplication.get(this)
                 .getUserComponent()
                 .plus(new HeartActivityModule(this))
@@ -69,15 +70,23 @@ public class HeartActivity extends BaseActivity {
                 Log.d(TAG, "Permission granted");
             } else {
                 Log.d(TAG, "Permission not granted");
-                Toast.makeText(this, "You have to give permission to access this window",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "You have to give permission to access this window", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
     }
 
     public void bindHeartRate(HeartM heartM) {
-        binding.setHeart(heartM);
+        //bind heart rate to the view
+        if (heartM != null)
+            binding.setHeart(heartM);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        heartActivityPresenter.stop();
+        heartEventHandlers.isStarted.set(false);
     }
 
     @Override

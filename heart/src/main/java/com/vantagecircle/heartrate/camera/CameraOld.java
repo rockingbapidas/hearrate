@@ -45,6 +45,11 @@ public class CameraOld implements CameraSupport {
         this.mCameraCallBack = callBack;
     }
 
+    @Override
+    public boolean isCameraInUse() {
+        return mCamera != null;
+    }
+
     private void setCamera(int width, int height){
         try {
             if(null == mCamera){

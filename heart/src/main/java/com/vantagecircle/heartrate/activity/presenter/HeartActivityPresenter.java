@@ -1,13 +1,25 @@
 package com.vantagecircle.heartrate.activity.presenter;
 
+import android.graphics.Typeface;
 import android.util.Log;
 
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Legend;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
+import com.github.mikephil.charting.utils.FileUtils;
+import com.vantagecircle.heartrate.R;
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.camera.CameraCallBack;
 import com.vantagecircle.heartrate.camera.CameraSupport;
 import com.vantagecircle.heartrate.data.HeartM;
 import com.vantagecircle.heartrate.utils.TYPE;
 
+import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
@@ -41,7 +53,12 @@ public class HeartActivityPresenter {
 
     public void start() {
         startTime = System.currentTimeMillis();
-        heartM = new HeartM();
+        if (heartM != null) {
+            heartM.setBeatsPerMinuteValue("-----");
+            heartActivity.bindHeartRate(heartM);
+        } else {
+            heartM = new HeartM();
+        }
         cameraSupport.open().setPreviewCallBack(new CameraCallBack() {
             @Override
             public void onFrameCallback(int pixelAverageCount) {
@@ -51,7 +68,9 @@ public class HeartActivityPresenter {
     }
 
     public void stop() {
-        cameraSupport.close();
+        if (cameraSupport.isCameraInUse()) {
+            cameraSupport.close();
+        }
     }
 
     private void calculateHeartRate(int imgAvg) {
@@ -69,7 +88,8 @@ public class HeartActivityPresenter {
                 averageArrayCnt++;
             }
         }
-        int rollingAverage = (averageArrayCnt > 0) ? (averageArrayAvg / averageArrayCnt) : 0;
+        int rollingAverage = (averageArrayCnt > 0) ?
+                (averageArrayAvg / averageArrayCnt) : 0;
         TYPE newType = currentType;
         if (imgAvg < rollingAverage) {
             newType = TYPE.RED;
@@ -90,7 +110,7 @@ public class HeartActivityPresenter {
             currentType = newType;
         }
 
-        Log.e(TAG, "Color freq ======   " + beats);
+        Log.e(TAG, "Beats ======   " + beats);
 
         long endTime = System.currentTimeMillis();
         double totalTimeInSecs = (endTime - startTime) / 1000d;
@@ -120,11 +140,57 @@ public class HeartActivityPresenter {
             }
             int beatsAvg = (beatsArrayAvg / beatsArrayCnt);
             String beatsPerMinuteValue = String.valueOf(beatsAvg);
+
             heartM.setBeatsPerMinuteValue(beatsPerMinuteValue);
             heartActivity.bindHeartRate(heartM);
+
             startTime = System.currentTimeMillis();
             beats = 0;
         }
         processing.set(false);
+    }
+
+    private void createGraph() {
+        LineChart mChart = (LineChart) heartActivity.findViewById(R.id.chart);
+        mChart.getDescription().setEnabled(false);
+        mChart.setDrawGridBackground(false);
+        mChart.setData(generateLineData());
+        mChart.animateX(3000);
+        mChart.setPinchZoom(false);
+        mChart.setDoubleTapToZoomEnabled(false);
+
+        Typeface tf = Typeface.createFromAsset(heartActivity.getAssets(), "OpenSans-Light.ttf");
+        Legend l = mChart.getLegend();
+        l.setTypeface(tf);
+
+        YAxis leftAxis = mChart.getAxisLeft();
+        leftAxis.setTypeface(tf);
+        leftAxis.setAxisMaximum(1.2f);
+        leftAxis.setAxisMinimum(-1.2f);
+
+        mChart.getAxisRight().setEnabled(false);
+
+        XAxis xAxis = mChart.getXAxis();
+        xAxis.setEnabled(false);
+    }
+
+    private LineData generateLineData() {
+        Typeface tf = Typeface.createFromAsset(heartActivity.getAssets(),
+                "OpenSans-Light.ttf");
+        ArrayList<ILineDataSet> sets = new ArrayList<>();
+
+        LineDataSet ds = new LineDataSet(FileUtils
+                .loadEntriesFromAssets(heartActivity.getAssets(), "cosine.txt"),
+                "Cosine function");
+
+        ds.setLineWidth(3f);
+        ds.setDrawCircles(false);
+        ds.setColor(ColorTemplate.VORDIPLOM_COLORS[0]);
+
+
+        sets.add(ds);
+        LineData d = new LineData(sets);
+        d.setValueTypeface(tf);
+        return d;
     }
 }

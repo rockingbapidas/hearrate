@@ -17,12 +17,10 @@ public class WelcomeActivityPresenter {
     private WelcomeActivity welcomeActivity;
 
     public WelcomeActivityPresenter(WelcomeActivity welcomeActivity) {
-        Log.d(TAG, "WelcomeActivityPresenter");
         this.welcomeActivity = welcomeActivity;
     }
 
     public void createUser(UserM userM) {
-        Log.d(TAG, "createUser");
         HeartApplication.get(welcomeActivity).createUserComponent(userM);
         welcomeActivity.startActivity(new Intent(welcomeActivity, HeartActivity.class));
         welcomeActivity.finish();

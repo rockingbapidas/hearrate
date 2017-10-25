@@ -15,7 +15,6 @@ public class HeartEventHandlers {
     public ObservableField<Boolean> isStarted = new ObservableField<>(false);
 
     public HeartEventHandlers(HeartActivityPresenter heartActivityPresenter) {
-        Log.d(TAG, "HeartEventHandlers");
         this.heartActivityPresenter = heartActivityPresenter;
     }
 

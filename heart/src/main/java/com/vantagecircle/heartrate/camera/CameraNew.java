@@ -20,10 +20,8 @@ import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.view.Surface;
 
-import com.vantagecircle.heartrate.processing.Processing;
 import com.vantagecircle.heartrate.processing.ProcessingSupport;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -103,6 +101,11 @@ public class CameraNew implements CameraSupport {
     @Override
     public void setPreviewCallBack(CameraCallBack callBack) {
         this.mCameraCallBack = callBack;
+    }
+
+    @Override
+    public boolean isCameraInUse() {
+        return mCameraDevice != null;
     }
 
     private void setCameraOutputs() {
