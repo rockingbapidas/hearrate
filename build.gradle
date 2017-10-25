@@ -30,20 +30,19 @@ ext{
 
     compileSdkVersion = 26
     buildToolsVersion = "26.0.2"
+
     minSdkVersion = 15
     targetSdkVersion = 26
+
     versionCode = 1
     versionName = "1.0"
+
     supportLibVersion = "26.0.0-alpha1"
     constraintLayoutVersion = "1.0.2"
 
-    jUnitVersion = "4.12"
-    daggerVersion = "2.7"
-    butterKnifeVersion = "8.4.0"
-    javaWriterVersion = "2.5.1"
-    googleGuavaVersion = "20.0"
     googleVersion = "11.0.4"
-    googleFactoryVersion = "1.0-beta3"
-    javaxAnnotationVersion = "10.0-b28"
-    mockitoVersion = "1.9.5"
+    daggerVersion = "2.8"
+    gsonVersion = "2.8.1"
+
+    mockitoVersion = "2.7.22"
 }

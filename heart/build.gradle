@@ -45,6 +45,12 @@ android {
     }
 }
 
+repositories {
+    maven {
+        url "https://jitpack.io"
+    }
+}
+
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
@@ -56,26 +62,25 @@ dependencies {
     compile "com.android.support:support-v4:${rootProject.ext.supportLibVersion}"
     compile "com.android.support.constraint:constraint-layout:${rootProject.ext.constraintLayoutVersion}"
 
-    //Dagger dependency
-    compile "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
-    annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
     compile "com.google.android.gms:play-services-auth:${rootProject.ext.googleVersion}"
-    compile "com.google.guava:guava:${rootProject.ext.googleGuavaVersion}"
-    compile "com.google.auto.factory:auto-factory:${rootProject.ext.googleFactoryVersion}"
-    provided "org.glassfish:javax.annotation:${rootProject.ext.javaxAnnotationVersion}"
+    compile "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
+    compile "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
 
-    //butter knife dependency
-    compile "com.jakewharton:butterknife:${rootProject.ext.butterKnifeVersion}"
-    annotationProcessor "com.jakewharton:butterknife-compiler:${rootProject.ext.butterKnifeVersion}"
+    compile 'com.jakewharton:butterknife:8.4.0'
+    compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
+    compile 'javax.inject:javax.inject:1'
+
+    provided 'org.glassfish:javax.annotation:10.0-b28'
+    provided 'javax.annotation:jsr250-api:1.0'
+
+    annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
+    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
 
     //all test compile dependency
-    testCompile "junit:junit:${rootProject.ext.jUnitVersion}"
-    testCompile "com.squareup:javawriter:${rootProject.ext.javaWriterVersion}"
+    testCompile "junit:junit:4.12"
     testCompile "org.mockito:mockito-core:${rootProject.ext.mockitoVersion}"
 
-    androidTestCompile "junit:junit:${rootProject.ext.jUnitVersion}"
-    androidTestCompile "com.squareup:javawriter:${rootProject.ext.javaWriterVersion}"
-    androidTestCompile "org.mockito:mockito-core:${rootProject.ext.mockitoVersion}"
+    androidTestCompile "org.mockito:mockito-android:${rootProject.ext.mockitoVersion}"
     androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })

@@ -10,42 +10,26 @@ import com.vantagecircle.heartrate.BR;
  */
 
 public class HeartM extends BaseObservable  {
-    private int beatsArrayAvg;
-    private int beatsArrayCnt;
-    private int beatsAvg;
     private String beatsPerMinuteValue;
-
-    public int getBeatsArrayAvg() {
-        return beatsArrayAvg;
-    }
-
-    public int getBeatsArrayCnt() {
-        return beatsArrayCnt;
-    }
-
-    public int getBeatsAvg() {
-        return beatsAvg;
-    }
+    private boolean isDetectHeartRate;
 
     @Bindable
     public String getBeatsPerMinuteValue() {
         return beatsPerMinuteValue;
     }
 
-    public void setBeatsArrayAvg(int beatsArrayAvg) {
-        this.beatsArrayAvg = beatsArrayAvg;
-    }
-
-    public void setBeatsArrayCnt(int beatsArrayCnt) {
-        this.beatsArrayCnt = beatsArrayCnt;
-    }
-
-    public void setBeatsAvg(int beatsAvg) {
-        this.beatsAvg = beatsAvg;
-    }
-
     public void setBeatsPerMinuteValue(String beatsPerMinuteValue) {
         this.beatsPerMinuteValue = beatsPerMinuteValue;
         notifyPropertyChanged(BR.beatsPerMinuteValue);
+    }
+
+    @Bindable
+    public boolean isDetectHeartRate() {
+        return isDetectHeartRate;
+    }
+
+    public void setDetectHeartRate(boolean detectHeartRate) {
+        isDetectHeartRate = detectHeartRate;
+        notifyPropertyChanged(BR.detectHeartRate);
     }
 }
