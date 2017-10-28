@@ -45,7 +45,7 @@ public class HeartActivityModule {
     @ActivityScope
     CameraSupport
     provideCameraSupport(HeartActivity heartActivity, ProcessingSupport processingSupport) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
             return new CameraNew(heartActivity, processingSupport);
         } else {
             return new CameraOld(heartActivity, processingSupport);
