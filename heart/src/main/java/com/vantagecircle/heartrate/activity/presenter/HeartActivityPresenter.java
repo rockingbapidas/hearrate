@@ -1,6 +1,7 @@
 package com.vantagecircle.heartrate.activity.presenter;
 
 import android.graphics.Typeface;
+import android.hardware.SensorManager;
 import android.util.Log;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -88,13 +89,13 @@ public class HeartActivityPresenter {
                 averageArrayCnt++;
             }
         }
-        int rollingAverage = (averageArrayCnt > 0) ?
-                (averageArrayAvg / averageArrayCnt) : 0;
+        int rollingAverage = (averageArrayCnt > 0) ? (averageArrayAvg / averageArrayCnt) : 0;
         TYPE newType = currentType;
         if (imgAvg < rollingAverage) {
             newType = TYPE.RED;
             if (newType != currentType) {
                 beats++;
+                Log.e(TAG, "Beats ======   " + beats);
             }
         } else if (imgAvg > rollingAverage) {
             newType = TYPE.GREEN;
@@ -109,8 +110,6 @@ public class HeartActivityPresenter {
         if (newType != currentType) {
             currentType = newType;
         }
-
-        Log.e(TAG, "Beats ======   " + beats);
 
         long endTime = System.currentTimeMillis();
         double totalTimeInSecs = (endTime - startTime) / 1000d;
@@ -151,7 +150,7 @@ public class HeartActivityPresenter {
     }
 
     private void createGraph() {
-        LineChart mChart = (LineChart) heartActivity.findViewById(R.id.chart);
+        LineChart mChart = heartActivity.findViewById(R.id.chart);
         mChart.getDescription().setEnabled(false);
         mChart.setDrawGridBackground(false);
         mChart.setData(generateLineData());

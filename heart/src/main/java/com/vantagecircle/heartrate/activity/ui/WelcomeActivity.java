@@ -46,7 +46,6 @@ public class WelcomeActivity extends BaseActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         WelcomeActivityBinding mBinding = DataBindingUtil.setContentView(this, R.layout.welcome_activity);
         mBinding.setWelcomeHandlers(new WelcomeEventHandlers(welcomeActivityPresenter));
     }

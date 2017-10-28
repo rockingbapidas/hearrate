@@ -1,4 +1,5 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
@@ -45,9 +46,8 @@ android {
 }
 
 repositories {
-    maven {
-        url "https://jitpack.io"
-    }
+    maven { url "https://jitpack.io" }
+    mavenCentral()
 }
 
 dependencies {
@@ -65,15 +65,16 @@ dependencies {
     compile "com.google.dagger:dagger:${rootProject.ext.daggerVersion}"
     compile "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
 
-    compile 'com.jakewharton:butterknife:8.4.0'
+    compile "com.jakewharton:butterknife:${rootProject.ext.butterKnifeVersion}"
     compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
     compile 'javax.inject:javax.inject:1'
+    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 
     provided 'org.glassfish:javax.annotation:10.0-b28'
     provided 'javax.annotation:jsr250-api:1.0'
 
     annotationProcessor "com.google.dagger:dagger-compiler:${rootProject.ext.daggerVersion}"
-    annotationProcessor 'com.jakewharton:butterknife-compiler:8.4.0'
+    annotationProcessor "com.jakewharton:butterknife-compiler:${rootProject.ext.butterKnifeVersion}"
 
     //all test compile dependency
     testCompile "junit:junit:4.12"

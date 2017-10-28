@@ -7,7 +7,6 @@ import android.support.annotation.RequiresApi;
 import java.nio.ByteBuffer;
 
 public class Processing implements ProcessingSupport {
-
     @Override
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public byte[] YUV_420_888toNV21(Image image) {
@@ -37,7 +36,6 @@ public class Processing implements ProcessingSupport {
         int sum = YUV420SPtoRedSum(yuv420sp, width, height);
         return (sum / frameSize);
     }
-
 
     private int YUV420SPtoRedSum(byte[] yuv420sp, int width, int height) {
         if (yuv420sp == null) return 0;

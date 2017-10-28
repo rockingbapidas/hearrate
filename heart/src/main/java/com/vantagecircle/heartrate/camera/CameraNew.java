@@ -18,6 +18,7 @@ import android.os.HandlerThread;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
+import android.util.Log;
 import android.view.Surface;
 
 import com.vantagecircle.heartrate.processing.ProcessingSupport;
@@ -47,6 +48,7 @@ public class CameraNew implements CameraSupport {
     private ProcessingSupport processingSupport;
 
     public CameraNew(Context context, ProcessingSupport processingSupport) {
+        Log.e("TAG", "CameraNew Run");
         this.mContext = context;
         this.mCameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
         this.processingSupport = processingSupport;
