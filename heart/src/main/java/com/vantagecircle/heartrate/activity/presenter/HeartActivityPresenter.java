@@ -158,7 +158,8 @@ public class HeartActivityPresenter {
         mChart.setPinchZoom(false);
         mChart.setDoubleTapToZoomEnabled(false);
 
-        Typeface tf = Typeface.createFromAsset(heartActivity.getAssets(), "OpenSans-Light.ttf");
+        Typeface tf = Typeface.createFromAsset(heartActivity.getAssets(),
+                "OpenSans-Light.ttf");
         Legend l = mChart.getLegend();
         l.setTypeface(tf);
 
@@ -185,7 +186,6 @@ public class HeartActivityPresenter {
         ds.setLineWidth(3f);
         ds.setDrawCircles(false);
         ds.setColor(ColorTemplate.VORDIPLOM_COLORS[0]);
-
 
         sets.add(ds);
         LineData d = new LineData(sets);

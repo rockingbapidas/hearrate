@@ -120,7 +120,7 @@ public class CameraNew implements CameraSupport {
                 if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
                     continue;
                 }
-                mImageReader = ImageReader.newInstance(176, 144, ImageFormat.NV21, 5);
+                mImageReader = ImageReader.newInstance(176, 144, ImageFormat.YUV_420_888, 5);
                 mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
                 Boolean available = mCharacteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
                 mFlashSupported = available == null ? false : available;
@@ -221,12 +221,10 @@ public class CameraNew implements CameraSupport {
             //pixel calculation done here
             Image image = reader.acquireLatestImage();
             if (image != null) {
-                ByteBuffer buffer = image.getPlanes()[0].getBuffer();
+                /*ByteBuffer buffer = image.getPlanes()[0].getBuffer();
                 byte[] data = new byte[buffer.remaining()];
-                buffer.get(data);
-
-                //byte[] data = processingSupport.YUV_420_888toNV21(image);
-
+                buffer.get(data);*/
+                byte[] data = processingSupport.YUV_420_888toNV21(image);
                 int value = processingSupport.YUV420SPtoRedAvg(data, image.getWidth(), image.getHeight());
                 mCameraCallBack.onFrameCallback(value);
                 image.close();

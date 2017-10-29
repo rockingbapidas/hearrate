@@ -20,9 +20,9 @@ public class CameraOld implements CameraSupport {
     private Camera mCamera;
     private PowerManager.WakeLock mWakeLock;
     private CameraCallBack mCameraCallBack;
-    private ProcessingSupport processingSupport;
     private final Object object = new Object();
     private SurfaceTexture surfaceTexture = null;
+    private ProcessingSupport processingSupport;
 
     public CameraOld(Context mContext, ProcessingSupport processingSupport) {
         Log.e("TAG", "CameraOld Run");
@@ -172,15 +172,6 @@ public class CameraOld implements CameraSupport {
             }
             size = result;
             result = size;
-            /*if (size.width <= 176 && size.height <= 144) {
-                if (result == null) {
-                    result = size;
-                } else {
-                    int resultArea = result.width * result.height;
-                    int newArea = size.width * size.height;
-                    if (newArea < resultArea) result = size;
-                }
-            }*/
         }
         return result;
     }

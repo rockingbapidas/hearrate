@@ -46,6 +46,6 @@ ext{
     daggerVersion = "2.8"
     gsonVersion = "2.8.1"
 
-    butterKnifeVersion = "8.5.1"
+    butterKnifeVersion = "8.8.1"
     mockitoVersion = "2.7.22"
 }
