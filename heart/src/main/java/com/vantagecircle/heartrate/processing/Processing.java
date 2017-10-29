@@ -3,6 +3,7 @@ package com.vantagecircle.heartrate.processing;
 import android.media.Image;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 
@@ -34,6 +35,7 @@ public class Processing implements ProcessingSupport {
         if (yuv420sp == null) return 0;
         final int frameSize = width * height;
         int sum = YUV420SPtoRedSum(yuv420sp, width, height);
+        //Log.e("TAG", "Red Avg " + sum / frameSize);
         return (sum / frameSize);
     }
 
@@ -65,6 +67,7 @@ public class Processing implements ProcessingSupport {
                 sum += red;
             }
         }
+        //Log.e("TAG", "Red sum " + sum);
         return sum;
     }
 }

@@ -24,11 +24,25 @@
         tools:context="com.vantagecircle.heartrate.activity.ui.HeartActivity">
 
         <TextView
+            android:id="@+id/fingerStatus"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/finger_status"
+            android:textColor="@android:color/holo_red_dark"
+            android:textSize="20sp"
+            android:visibility="@{heart.detectHeartRate ? View.GONE : View.VISIBLE}"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
             android:id="@+id/heartRate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@{heart.beatsPerMinuteValue == null ? @string/blank : heart.beatsPerMinuteValue}"
-            android:textSize="20sp"
+            android:textSize="24sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"

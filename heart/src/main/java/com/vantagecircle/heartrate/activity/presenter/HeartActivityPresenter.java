@@ -3,6 +3,7 @@ package com.vantagecircle.heartrate.activity.presenter;
 import android.graphics.Typeface;
 import android.hardware.SensorManager;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -39,13 +40,15 @@ public class HeartActivityPresenter {
     private int beatsIndex = 0;
     private final int beatsArraySize = 3;
     private final int[] beatsArray = new int[beatsArraySize];
-    private double beats = 0;
 
+    private double beats = 0;
     private final AtomicBoolean processing = new AtomicBoolean(false);
     private long startTime = 0;
     private TYPE currentType = TYPE.GREEN;
 
     private HeartM heartM;
+    private int errorCount = 0;
+    private int successCount = 0;
 
     public HeartActivityPresenter(HeartActivity heartActivity, CameraSupport cameraSupport) {
         this.heartActivity = heartActivity;
@@ -53,13 +56,17 @@ public class HeartActivityPresenter {
     }
 
     public void start() {
-        startTime = System.currentTimeMillis();
+        errorCount = 0;
+        successCount = 0;
         if (heartM != null) {
             heartM.setBeatsPerMinuteValue("-----");
             heartActivity.bindHeartRate(heartM);
         } else {
             heartM = new HeartM();
+            heartM.setBeatsPerMinuteValue("-----");
+            heartActivity.bindHeartRate(heartM);
         }
+        startTime = System.currentTimeMillis();
         cameraSupport.open().setPreviewCallBack(new CameraCallBack() {
             @Override
             public void onFrameCallback(int pixelAverageCount) {
@@ -75,12 +82,21 @@ public class HeartActivityPresenter {
     }
 
     private void calculateHeartRate(int imgAvg) {
-        if (!processing.compareAndSet(false, true))
+        if (!processing.compareAndSet(false, true)) {
             return;
-        if (imgAvg == 0 || imgAvg == 255) {
+        }
+
+        if (imgAvg == 0 || imgAvg < 200 || imgAvg >= 255) {
+            Log.e(TAG, "Please attach finger");
+            heartM.setDetectHeartRate(false);
+            heartActivity.bindHeartRate(heartM);
+            errorCount++;
             processing.set(false);
             return;
         }
+
+        heartM.setDetectHeartRate(true);
+        heartActivity.bindHeartRate(heartM);
         int averageArrayAvg = 0;
         int averageArrayCnt = 0;
         for (int anAverageArray : averageArray) {
@@ -95,7 +111,6 @@ public class HeartActivityPresenter {
             newType = TYPE.RED;
             if (newType != currentType) {
                 beats++;
-                Log.e(TAG, "Beats ======   " + beats);
             }
         } else if (imgAvg > rollingAverage) {
             newType = TYPE.GREEN;
@@ -114,7 +129,7 @@ public class HeartActivityPresenter {
         long endTime = System.currentTimeMillis();
         double totalTimeInSecs = (endTime - startTime) / 1000d;
 
-        if (totalTimeInSecs >= 10) {
+        if (totalTimeInSecs >= 5) {
             double bps = (beats / totalTimeInSecs);
             int dpm = (int) (bps * 60d);
             if (dpm < 30 || dpm > 180) {
@@ -142,6 +157,7 @@ public class HeartActivityPresenter {
 
             heartM.setBeatsPerMinuteValue(beatsPerMinuteValue);
             heartActivity.bindHeartRate(heartM);
+            successCount++;
 
             startTime = System.currentTimeMillis();
             beats = 0;
