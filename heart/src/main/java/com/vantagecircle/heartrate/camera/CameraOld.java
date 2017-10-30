@@ -41,7 +41,7 @@ public class CameraOld implements CameraSupport {
                 this.mCamera = Camera.open();
                 setCamera();
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new RuntimeException("Interrupted while trying to open camera.", e);
             }
         }
         return this;
@@ -65,14 +65,16 @@ public class CameraOld implements CameraSupport {
                                 method.invoke(this.surfaceTexture);
                             }
                         } catch (Throwable th) {
-                            Log.e("TAG", th.getMessage());
+                            throw new RuntimeException("Interrupted while trying " +
+                                    "to get surface method.",
+                                    th.getCause());
                         }
                         this.surfaceTexture = null;
                     }
                 }
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Interrupted while trying to close camera.", e);
         }
     }
 
@@ -141,7 +143,7 @@ public class CameraOld implements CameraSupport {
             }
             this.mCamera.setParameters(parameters);
         } catch (Exception e) {
-            e.printStackTrace();
+            throw new RuntimeException("Interrupted while trying to setup camera.", e);
         }
     }
 
@@ -181,13 +183,10 @@ public class CameraOld implements CameraSupport {
         public void onPreviewFrame(byte[] data, Camera cam) {
             //pixel calculation done here
             if (data == null) throw new NullPointerException();
-
             Camera.Size size = cam.getParameters().getPreviewSize();
             if (size == null) throw new NullPointerException();
-
             int value = processingSupport.YUV420SPtoRedAvg(data, size.width, size.height);
             mCameraCallBack.onFrameCallback(value);
-
             cam.addCallbackBuffer(data);
         }
     };

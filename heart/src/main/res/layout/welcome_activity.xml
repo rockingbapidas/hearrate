@@ -2,8 +2,11 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools">
+
     <data class="com.vantagecircle.heartrate.databinding.WelcomeActivityBinding">
+
         <import type="android.view.View" />
+
         <variable
             name="welcomeHandlers"
             type="com.vantagecircle.heartrate.activity.handlers.WelcomeEventHandlers" />
@@ -20,8 +23,19 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:text="@string/check_your_heart_rate"
-            android:onClick="@{(view) -> welcomeHandlers.onCheckClick()}"/>
+            android:onClick="@{(view) -> welcomeHandlers.onCheckClick()}"
+            android:text="@string/check_your_heart_rate" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="350dp"
+            android:layout_marginTop="10dp">
+
+            <com.vantagecircle.heartrate.utils.DemoView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </LinearLayout>
+
 
     </LinearLayout>
 </layout>
