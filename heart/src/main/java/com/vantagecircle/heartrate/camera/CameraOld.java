@@ -20,22 +20,22 @@ public class CameraOld implements CameraSupport {
     private Camera mCamera;
     private PowerManager.WakeLock mWakeLock;
     private CameraCallBack mCameraCallBack;
-    private final Object object = new Object();
-    private SurfaceTexture surfaceTexture = null;
-    private ProcessingSupport processingSupport;
+    private final Object mObject = new Object();
+    private SurfaceTexture mSurfaceTexture = null;
+    private ProcessingSupport mProcessingSupport;
 
-    public CameraOld(Context mContext, ProcessingSupport processingSupport) {
+    public CameraOld(Context mContext, ProcessingSupport mProcessingSupport) {
         Log.e("TAG", "CameraOld Run");
         PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
         if (powerManager != null) {
             this.mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
         }
-        this.processingSupport = processingSupport;
+        this.mProcessingSupport = mProcessingSupport;
     }
 
     @Override
     public CameraSupport open() {
-        if (this.mCamera == null) {
+        if (mCamera == null) {
             try {
                 this.mWakeLock.acquire(10 * 60 * 1000L);
                 this.mCamera = Camera.open();
@@ -56,22 +56,7 @@ public class CameraOld implements CameraSupport {
                 this.mCamera.stopPreview();
                 this.mCamera.release();
                 this.mCamera = null;
-                synchronized (this.object) {
-                    if (this.surfaceTexture != null) {
-                        try {
-                            Method method = this.surfaceTexture.getClass()
-                                    .getMethod("release");
-                            if (method != null) {
-                                method.invoke(this.surfaceTexture);
-                            }
-                        } catch (Throwable th) {
-                            throw new RuntimeException("Interrupted while trying " +
-                                    "to get surface method.",
-                                    th.getCause());
-                        }
-                        this.surfaceTexture = null;
-                    }
-                }
+                releaseSurface();
             }
         } catch (Exception e) {
             throw new RuntimeException("Interrupted while trying to close camera.", e);
@@ -90,10 +75,10 @@ public class CameraOld implements CameraSupport {
 
     private void setCamera() {
         try {
-            if (this.mCamera == null) {
+            if (mCamera == null) {
                 return;
             }
-            Camera.Parameters parameters = this.mCamera.getParameters();
+            Camera.Parameters parameters = mCamera.getParameters();
 
             Camera.Size size = getSmallestPreviewSize(parameters);
             if (size != null) {
@@ -149,15 +134,33 @@ public class CameraOld implements CameraSupport {
 
     private SurfaceTexture surfaceTexture() {
         SurfaceTexture surfaceTexture;
-        synchronized (this.object) {
-            if (this.surfaceTexture != null) {
-                this.surfaceTexture.release();
-                this.surfaceTexture = null;
+        synchronized (this.mObject) {
+            if (this.mSurfaceTexture != null) {
+                this.mSurfaceTexture.release();
+                this.mSurfaceTexture = null;
             }
-            this.surfaceTexture = new SurfaceTexture(0);
-            surfaceTexture = this.surfaceTexture;
+            this.mSurfaceTexture = new SurfaceTexture(0);
+            surfaceTexture = this.mSurfaceTexture;
         }
         return surfaceTexture;
+    }
+
+    private void releaseSurface() {
+        synchronized (this.mObject) {
+            if (this.mSurfaceTexture != null) {
+                try {
+                    Method method = this.mSurfaceTexture.getClass().getMethod("release");
+                    if (method != null) {
+                        method.invoke(this.mSurfaceTexture);
+                    }
+                } catch (Throwable th) {
+                    throw new RuntimeException("Interrupted while trying " +
+                            "to get surface method.", th.getCause());
+                } finally {
+                    this.mSurfaceTexture = null;
+                }
+            }
+        }
     }
 
     private Camera.Size getSmallestPreviewSize(Camera.Parameters parameters) {
@@ -168,6 +171,7 @@ public class CameraOld implements CameraSupport {
                 if (result != null) {
                     if (i2 < result.width + result.height) {
                         //TODO
+                        //No need to any task here
                     }
                 }
                 result = size;
@@ -185,7 +189,7 @@ public class CameraOld implements CameraSupport {
             if (data == null) throw new NullPointerException();
             Camera.Size size = cam.getParameters().getPreviewSize();
             if (size == null) throw new NullPointerException();
-            int value = processingSupport.YUV420SPtoRedAvg(data, size.width, size.height);
+            int value = mProcessingSupport.YUV420SPtoRedAvg(data, size.width, size.height);
             mCameraCallBack.onFrameCallback(value);
             cam.addCallbackBuffer(data);
         }

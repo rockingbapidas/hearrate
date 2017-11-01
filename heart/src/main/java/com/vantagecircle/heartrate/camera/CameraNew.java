@@ -15,6 +15,7 @@ import android.media.ImageReader;
 import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
+import android.os.PowerManager;
 import android.support.annotation.NonNull;
 import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
@@ -47,12 +48,17 @@ public class CameraNew implements CameraSupport {
     private boolean mFlashSupported;
     private CameraCallBack mCameraCallBack;
     private ProcessingSupport processingSupport;
+    private PowerManager.WakeLock mWakeLock;
 
     public CameraNew(Context context, ProcessingSupport processingSupport) {
         Log.e("TAG", "CameraNew Run");
         this.mContext = context;
         this.mCameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
         this.processingSupport = processingSupport;
+        PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+        if (powerManager != null) {
+            this.mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
+        }
     }
 
     @Override
@@ -61,18 +67,19 @@ public class CameraNew implements CameraSupport {
             startBackgroundThread();
             setCameraOutputs();
             if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
-                throw new RuntimeException("Time out waiting to lock camera opening.");
+                throw new RuntimeException("Time out waiting to acquire lock while camera opening.");
             }
             if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) ==
                     PackageManager.PERMISSION_GRANTED) {
-                mCameraManager.openCamera(mCameraId, mStateCallback, mBackgroundHandler);
+                this.mWakeLock.acquire(10 * 60 * 1000L);
+                this.mCameraManager.openCamera(mCameraId, mStateCallback, mBackgroundHandler);
             } else {
-                throw new RuntimeException("Access camera need permission.");
+                throw new RuntimeException("Permission failed while access camera.");
             }
         } catch (CameraAccessException e) {
             e.printStackTrace();
         } catch (InterruptedException e) {
-            throw new RuntimeException("Interrupted while trying to lock camera opening.", e);
+            throw new RuntimeException("Interrupted while trying to camera opening.", e);
         }
         return this;
     }
@@ -80,23 +87,24 @@ public class CameraNew implements CameraSupport {
     @Override
     public void close() {
         try {
-            mCameraOpenCloseLock.acquire();
+            this.mCameraOpenCloseLock.acquire();
             if (null != mCaptureSession) {
-                mCaptureSession.close();
-                mCaptureSession = null;
+                this.mCaptureSession.close();
+                this.mCaptureSession = null;
             }
             if (null != mCameraDevice) {
-                mCameraDevice.close();
-                mCameraDevice = null;
+                this.mCameraDevice.close();
+                this.mCameraDevice = null;
             }
             if (null != mImageReader) {
-                mImageReader.close();
-                mImageReader = null;
+                this.mImageReader.close();
+                this.mImageReader = null;
             }
         } catch (InterruptedException e) {
-            throw new RuntimeException("Interrupted while trying to lock camera closing.", e);
+            throw new RuntimeException("Interrupted while trying to release and close camera.", e);
         } finally {
-            mCameraOpenCloseLock.release();
+            this.mWakeLock.release();
+            this.mCameraOpenCloseLock.release();
         }
         stopBackgroundThread();
     }
@@ -120,11 +128,13 @@ public class CameraNew implements CameraSupport {
                 if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
                     continue;
                 }
-                mImageReader = ImageReader.newInstance(176, 144, ImageFormat.YUV_420_888, 5);
-                mImageReader.setOnImageAvailableListener(mOnImageAvailableListener, mBackgroundHandler);
+                this.mImageReader = ImageReader.newInstance(176, 144,
+                        ImageFormat.YUV_420_888, 5);
+                this.mImageReader.setOnImageAvailableListener(mOnImageAvailableListener,
+                        mBackgroundHandler);
                 Boolean available = mCharacteristics.get(CameraCharacteristics.FLASH_INFO_AVAILABLE);
-                mFlashSupported = available == null ? false : available;
-                mCameraId = cameraId;
+                this.mFlashSupported = available == null ? false : available;
+                this.mCameraId = cameraId;
                 return;
             }
         } catch (CameraAccessException e) {
@@ -136,34 +146,34 @@ public class CameraNew implements CameraSupport {
         try {
             Surface imageSurface = mImageReader.getSurface();
             List<Surface> surfaceList = new ArrayList<>();
-            mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
-            mPreviewRequestBuilder.addTarget(imageSurface);
+            this.mPreviewRequestBuilder = mCameraDevice.createCaptureRequest(CameraDevice.TEMPLATE_PREVIEW);
+            this.mPreviewRequestBuilder.addTarget(imageSurface);
             surfaceList.add(imageSurface);
-            mCameraDevice.createCaptureSession(surfaceList, mSessionStateCallBack, null);
+            this.mCameraDevice.createCaptureSession(surfaceList, mSessionStateCallBack, null);
         } catch (CameraAccessException e) {
             e.printStackTrace();
         }
     }
 
     private void startBackgroundThread() {
-        mBackgroundThread = new HandlerThread("CameraBackground");
-        mBackgroundThread.start();
-        mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
+        this.mBackgroundThread = new HandlerThread("CameraBackground");
+        this.mBackgroundThread.start();
+        this.mBackgroundHandler = new Handler(mBackgroundThread.getLooper());
     }
 
     private void stopBackgroundThread() {
-        mBackgroundThread.quitSafely();
+        this.mBackgroundThread.quitSafely();
         try {
-            mBackgroundThread.join();
-            mBackgroundThread = null;
-            mBackgroundHandler = null;
+            this.mBackgroundThread.join();
+            this.mBackgroundThread = null;
+            this.mBackgroundHandler = null;
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
     }
 
     private void setAutoFlash(CaptureRequest.Builder requestBuilder) {
-        if (mFlashSupported) {
+        if (this.mFlashSupported) {
             requestBuilder.set(CaptureRequest.FLASH_MODE, CaptureRequest.FLASH_MODE_TORCH);
         }
     }
@@ -202,7 +212,8 @@ public class CameraNew implements CameraSupport {
                 mCaptureSession = session;
                 setAutoFlash(mPreviewRequestBuilder);
                 CaptureRequest mPreviewRequest = mPreviewRequestBuilder.build();
-                mCaptureSession.setRepeatingRequest(mPreviewRequest, null, mBackgroundHandler);
+                mCaptureSession.setRepeatingRequest(mPreviewRequest,
+                        null, mBackgroundHandler);
             } catch (CameraAccessException e) {
                 e.printStackTrace();
             }
@@ -220,15 +231,11 @@ public class CameraNew implements CameraSupport {
         public void onImageAvailable(ImageReader reader) {
             //pixel calculation done here
             Image image = reader.acquireLatestImage();
-            if (image != null) {
-                /*ByteBuffer buffer = image.getPlanes()[0].getBuffer();
-                byte[] data = new byte[buffer.remaining()];
-                buffer.get(data);*/
-                byte[] data = processingSupport.YUV_420_888toNV21(image);
-                int value = processingSupport.YUV420SPtoRedAvg(data, image.getWidth(), image.getHeight());
-                mCameraCallBack.onFrameCallback(value);
-                image.close();
-            }
+            if(image == null) throw new NullPointerException();
+            byte[] data = processingSupport.YUV_420_888toNV21(image);
+            int value = processingSupport.YUV420SPtoRedAvg(data, image.getWidth(), image.getHeight());
+            mCameraCallBack.onFrameCallback(value);
+            image.close();
         }
     };
 }
