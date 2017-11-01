@@ -48,6 +48,8 @@ public class HeartActivityPresenter {
     private HeartM heartM;
     private int errorCount = 0;
     private int successCount = 0;
+    private CountDownTimer countDownTimer;
+    private boolean isTimeRunning;
 
     public HeartActivityPresenter(HeartActivity heartActivity, CameraSupport cameraSupport) {
         this.heartActivity = heartActivity;
@@ -80,6 +82,10 @@ public class HeartActivityPresenter {
     public void stop() {
         if (cameraSupport.isCameraInUse()) {
             cameraSupport.close();
+            if (isTimeRunning) {
+                countDownTimer.cancel();
+                isTimeRunning = false;
+            }
         }
     }
 
@@ -175,13 +181,15 @@ public class HeartActivityPresenter {
     }
 
     private void prepareCountDownTimer() {
-        new CountDownTimer(10000, 1000) {
+        isTimeRunning = true;
+        countDownTimer = new CountDownTimer(20000, 500) {
 
             public void onTick(long millisUntilFinished) {
 
             }
 
             public void onFinish() {
+                isTimeRunning = false;
                 stop();
                 if (errorCount > successCount) {
                     Log.e(TAG, "Heart rate  pulse is inaccurate");
@@ -189,7 +197,8 @@ public class HeartActivityPresenter {
                     Log.e(TAG, "Heart rate pulse is accurate");
                 }
             }
-        }.start();
+        };
+        countDownTimer.start();
     }
 
     private void createGraph() {
