@@ -1,7 +1,10 @@
 package com.vantagecircle.heartrate.activity.presenter;
 
+import android.Manifest;
 import android.graphics.Typeface;
+import android.os.Build;
 import android.os.CountDownTimer;
+import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 
 import com.github.mikephil.charting.charts.LineChart;
@@ -18,7 +21,9 @@ import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.camera.CameraCallBack;
 import com.vantagecircle.heartrate.camera.CameraSupport;
 import com.vantagecircle.heartrate.data.HeartM;
+import com.vantagecircle.heartrate.utils.Constant;
 import com.vantagecircle.heartrate.utils.TYPE;
+import com.vantagecircle.heartrate.utils.ToolsUtils;
 
 import java.util.ArrayList;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -56,37 +61,85 @@ public class HeartActivityPresenter {
         this.cameraSupport = cameraSupport;
     }
 
-    public void start() {
-        errorCount = 0;
-        successCount = 0;
-
-        if (heartM != null) {
-            heartM.setBeatsPerMinuteValue("-----");
-            heartActivity.bindHeartRate(heartM);
-        } else {
-            heartM = new HeartM();
-            heartM.setBeatsPerMinuteValue("-----");
-            heartActivity.bindHeartRate(heartM);
-        }
-
-        startTime = System.currentTimeMillis();
-        prepareCountDownTimer();
-        cameraSupport.open().setPreviewCallBack(new CameraCallBack() {
-            @Override
-            public void onFrameCallback(int pixelAverageCount) {
-                calculateHeartRate(pixelAverageCount);
+    public void askPermission(){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (ToolsUtils.getInstance().isHasPermissions(heartActivity, Manifest.permission.CAMERA)) {
+                Log.d(TAG, "Permission already accepted");
+            } else {
+                ActivityCompat.requestPermissions(heartActivity, new String[]{Manifest.permission.CAMERA},
+                        Constant.REQUEST_CAMERA_PERMISSION);
             }
-        });
+        } else {
+            Log.d(TAG, "No need permission");
+        }
+    }
+
+    public void handleClick() {
+        if (heartM != null && heartM.isStarted()) {
+            stop();
+        } else {
+            start();
+        }
+    }
+
+    private void start() {
+        if (!cameraSupport.isCameraInUse()) {
+            errorCount = 0;
+            successCount = 0;
+            if (heartM != null) {
+                heartM.setBeatsPerMinuteValue("-----");
+                heartM.setStarted(true);
+                heartActivity.bindHeartRate(heartM);
+            } else {
+                heartM = new HeartM();
+                heartM.setBeatsPerMinuteValue("-----");
+                heartM.setStarted(true);
+                heartActivity.bindHeartRate(heartM);
+            }
+            startTime = System.currentTimeMillis();
+            startTimer();
+            cameraSupport.open().setPreviewCallBack(new CameraCallBack() {
+                @Override
+                public void onFrameCallback(int pixelAverageCount) {
+                    calculateHeartRate(pixelAverageCount);
+                }
+            });
+        }
     }
 
     public void stop() {
         if (cameraSupport.isCameraInUse()) {
             cameraSupport.close();
+            if (heartM != null) {
+                heartM.setStarted(false);
+                heartActivity.bindHeartRate(heartM);
+            }
             if (isTimeRunning) {
                 countDownTimer.cancel();
                 isTimeRunning = false;
             }
         }
+    }
+
+    private void startTimer() {
+        isTimeRunning = true;
+        countDownTimer = new CountDownTimer(20000, 500) {
+
+            public void onTick(long millisUntilFinished) {
+
+            }
+
+            public void onFinish() {
+                isTimeRunning = false;
+                stop();
+                if (errorCount > successCount) {
+                    Log.e(TAG, "Heart rate  pulse is inaccurate");
+                } else {
+                    Log.e(TAG, "Heart rate pulse is accurate");
+                }
+            }
+        };
+        countDownTimer.start();
     }
 
     private void calculateHeartRate(int imgAvg) {
@@ -178,27 +231,6 @@ public class HeartActivityPresenter {
             }
             processing.set(false);
         }
-    }
-
-    private void prepareCountDownTimer() {
-        isTimeRunning = true;
-        countDownTimer = new CountDownTimer(20000, 500) {
-
-            public void onTick(long millisUntilFinished) {
-
-            }
-
-            public void onFinish() {
-                isTimeRunning = false;
-                stop();
-                if (errorCount > successCount) {
-                    Log.e(TAG, "Heart rate  pulse is inaccurate");
-                } else {
-                    Log.e(TAG, "Heart rate pulse is accurate");
-                }
-            }
-        };
-        countDownTimer.start();
     }
 
     private void createGraph() {
