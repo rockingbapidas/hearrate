@@ -1,12 +1,9 @@
 package com.vantagecircle.heartrate.activity.ui;
 
-import android.Manifest;
 import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
-import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -19,7 +16,6 @@ import com.vantagecircle.heartrate.activity.presenter.HeartActivityPresenter;
 import com.vantagecircle.heartrate.data.HeartM;
 import com.vantagecircle.heartrate.databinding.ActivityMainBinding;
 import com.vantagecircle.heartrate.utils.Constant;
-import com.vantagecircle.heartrate.utils.ToolsUtils;
 
 import javax.inject.Inject;
 
@@ -54,16 +50,7 @@ public class HeartActivity extends BaseActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        if (requestCode == Constant.REQUEST_CAMERA_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "Permission granted");
-            } else {
-                Log.d(TAG, "Permission not granted");
-                Toast.makeText(this, "You have to give permission " +
-                        "to access this window", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        }
+        heartActivityPresenter.checkPermission(requestCode, permissions, grantResults);
     }
 
     //bind heart rate to the view
@@ -75,7 +62,6 @@ public class HeartActivity extends BaseActivity {
     @Override
     protected void onPause() {
         super.onPause();
-        heartActivityPresenter.stop();
     }
 
     @Override

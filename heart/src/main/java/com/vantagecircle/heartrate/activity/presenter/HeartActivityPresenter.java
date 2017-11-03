@@ -1,11 +1,14 @@
 package com.vantagecircle.heartrate.activity.presenter;
 
 import android.Manifest;
+import android.content.pm.PackageManager;
 import android.graphics.Typeface;
 import android.os.Build;
 import android.os.CountDownTimer;
+import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Legend;
@@ -20,6 +23,8 @@ import com.vantagecircle.heartrate.R;
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.camera.CameraCallBack;
 import com.vantagecircle.heartrate.camera.CameraSupport;
+import com.vantagecircle.heartrate.core.HeartSupport;
+import com.vantagecircle.heartrate.core.PulseListener;
 import com.vantagecircle.heartrate.data.HeartM;
 import com.vantagecircle.heartrate.utils.Constant;
 import com.vantagecircle.heartrate.utils.TYPE;
@@ -35,38 +40,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class HeartActivityPresenter {
     private final String TAG = HeartActivityPresenter.class.getSimpleName();
     private HeartActivity heartActivity;
-    private CameraSupport cameraSupport;
-
-    private int averageIndex = 0;
-    private final int averageArraySize = 4;
-    private final int[] averageArray = new int[averageArraySize];
-
-    private int beatsIndex = 0;
-    private final int beatsArraySize = 3;
-    private final int[] beatsArray = new int[beatsArraySize];
-
-    private double beats = 0;
-    private final AtomicBoolean processing = new AtomicBoolean(false);
-    private long startTime = 0;
-    private TYPE currentType = TYPE.GREEN;
-
+    private HeartSupport heartSupport;
     private HeartM heartM;
-    private int errorCount = 0;
-    private int successCount = 0;
-    private CountDownTimer countDownTimer;
-    private boolean isTimeRunning;
 
-    public HeartActivityPresenter(HeartActivity heartActivity, CameraSupport cameraSupport) {
+    public HeartActivityPresenter(HeartActivity heartActivity, HeartSupport heartSupport) {
         this.heartActivity = heartActivity;
-        this.cameraSupport = cameraSupport;
+        this.heartSupport = heartSupport;
     }
 
-    public void askPermission(){
+    public void askPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ToolsUtils.getInstance().isHasPermissions(heartActivity, Manifest.permission.CAMERA)) {
+            if (ToolsUtils.getInstance().isHasPermissions(heartActivity,
+                    Manifest.permission.CAMERA)) {
                 Log.d(TAG, "Permission already accepted");
             } else {
-                ActivityCompat.requestPermissions(heartActivity, new String[]{Manifest.permission.CAMERA},
+                ActivityCompat.requestPermissions(heartActivity,
+                        new String[]{Manifest.permission.CAMERA},
                         Constant.REQUEST_CAMERA_PERMISSION);
             }
         } else {
@@ -74,206 +63,61 @@ public class HeartActivityPresenter {
         }
     }
 
+    public void checkPermission(int requestCode, String[] permissions, int[] grantResults) {
+        if (requestCode == Constant.REQUEST_CAMERA_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                Log.d(TAG, "Permission granted");
+            } else {
+                Log.d(TAG, "Permission not granted");
+                Toast.makeText(heartActivity, "You have to give permission " +
+                        "to access this window", Toast.LENGTH_SHORT).show();
+                heartActivity.finish();
+            }
+        }
+    }
+
     public void handleClick() {
         if (heartM != null && heartM.isStarted()) {
+            heartM.setStarted(false);
+            heartActivity.bindHeartRate(heartM);
             stop();
         } else {
+            if (heartM != null) {
+                heartM.setStarted(true);
+            } else {
+                heartM = new HeartM();
+                heartM.setStarted(true);
+            }
+            heartActivity.bindHeartRate(heartM);
             start();
         }
     }
 
     private void start() {
-        if (!cameraSupport.isCameraInUse()) {
-            errorCount = 0;
-            successCount = 0;
-            if (heartM != null) {
-                heartM.setBeatsPerMinuteValue("-----");
-                heartM.setStarted(true);
-                heartActivity.bindHeartRate(heartM);
-            } else {
-                heartM = new HeartM();
-                heartM.setBeatsPerMinuteValue("-----");
-                heartM.setStarted(true);
-                heartActivity.bindHeartRate(heartM);
+        heartSupport.startPulseCheck(new PulseListener() {
+            @Override
+            public void OnPulseDetected(int success) {
+                Log.e(TAG, "OnPulseDetected == " + success);
             }
-            startTime = System.currentTimeMillis();
-            startTimer();
-            cameraSupport.open().setPreviewCallBack(new CameraCallBack() {
-                @Override
-                public void onFrameCallback(int pixelAverageCount) {
-                    calculateHeartRate(pixelAverageCount);
-                }
-            });
-        }
+
+            @Override
+            public void OnPulseDetectFailed(int failed) {
+                Log.e(TAG, "OnPulseDetectFailed == " + failed);
+            }
+
+            @Override
+            public void OnPulseResult(String pulse) {
+                Log.e(TAG, "OnPulseResult == " + pulse);
+            }
+
+            @Override
+            public void OnPulseCheckStop() {
+                Log.e(TAG, "OnPulseCheckStop == ");
+            }
+        }).setPulseTimeLimit(20000, 1000);
     }
 
-    public void stop() {
-        if (cameraSupport.isCameraInUse()) {
-            cameraSupport.close();
-            if (heartM != null) {
-                heartM.setStarted(false);
-                heartActivity.bindHeartRate(heartM);
-            }
-            if (isTimeRunning) {
-                countDownTimer.cancel();
-                isTimeRunning = false;
-            }
-        }
-    }
-
-    private void startTimer() {
-        isTimeRunning = true;
-        countDownTimer = new CountDownTimer(20000, 500) {
-
-            public void onTick(long millisUntilFinished) {
-
-            }
-
-            public void onFinish() {
-                isTimeRunning = false;
-                stop();
-                if (errorCount > successCount) {
-                    Log.e(TAG, "Heart rate  pulse is inaccurate");
-                } else {
-                    Log.e(TAG, "Heart rate pulse is accurate");
-                }
-            }
-        };
-        countDownTimer.start();
-    }
-
-    private void calculateHeartRate(int imgAvg) {
-        if (!processing.compareAndSet(false, true)) {
-            return;
-        }
-
-        if (imgAvg == 0 || imgAvg >= 255) {
-            heartM.setDetectHeartRate(false);
-            heartActivity.bindHeartRate(heartM);
-
-            errorCount++;
-            processing.set(false);
-        } else if (imgAvg < 170) {
-            heartM.setDetectHeartRate(false);
-            heartActivity.bindHeartRate(heartM);
-
-            errorCount++;
-            processing.set(false);
-        } else {
-            heartM.setDetectHeartRate(true);
-            heartActivity.bindHeartRate(heartM);
-
-            successCount++;
-            int averageArrayAvg = 0;
-            int averageArrayCnt = 0;
-            for (int anAverageArray : averageArray) {
-                if (anAverageArray > 0) {
-                    averageArrayAvg += anAverageArray;
-                    averageArrayCnt++;
-                }
-            }
-
-            int rollingAverage = (averageArrayCnt > 0) ? (averageArrayAvg / averageArrayCnt) : 0;
-            TYPE newType = currentType;
-            if (imgAvg < rollingAverage) {
-                newType = TYPE.RED;
-                if (newType != currentType) {
-                    beats++;
-                }
-            } else if (imgAvg > rollingAverage) {
-                newType = TYPE.GREEN;
-            }
-
-            if (averageIndex == averageArraySize)
-                averageIndex = 0;
-            averageArray[averageIndex] = imgAvg;
-            averageIndex++;
-
-            // Transitioned from one state to another to the same
-            if (newType != currentType) {
-                currentType = newType;
-            }
-
-            long endTime = System.currentTimeMillis();
-            double totalTimeInSecs = (endTime - startTime) / 1000d;
-
-            if (totalTimeInSecs >= 10) {
-
-                double bps = (beats / totalTimeInSecs);
-                int dpm = (int) (bps * 60d);
-                if (dpm < 30 || dpm > 180) {
-                    startTime = System.currentTimeMillis();
-                    beats = 0;
-                    processing.set(false);
-                    return;
-                }
-
-                if (beatsIndex == beatsArraySize)
-                    beatsIndex = 0;
-                beatsArray[beatsIndex] = dpm;
-                beatsIndex++;
-
-                int beatsArrayAvg = 0;
-                int beatsArrayCnt = 0;
-                for (int aBeatsArray : beatsArray) {
-                    if (aBeatsArray > 0) {
-                        beatsArrayAvg += aBeatsArray;
-                        beatsArrayCnt++;
-                    }
-                }
-
-                int beatsAvg = (beatsArrayAvg / beatsArrayCnt);
-                String beatsPerMinuteValue = String.valueOf(beatsAvg);
-                heartM.setBeatsPerMinuteValue(beatsPerMinuteValue);
-                heartActivity.bindHeartRate(heartM);
-                startTime = System.currentTimeMillis();
-                beats = 0;
-            }
-            processing.set(false);
-        }
-    }
-
-    private void createGraph() {
-        LineChart mChart = heartActivity.findViewById(R.id.chart);
-        mChart.getDescription().setEnabled(false);
-        mChart.setDrawGridBackground(false);
-        mChart.setData(generateLineData());
-        mChart.animateX(3000);
-        mChart.setPinchZoom(false);
-        mChart.setDoubleTapToZoomEnabled(false);
-
-        Typeface tf = Typeface.createFromAsset(heartActivity.getAssets(),
-                "OpenSans-Light.ttf");
-        Legend l = mChart.getLegend();
-        l.setTypeface(tf);
-
-        YAxis leftAxis = mChart.getAxisLeft();
-        leftAxis.setTypeface(tf);
-        leftAxis.setAxisMaximum(1.2f);
-        leftAxis.setAxisMinimum(-1.2f);
-
-        mChart.getAxisRight().setEnabled(false);
-
-        XAxis xAxis = mChart.getXAxis();
-        xAxis.setEnabled(false);
-    }
-
-    private LineData generateLineData() {
-        Typeface tf = Typeface.createFromAsset(heartActivity.getAssets(),
-                "OpenSans-Light.ttf");
-        ArrayList<ILineDataSet> sets = new ArrayList<>();
-
-        LineDataSet ds = new LineDataSet(FileUtils
-                .loadEntriesFromAssets(heartActivity.getAssets(), "cosine.txt"),
-                "Cosine function");
-
-        ds.setLineWidth(3f);
-        ds.setDrawCircles(false);
-        ds.setColor(ColorTemplate.VORDIPLOM_COLORS[0]);
-
-        sets.add(ds);
-        LineData d = new LineData(sets);
-        d.setValueTypeface(tf);
-        return d;
+    private void stop() {
+        heartSupport.stopPulseCheck();
     }
 }
