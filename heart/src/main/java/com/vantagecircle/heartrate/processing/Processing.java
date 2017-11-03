@@ -5,9 +5,13 @@ import android.os.Build;
 import android.support.annotation.RequiresApi;
 import android.util.Log;
 
+import com.vantagecircle.heartrate.core.HeartRate;
+
 import java.nio.ByteBuffer;
 
 public class Processing implements ProcessingSupport {
+    private static final String TAG = Processing.class.getSimpleName();
+
     @Override
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public byte[] YUV_420_888toNV21(Image image) {
@@ -35,7 +39,7 @@ public class Processing implements ProcessingSupport {
         if (yuv420sp == null) return 0;
         final int frameSize = width * height;
         int sum = YUV420SPtoRedSum(yuv420sp, width, height);
-        //Log.e("TAG", "Red Avg " + sum / frameSize);
+        //Log.e(TAG, "Red Avg " + sum / frameSize);
         return (sum / frameSize);
     }
 
@@ -73,7 +77,7 @@ public class Processing implements ProcessingSupport {
                 sum += red;
             }
         }
-        //Log.e("TAG", "Red sum " + sum);
+        //Log.e(TAG, "Red sum " + sum);
         return sum;
     }
 }

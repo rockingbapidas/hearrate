@@ -8,6 +8,8 @@ import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.camera.CameraNew;
 import com.vantagecircle.heartrate.camera.CameraOld;
 import com.vantagecircle.heartrate.camera.CameraSupport;
+import com.vantagecircle.heartrate.core.HeartRate;
+import com.vantagecircle.heartrate.core.HeartSupport;
 import com.vantagecircle.heartrate.processing.Processing;
 import com.vantagecircle.heartrate.processing.ProcessingSupport;
 import com.vantagecircle.heartrate.scope.ActivityScope;
@@ -30,14 +32,14 @@ public class HeartActivityModule {
     @Provides
     @ActivityScope
     HeartActivity
-    provideHeartActivity(){
+    provideHeartActivity() {
         return heartActivity;
     }
 
     @Provides
     @ActivityScope
     ProcessingSupport
-    provideProcessingSupport(){
+    provideProcessingSupport() {
         return new Processing();
     }
 
@@ -45,7 +47,7 @@ public class HeartActivityModule {
     @ActivityScope
     CameraSupport
     provideCameraSupport(HeartActivity heartActivity, ProcessingSupport processingSupport) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP){
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             return new CameraNew(heartActivity, processingSupport);
         } else {
             return new CameraOld(heartActivity, processingSupport);
@@ -54,8 +56,16 @@ public class HeartActivityModule {
 
     @Provides
     @ActivityScope
+    HeartSupport
+    provideHeartSupport(CameraSupport cameraSupport) {
+        return new HeartRate(cameraSupport);
+    }
+
+
+    @Provides
+    @ActivityScope
     HeartActivityPresenter
-    provideHeartActivityPresenter(HeartActivity heartActivity, CameraSupport cameraSupport){
-        return new HeartActivityPresenter(heartActivity, cameraSupport);
+    provideHeartActivityPresenter(HeartActivity heartActivity, HeartSupport heartSupport) {
+        return new HeartActivityPresenter(heartActivity, heartSupport);
     }
 }

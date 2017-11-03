@@ -22,9 +22,9 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Surface;
 
+import com.vantagecircle.heartrate.core.HeartSupport;
 import com.vantagecircle.heartrate.processing.ProcessingSupport;
 
-import java.nio.ByteBuffer;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
@@ -46,9 +46,10 @@ public class CameraNew implements CameraSupport {
     private CaptureRequest.Builder mPreviewRequestBuilder;
     private String mCameraId;
     private boolean mFlashSupported;
+    private PowerManager.WakeLock mWakeLock;
+
     private CameraCallBack mCameraCallBack;
     private ProcessingSupport processingSupport;
-    private PowerManager.WakeLock mWakeLock;
 
     public CameraNew(Context context, ProcessingSupport processingSupport) {
         Log.e("TAG", "CameraNew Run");
@@ -234,7 +235,7 @@ public class CameraNew implements CameraSupport {
             if (image != null) {
                 byte[] data = processingSupport.YUV_420_888toNV21(image);
                 int value = processingSupport.YUV420SPtoRedAvg(data, image.getWidth(), image.getHeight());
-                mCameraCallBack.onFrameCallback(value);
+                mCameraCallBack.OnPixelAverage(value);
                 image.close();
             }
         }
