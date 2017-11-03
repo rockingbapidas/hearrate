@@ -3,11 +3,11 @@ package com.vantagecircle.heartrate.processing;
 import android.media.Image;
 import android.os.Build;
 import android.support.annotation.RequiresApi;
+import android.util.Log;
 
 import java.nio.ByteBuffer;
 
 public class Processing implements ProcessingSupport {
-
     @Override
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public byte[] YUV_420_888toNV21(Image image) {
@@ -35,9 +35,9 @@ public class Processing implements ProcessingSupport {
         if (yuv420sp == null) return 0;
         final int frameSize = width * height;
         int sum = YUV420SPtoRedSum(yuv420sp, width, height);
+        //Log.e("TAG", "Red Avg " + sum / frameSize);
         return (sum / frameSize);
     }
-
 
     private int YUV420SPtoRedSum(byte[] yuv420sp, int width, int height) {
         if (yuv420sp == null) return 0;
@@ -56,17 +56,24 @@ public class Processing implements ProcessingSupport {
                 int r = (y1192 + 1634 * v);
                 int g = (y1192 - 833 * v - 400 * u);
                 int b = (y1192 + 2066 * u);
-                if (r < 0) r = 0;
-                else if (r > 262143) r = 262143;
-                if (g < 0) g = 0;
-                else if (g > 262143) g = 262143;
-                if (b < 0) b = 0;
-                else if (b > 262143) b = 262143;
+                if (r < 0)
+                    r = 0;
+                else if (r > 262143)
+                    r = 262143;
+                if (g < 0)
+                    g = 0;
+                else if (g > 262143)
+                    g = 262143;
+                if (b < 0)
+                    b = 0;
+                else if (b > 262143)
+                    b = 262143;
                 int pixel = 0xff000000 | ((r << 6) & 0xff0000) | ((g >> 2) & 0xff00) | ((b >> 10) & 0xff);
                 int red = (pixel >> 16) & 0xff;
                 sum += red;
             }
         }
+        //Log.e("TAG", "Red sum " + sum);
         return sum;
     }
 }

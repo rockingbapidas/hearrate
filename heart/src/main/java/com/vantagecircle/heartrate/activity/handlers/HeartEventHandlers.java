@@ -12,20 +12,12 @@ import com.vantagecircle.heartrate.activity.presenter.HeartActivityPresenter;
 public class HeartEventHandlers {
     private final static String TAG = HeartEventHandlers.class.getSimpleName();
     private HeartActivityPresenter heartActivityPresenter;
-    public ObservableField<Boolean> isStarted = new ObservableField<>(false);
 
     public HeartEventHandlers(HeartActivityPresenter heartActivityPresenter) {
-        Log.d(TAG, "HeartEventHandlers");
         this.heartActivityPresenter = heartActivityPresenter;
     }
 
     public void onStartClick() {
-        if (isStarted.get()) {
-            isStarted.set(false);
-            heartActivityPresenter.stop();
-        } else {
-            isStarted.set(true);
-            heartActivityPresenter.start();
-        }
+        heartActivityPresenter.handleClick();
     }
 }

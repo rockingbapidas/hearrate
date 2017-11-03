@@ -12,6 +12,7 @@ import com.vantagecircle.heartrate.BR;
 public class HeartM extends BaseObservable  {
     private String beatsPerMinuteValue;
     private boolean isDetectHeartRate;
+    private boolean isStarted;
 
     @Bindable
     public String getBeatsPerMinuteValue() {
@@ -31,5 +32,15 @@ public class HeartM extends BaseObservable  {
     public void setDetectHeartRate(boolean detectHeartRate) {
         isDetectHeartRate = detectHeartRate;
         notifyPropertyChanged(BR.detectHeartRate);
+    }
+
+    @Bindable
+    public boolean isStarted() {
+        return isStarted;
+    }
+
+    public void setStarted(boolean started) {
+        isStarted = started;
+        notifyPropertyChanged(BR.started);
     }
 }

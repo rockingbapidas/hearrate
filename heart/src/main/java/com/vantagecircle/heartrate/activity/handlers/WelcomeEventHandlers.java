@@ -15,12 +15,10 @@ public class WelcomeEventHandlers {
     private WelcomeActivityPresenter welcomeActivityPresenter;
 
     public WelcomeEventHandlers(WelcomeActivityPresenter welcomeActivityPresenter) {
-        Log.d(TAG, "WelcomeEventHandlers");
         this.welcomeActivityPresenter = welcomeActivityPresenter;
     }
 
     public void onCheckClick() {
-        Log.d(TAG, "onCheckClick");
         welcomeActivityPresenter.createUser(new UserM("0944", "Bapi Das"));
     }
 }

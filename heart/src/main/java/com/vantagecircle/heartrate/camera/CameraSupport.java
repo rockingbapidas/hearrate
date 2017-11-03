@@ -8,4 +8,5 @@ public interface CameraSupport {
     CameraSupport open();
     void close();
     void setPreviewCallBack(CameraCallBack callBack);
+    boolean isCameraInUse();
 }

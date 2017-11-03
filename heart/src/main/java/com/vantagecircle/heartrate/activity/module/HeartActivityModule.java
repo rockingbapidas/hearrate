@@ -24,7 +24,6 @@ public class HeartActivityModule {
     private HeartActivity heartActivity;
 
     public HeartActivityModule(HeartActivity heartActivity) {
-        Log.d(TAG, "HeartActivityModule");
         this.heartActivity = heartActivity;
     }
 

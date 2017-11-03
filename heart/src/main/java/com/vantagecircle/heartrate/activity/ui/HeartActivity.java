@@ -39,7 +39,6 @@ public class HeartActivity extends BaseActivity {
 
     @Override
     protected void setupActivityComponent() {
-        Log.d(TAG, "setupActivityComponent");
         HeartApplication.get(this)
                 .getUserComponent()
                 .plus(new HeartActivityModule(this))
@@ -49,16 +48,7 @@ public class HeartActivity extends BaseActivity {
     @Override
     protected void init() {
         super.init();
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ToolsUtils.getInstance().isHasPermissions(this, Manifest.permission.CAMERA)) {
-                Log.d(TAG, "Permission already accepted");
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
-                        Constant.REQUEST_CAMERA_PERMISSION);
-            }
-        } else {
-            Log.d(TAG, "No need permission");
-        }
+        heartActivityPresenter.askPermission();
     }
 
     @Override
@@ -69,15 +59,23 @@ public class HeartActivity extends BaseActivity {
                 Log.d(TAG, "Permission granted");
             } else {
                 Log.d(TAG, "Permission not granted");
-                Toast.makeText(this, "You have to give permission to access this window",
-                        Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "You have to give permission " +
+                        "to access this window", Toast.LENGTH_SHORT).show();
                 finish();
             }
         }
     }
 
+    //bind heart rate to the view
     public void bindHeartRate(HeartM heartM) {
-        binding.setHeart(heartM);
+        if (heartM != null)
+            binding.setHeart(heartM);
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        heartActivityPresenter.stop();
     }
 
     @Override
