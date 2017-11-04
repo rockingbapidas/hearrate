@@ -111,7 +111,7 @@ public class CameraNew implements CameraSupport {
     }
 
     @Override
-    public void setPreviewCallBack(CameraCallBack callBack) {
+    public void setOnPreviewListener(CameraCallBack callBack) {
         this.mCameraCallBack = callBack;
     }
 

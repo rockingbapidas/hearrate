@@ -78,46 +78,55 @@ public class HeartActivityPresenter {
 
     public void handleClick() {
         if (heartM != null && heartM.isStarted()) {
+            heartSupport.stopPulseCheck();
+
             heartM.setStarted(false);
             heartActivity.bindHeartRate(heartM);
-            stop();
         } else {
             if (heartM != null) {
                 heartM.setStarted(true);
+                heartM.setBeatsPerMinuteValue("-----");
             } else {
                 heartM = new HeartM();
                 heartM.setStarted(true);
+                heartM.setBeatsPerMinuteValue("-----");
             }
             heartActivity.bindHeartRate(heartM);
+
             start();
         }
     }
 
     private void start() {
-        heartSupport.startPulseCheck(new PulseListener() {
-            @Override
-            public void OnPulseDetected(int success) {
-                Log.e(TAG, "OnPulseDetected == " + success);
-            }
+        heartSupport.setPulseTimeLimit(20000, 1000)
+                .startPulseCheck(new PulseListener() {
+                    @Override
+                    public void OnPulseDetected(int success) {
+                        Log.e(TAG, "OnPulseDetected == " + success);
+                        heartM.setDetectHeartRate(true);
+                        heartActivity.bindHeartRate(heartM);
+                    }
 
-            @Override
-            public void OnPulseDetectFailed(int failed) {
-                Log.e(TAG, "OnPulseDetectFailed == " + failed);
-            }
+                    @Override
+                    public void OnPulseDetectFailed(int failed) {
+                        Log.e(TAG, "OnPulseDetectFailed == " + failed);
+                        heartM.setDetectHeartRate(false);
+                        heartActivity.bindHeartRate(heartM);
+                    }
 
-            @Override
-            public void OnPulseResult(String pulse) {
-                Log.e(TAG, "OnPulseResult == " + pulse);
-            }
+                    @Override
+                    public void OnPulseResult(String pulse) {
+                        Log.e(TAG, "OnPulseResult == " + pulse);
+                        heartM.setBeatsPerMinuteValue(pulse);
+                        heartActivity.bindHeartRate(heartM);
+                    }
 
-            @Override
-            public void OnPulseCheckStop() {
-                Log.e(TAG, "OnPulseCheckStop == ");
-            }
-        }).setPulseTimeLimit(20000, 1000);
-    }
-
-    private void stop() {
-        heartSupport.stopPulseCheck();
+                    @Override
+                    public void OnPulseCheckStop() {
+                        Log.e(TAG, "OnPulseCheckStop == ");
+                        heartM.setStarted(false);
+                        heartActivity.bindHeartRate(heartM);
+                    }
+                });
     }
 }
