@@ -1,43 +1,48 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'com.jfrog.bintray'
+apply plugin: 'com.github.dcendents.android-maven'
+
+bintray {
+    user = 'siteadmin'
+    key = '9da9f11a62a1f5183fe187dde419779e449fbd48'
+    pkg {
+        repo = 'Vantage_Fit_Heart_Rate'
+        name = 'com.vantagecircle.heartrate'
+
+        version {
+            name = '1.0.0'
+            desc = 'Fresh Project'
+            userOrg = 'vantagecircle'
+            released = new Date()
+            vcsTag = '1.0.0'
+        }
+
+        licenses = ['Apache-2.0']
+        vcsUrl = 'https://Somir@bitbucket.org/Somir/HeartRate.git'
+        websiteUrl = 'https://bitbucket.org/Somir/HeartRate'
+    }
+    configurations = ['archives']
+}
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        applicationId rootProject.ext.applicationId
+        group = 'com.vantagecircle.heartrate'
+        version = '1.0.0'
 
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
 
-        versionCode rootProject.ext.versionCode
-        versionName rootProject.ext.versionName
-
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-    signingConfigs {
-        release {
-            keyAlias rootProject.ext.keyAlias
-            keyPassword rootProject.ext.keyPassword
-            storePassword rootProject.ext.storePassword
-            //storeFile file('I:/Android_Projects/HeartRate/heart_rate_key.jks')
-            storeFile file('/Users/bapidas/AndroidStudioProjects/HeartRate/heart_rate_key.jks')
-        }
-    }
+
     buildTypes {
-        debug {
-            minifyEnabled false
-            shrinkResources false
-            useProguard false
-            debuggable true
-        }
         release {
-            minifyEnabled true
-            shrinkResources true
-            useProguard true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
         }
     }
     dataBinding {
