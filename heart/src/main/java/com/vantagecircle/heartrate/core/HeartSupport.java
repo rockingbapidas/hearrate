@@ -6,7 +6,7 @@ package com.vantagecircle.heartrate.core;
 
 public interface HeartSupport {
     HeartSupport startPulseCheck(PulseListener pulseListener);
-    void setPulseTimeLimit(long timeLimit, long countInterval);
+    HeartSupport setPulseTimeLimit(long timeLimit, long countInterval);
     boolean isTimerRunning();
     void stopPulseCheck();
 }

@@ -13,8 +13,9 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Created by bapidas on 03/11/17.
  */
 
-public class HeartRate implements HeartSupport {
+public class HeartRate implements HeartSupport, CameraCallBack {
     private static final String TAG = HeartRate.class.getSimpleName();
+
     private CameraSupport cameraSupport;
     private PulseListener pulseListener;
 
@@ -51,12 +52,7 @@ public class HeartRate implements HeartSupport {
             successCount = 0;
             startTime = System.currentTimeMillis();
             startTimer();
-            cameraSupport.open().setPreviewCallBack(new CameraCallBack() {
-                @Override
-                public void OnPixelAverage(int pixelAverage) {
-                    calculatePulse(pixelAverage);
-                }
-            });
+            cameraSupport.open().setOnPreviewListener(this);
         } else {
             throw new RuntimeException("Camera is already in use state");
         }
@@ -64,14 +60,8 @@ public class HeartRate implements HeartSupport {
     }
 
     @Override
-    public void setPulseTimeLimit(long timeLimit, long countInterval) {
-        this.timeLimit = timeLimit;
-        this.countInterval = countInterval;
-    }
-
-    @Override
-    public boolean isTimerRunning() {
-        return isTimeRunning;
+    public void OnPixelAverage(int pixelAverage) {
+        calculatePulse(pixelAverage);
     }
 
     @Override
@@ -88,8 +78,21 @@ public class HeartRate implements HeartSupport {
         }
     }
 
+    @Override
+    public HeartSupport setPulseTimeLimit(long timeLimit, long countInterval) {
+        this.timeLimit = timeLimit;
+        this.countInterval = countInterval;
+        return this;
+    }
+
+    @Override
+    public boolean isTimerRunning() {
+        return isTimeRunning;
+    }
+
     private void startTimer() {
         if (timeLimit != 0 && countInterval != 0) {
+            Log.e(TAG, "Timer started");
             countDownTimer = new CountDownTimer(timeLimit, countInterval) {
 
                 public void onTick(long millisUntilFinished) {
@@ -97,11 +100,11 @@ public class HeartRate implements HeartSupport {
                 }
 
                 public void onFinish() {
+                    Log.e(TAG, "Timer finish");
                     isTimeRunning = false;
                     stopPulseCheck();
                 }
-            };
-            countDownTimer.start();
+            }.start();
         }
     }
 
