@@ -50,7 +50,7 @@ public class HeartActivity extends BaseActivity {
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        heartActivityPresenter.checkPermission(requestCode, permissions, grantResults);
+        heartActivityPresenter.checkPermission(requestCode, grantResults);
     }
 
     //bind heart rate to the view

@@ -1,7 +1,6 @@
 package com.vantagecircle.heartrate.core;
 
 import android.os.CountDownTimer;
-import android.util.Log;
 
 import com.vantagecircle.heartrate.camera.CameraCallBack;
 import com.vantagecircle.heartrate.camera.CameraSupport;
@@ -17,10 +16,10 @@ public class HeartRate implements HeartSupport, CameraCallBack {
     private static final String TAG = HeartRate.class.getSimpleName();
 
     private CameraSupport cameraSupport;
+    private StatusListener statusListener;
     private PulseListener pulseListener;
 
     private long timeLimit = 0;
-    private long countInterval = 0;
     private boolean isTimeRunning = false;
     private CountDownTimer countDownTimer;
 
@@ -45,18 +44,51 @@ public class HeartRate implements HeartSupport, CameraCallBack {
     }
 
     @Override
-    public HeartSupport startPulseCheck(PulseListener pulseListener) {
+    public void startPulseCheck(long timeLimit, PulseListener pulseListener) {
+        this.timeLimit = timeLimit;
         this.pulseListener = pulseListener;
-        if (!cameraSupport.isCameraInUse()) {
-            errorCount = 0;
-            successCount = 0;
-            startTime = System.currentTimeMillis();
-            startTimer();
-            cameraSupport.open().setOnPreviewListener(this);
+        if (cameraSupport != null) {
+            if (!cameraSupport.isCameraInUse()) {
+                errorCount = 0;
+                successCount = 0;
+                startTime = System.currentTimeMillis();
+                startTimer();
+                cameraSupport.open().setOnPreviewListener(this);
+                if (statusListener != null) {
+                    statusListener.OnCheckStarted();
+                }
+            } else {
+                throw new RuntimeException("Camera is already in use state");
+            }
         } else {
-            throw new RuntimeException("Camera is already in use state");
+            throw new RuntimeException("Camera Support is null");
         }
-        return this;
+    }
+
+    @Override
+    public void startPulseCheck(PulseListener pulseListener) {
+        this.pulseListener = pulseListener;
+        if (cameraSupport != null) {
+            if (!cameraSupport.isCameraInUse()) {
+                errorCount = 0;
+                successCount = 0;
+                startTime = System.currentTimeMillis();
+                startTimer();
+                cameraSupport.open().setOnPreviewListener(this);
+                if (statusListener != null) {
+                    statusListener.OnCheckStarted();
+                }
+            } else {
+                throw new RuntimeException("Camera is already in use state");
+            }
+        } else {
+            throw new RuntimeException("Camera Support is null");
+        }
+    }
+
+    @Override
+    public void setOnStatusListener(StatusListener statusListener) {
+        this.statusListener = statusListener;
     }
 
     @Override
@@ -66,45 +98,41 @@ public class HeartRate implements HeartSupport, CameraCallBack {
 
     @Override
     public void stopPulseCheck() {
-        if (cameraSupport.isCameraInUse()) {
-            cameraSupport.close();
-            if (isTimeRunning) {
-                countDownTimer.cancel();
-                isTimeRunning = false;
+        if (cameraSupport != null) {
+            if (cameraSupport.isCameraInUse()) {
+                cameraSupport.close();
+                if (isTimeRunning) {
+                    countDownTimer.cancel();
+                    isTimeRunning = false;
+                }
+                if (statusListener != null) {
+                    statusListener.OnCheckStopped();
+                }
+            } else {
+                throw new RuntimeException("Camera is already in close state");
             }
-            pulseListener.OnPulseCheckStop();
         } else {
-            throw new RuntimeException("Camera is already in close state");
+            throw new RuntimeException("Camera Support is null");
         }
     }
 
-    @Override
-    public HeartSupport setPulseTimeLimit(long timeLimit, long countInterval) {
-        this.timeLimit = timeLimit;
-        this.countInterval = countInterval;
-        return this;
-    }
-
-    @Override
-    public boolean isTimerRunning() {
-        return isTimeRunning;
-    }
-
     private void startTimer() {
-        if (timeLimit != 0 && countInterval != 0) {
-            Log.e(TAG, "Timer started");
-            countDownTimer = new CountDownTimer(timeLimit, countInterval) {
+        if (timeLimit != 0) {
+            countDownTimer = new CountDownTimer(timeLimit, 1000) {
 
                 public void onTick(long millisUntilFinished) {
                     isTimeRunning = true;
+                    if (statusListener != null) {
+                        statusListener.OnCheckRunning();
+                    }
                 }
 
                 public void onFinish() {
-                    Log.e(TAG, "Timer finish");
                     isTimeRunning = false;
                     stopPulseCheck();
                 }
-            }.start();
+            };
+            countDownTimer.start();
         }
     }
 
@@ -116,15 +144,21 @@ public class HeartRate implements HeartSupport, CameraCallBack {
             errorCount++;
             processing.set(false);
 
-            pulseListener.OnPulseDetectFailed(errorCount);
+            if (pulseListener != null) {
+                pulseListener.OnPulseDetectFailed(errorCount);
+            }
         } else if (pixelAverage < 170) {
             errorCount++;
             processing.set(false);
 
-            pulseListener.OnPulseDetectFailed(errorCount);
+            if (pulseListener != null) {
+                pulseListener.OnPulseDetectFailed(errorCount);
+            }
         } else {
             successCount++;
-            pulseListener.OnPulseDetected(successCount);
+            if (pulseListener != null) {
+                pulseListener.OnPulseDetected(successCount);
+            }
 
             int averageArrayAvg = 0;
             int averageArrayCnt = 0;
@@ -151,7 +185,6 @@ public class HeartRate implements HeartSupport, CameraCallBack {
             averageArray[averageIndex] = pixelAverage;
             averageIndex++;
 
-            // Transitioned from one state to another to the same
             if (newType != currentType) {
                 currentType = newType;
             }
@@ -186,7 +219,9 @@ public class HeartRate implements HeartSupport, CameraCallBack {
                 int beatsAvg = (beatsArrayAvg / beatsArrayCnt);
                 String beatsPerMinuteValue = String.valueOf(beatsAvg);
 
-                pulseListener.OnPulseResult(beatsPerMinuteValue);
+                if (pulseListener != null) {
+                    pulseListener.OnPulseResult(beatsPerMinuteValue);
+                }
                 startTime = System.currentTimeMillis();
                 beats = 0;
             }
