@@ -192,7 +192,7 @@ public class HeartRate implements HeartSupport, CameraCallBack {
             long endTime = System.currentTimeMillis();
             double totalTimeInSecs = (endTime - startTime) / 1000d;
 
-            if (totalTimeInSecs >= 10) {
+            if (totalTimeInSecs >= 5) {
                 double bps = (beats / totalTimeInSecs);
                 int dpm = (int) (bps * 60d);
                 if (dpm < 30 || dpm > 180) {

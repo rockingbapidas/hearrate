@@ -23,6 +23,5 @@ public class WelcomeActivityPresenter {
     public void createUser(UserM userM) {
         HeartApplication.get(welcomeActivity).createUserComponent(userM);
         welcomeActivity.startActivity(new Intent(welcomeActivity, HeartActivity.class));
-        welcomeActivity.finish();
     }
 }

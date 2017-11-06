@@ -100,7 +100,7 @@ public class HeartActivityPresenter {
     }
 
     private void start() {
-        heartSupport.startPulseCheck(timeLimit, new PulseListener() {
+        heartSupport.startPulseCheck(new PulseListener() {
             @Override
             public void OnPulseDetected(int success) {
                 Log.e(TAG, "OnPulseDetected == " + success);
