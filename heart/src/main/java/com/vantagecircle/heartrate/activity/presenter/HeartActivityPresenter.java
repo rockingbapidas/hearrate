@@ -104,6 +104,7 @@ public class HeartActivityPresenter {
             @Override
             public void OnPulseDetected(int success) {
                 Log.e(TAG, "OnPulseDetected == " + success);
+
                 heartM.setDetectHeartRate(true);
                 heartActivity.bindHeartRate(heartM);
             }
@@ -111,6 +112,7 @@ public class HeartActivityPresenter {
             @Override
             public void OnPulseDetectFailed(int failed) {
                 Log.e(TAG, "OnPulseDetectFailed == " + failed);
+
                 heartM.setDetectHeartRate(false);
                 heartActivity.bindHeartRate(heartM);
             }
@@ -118,12 +120,11 @@ public class HeartActivityPresenter {
             @Override
             public void OnPulseResult(String pulse) {
                 Log.e(TAG, "OnPulseResult == " + pulse);
+
                 heartM.setBeatsPerMinuteValue(pulse);
                 heartActivity.bindHeartRate(heartM);
             }
-        });
-
-        heartSupport.setOnStatusListener(new StatusListener() {
+        }).setOnStatusListener(new StatusListener() {
             @Override
             public void OnCheckStarted() {
                 Log.e(TAG, "OnCheckStarted == ");
@@ -137,6 +138,7 @@ public class HeartActivityPresenter {
             @Override
             public void OnCheckStopped() {
                 Log.e(TAG, "OnCheckStopped == ");
+
                 heartM.setStarted(false);
                 heartActivity.bindHeartRate(heartM);
             }

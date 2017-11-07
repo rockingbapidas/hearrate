@@ -231,16 +231,13 @@ public class CameraNew implements CameraSupport {
         public void onImageAvailable(ImageReader reader) {
             //pixel calculation done here
             Image image = reader.acquireLatestImage();
-            if (image != null) {
-                if (processingSupport != null) {
-                    byte[] data = processingSupport.YUV_420_888toNV21(image);
-                    int value = processingSupport.YUV420SPtoRedAvg(data, image.getWidth(), image.getHeight());
-                    if (mCameraCallBack != null) {
-                        mCameraCallBack.OnPixelAverage(value);
-                    }
-                }
-                image.close();
-            }
+            if(image == null) throw new NullPointerException();
+            if (processingSupport == null) throw new NullPointerException();
+            byte[] data = processingSupport.YUV_420_888toNV21(image);
+            int value = processingSupport.YUV420SPtoRedAvg(data, image.getWidth(), image.getHeight());
+            if (mCameraCallBack == null) throw new NullPointerException();
+            mCameraCallBack.OnPixelAverage(value);
+            image.close();
         }
     };
 }

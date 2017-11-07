@@ -1,6 +1,7 @@
 package com.vantagecircle.heartrate.core;
 
 import android.os.CountDownTimer;
+import android.util.Log;
 
 import com.vantagecircle.heartrate.camera.CameraCallBack;
 import com.vantagecircle.heartrate.camera.CameraSupport;
@@ -44,7 +45,7 @@ public class HeartRate implements HeartSupport, CameraCallBack {
     }
 
     @Override
-    public void startPulseCheck(long timeLimit, PulseListener pulseListener) {
+    public HeartSupport startPulseCheck(long timeLimit, PulseListener pulseListener) {
         this.timeLimit = timeLimit;
         this.pulseListener = pulseListener;
         if (cameraSupport != null) {
@@ -63,10 +64,11 @@ public class HeartRate implements HeartSupport, CameraCallBack {
         } else {
             throw new RuntimeException("Camera Support is null");
         }
+        return this;
     }
 
     @Override
-    public void startPulseCheck(PulseListener pulseListener) {
+    public HeartSupport startPulseCheck(PulseListener pulseListener) {
         this.pulseListener = pulseListener;
         if (cameraSupport != null) {
             if (!cameraSupport.isCameraInUse()) {
@@ -84,6 +86,7 @@ public class HeartRate implements HeartSupport, CameraCallBack {
         } else {
             throw new RuntimeException("Camera Support is null");
         }
+        return this;
     }
 
     @Override
@@ -137,23 +140,23 @@ public class HeartRate implements HeartSupport, CameraCallBack {
     }
 
     private void calculatePulse(int pixelAverage) {
+        Log.e(TAG, "Pixels == " + pixelAverage);
+
         if (!processing.compareAndSet(false, true)) {
             return;
         }
+
         if (pixelAverage == 0 || pixelAverage >= 255) {
-            errorCount++;
             processing.set(false);
+            return;
+        }
 
+        if (pixelAverage < 200) {
+            errorCount++;
             if (pulseListener != null) {
                 pulseListener.OnPulseDetectFailed(errorCount);
             }
-        } else if (pixelAverage < 170) {
-            errorCount++;
             processing.set(false);
-
-            if (pulseListener != null) {
-                pulseListener.OnPulseDetectFailed(errorCount);
-            }
         } else {
             successCount++;
             if (pulseListener != null) {
@@ -170,6 +173,8 @@ public class HeartRate implements HeartSupport, CameraCallBack {
             }
 
             int rollingAverage = (averageArrayCnt > 0) ? (averageArrayAvg / averageArrayCnt) : 0;
+            Log.e(TAG, "RollingAverage == " + rollingAverage);
+
             TYPE newType = currentType;
             if (pixelAverage < rollingAverage) {
                 newType = TYPE.RED;
@@ -192,7 +197,7 @@ public class HeartRate implements HeartSupport, CameraCallBack {
             long endTime = System.currentTimeMillis();
             double totalTimeInSecs = (endTime - startTime) / 1000d;
 
-            if (totalTimeInSecs >= 5) {
+            if (totalTimeInSecs >= 20) {
                 double bps = (beats / totalTimeInSecs);
                 int dpm = (int) (bps * 60d);
                 if (dpm < 30 || dpm > 180) {
@@ -228,4 +233,81 @@ public class HeartRate implements HeartSupport, CameraCallBack {
             processing.set(false);
         }
     }
+
+    /*private void calculatePulse(int pixelAverage) {
+        if (!processing.compareAndSet(false, true))
+            return;
+
+        if (pixelAverage == 0 || pixelAverage >= 255) {
+            processing.set(false);
+            return;
+        }
+
+        int averageArrayAvg = 0;
+        int averageArrayCnt = 0;
+        for (int anAverageArray : averageArray) {
+            if (anAverageArray > 0) {
+                averageArrayAvg += anAverageArray;
+                averageArrayCnt++;
+            }
+        }
+
+        int rollingAverage = (averageArrayCnt > 0) ? (averageArrayAvg / averageArrayCnt) : 0;
+        TYPE newType = currentType;
+        if (pixelAverage < rollingAverage) {
+            newType = TYPE.RED;
+            if (newType != currentType) {
+                beats++;
+            }
+        } else if (pixelAverage > rollingAverage) {
+            newType = TYPE.GREEN;
+        }
+
+        if (averageIndex == averageArraySize)
+            averageIndex = 0;
+        averageArray[averageIndex] = pixelAverage;
+        averageIndex++;
+
+        if (newType != currentType) {
+            currentType = newType;
+        }
+
+        long endTime = System.currentTimeMillis();
+        double totalTimeInSecs = (endTime - startTime) / 1000d;
+
+        if (totalTimeInSecs >= 5) {
+            double bps = (beats / totalTimeInSecs);
+            int dpm = (int) (bps * 60d);
+            if (dpm < 30 || dpm > 180) {
+                startTime = System.currentTimeMillis();
+                beats = 0;
+                processing.set(false);
+                return;
+            }
+
+            if (beatsIndex == beatsArraySize)
+                beatsIndex = 0;
+            beatsArray[beatsIndex] = dpm;
+            beatsIndex++;
+
+            int beatsArrayAvg = 0;
+            int beatsArrayCnt = 0;
+            for (int aBeatsArray : beatsArray) {
+                if (aBeatsArray > 0) {
+                    beatsArrayAvg += aBeatsArray;
+                    beatsArrayCnt++;
+                }
+            }
+
+            int beatsAvg = (beatsArrayAvg / beatsArrayCnt);
+            String beatsPerMinuteValue = String.valueOf(beatsAvg);
+
+            if (pulseListener != null) {
+                pulseListener.OnPulseResult(beatsPerMinuteValue);
+            }
+            startTime = System.currentTimeMillis();
+            beats = 0;
+        }
+        processing.set(false);
+    }*/
 }
