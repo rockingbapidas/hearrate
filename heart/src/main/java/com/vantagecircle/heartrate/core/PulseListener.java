@@ -8,5 +8,4 @@ public interface PulseListener {
     void OnPulseDetected(int success);
     void OnPulseDetectFailed(int failed);
     void OnPulseResult(String pulse);
-    void OnPulseCheckStop();
 }

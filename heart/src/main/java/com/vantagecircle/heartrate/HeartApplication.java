@@ -38,9 +38,8 @@ public class HeartApplication extends Application {
         return appComponent;
     }
 
-    public UserComponent createUserComponent(UserM userM) {
+    public void createUserComponent(UserM userM) {
         userComponent = appComponent.plus(new UserModule(userM));
-        return userComponent;
     }
 
     public void releaseUserComponent() {

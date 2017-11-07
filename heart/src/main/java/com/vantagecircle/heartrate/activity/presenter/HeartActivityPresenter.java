@@ -25,6 +25,7 @@ import com.vantagecircle.heartrate.camera.CameraCallBack;
 import com.vantagecircle.heartrate.camera.CameraSupport;
 import com.vantagecircle.heartrate.core.HeartSupport;
 import com.vantagecircle.heartrate.core.PulseListener;
+import com.vantagecircle.heartrate.core.StatusListener;
 import com.vantagecircle.heartrate.data.HeartM;
 import com.vantagecircle.heartrate.utils.Constant;
 import com.vantagecircle.heartrate.utils.TYPE;
@@ -42,6 +43,7 @@ public class HeartActivityPresenter {
     private HeartActivity heartActivity;
     private HeartSupport heartSupport;
     private HeartM heartM;
+    private long timeLimit = 20000;
 
     public HeartActivityPresenter(HeartActivity heartActivity, HeartSupport heartSupport) {
         this.heartActivity = heartActivity;
@@ -63,7 +65,7 @@ public class HeartActivityPresenter {
         }
     }
 
-    public void checkPermission(int requestCode, String[] permissions, int[] grantResults) {
+    public void checkPermission(int requestCode, int[] grantResults) {
         if (requestCode == Constant.REQUEST_CAMERA_PERMISSION) {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 Log.d(TAG, "Permission granted");
@@ -98,35 +100,48 @@ public class HeartActivityPresenter {
     }
 
     private void start() {
-        heartSupport.setPulseTimeLimit(20000, 1000)
-                .startPulseCheck(new PulseListener() {
-                    @Override
-                    public void OnPulseDetected(int success) {
-                        Log.e(TAG, "OnPulseDetected == " + success);
-                        heartM.setDetectHeartRate(true);
-                        heartActivity.bindHeartRate(heartM);
-                    }
+        heartSupport.startPulseCheck(new PulseListener() {
+            @Override
+            public void OnPulseDetected(int success) {
+                Log.e(TAG, "OnPulseDetected == " + success);
 
-                    @Override
-                    public void OnPulseDetectFailed(int failed) {
-                        Log.e(TAG, "OnPulseDetectFailed == " + failed);
-                        heartM.setDetectHeartRate(false);
-                        heartActivity.bindHeartRate(heartM);
-                    }
+                heartM.setDetectHeartRate(true);
+                heartActivity.bindHeartRate(heartM);
+            }
 
-                    @Override
-                    public void OnPulseResult(String pulse) {
-                        Log.e(TAG, "OnPulseResult == " + pulse);
-                        heartM.setBeatsPerMinuteValue(pulse);
-                        heartActivity.bindHeartRate(heartM);
-                    }
+            @Override
+            public void OnPulseDetectFailed(int failed) {
+                Log.e(TAG, "OnPulseDetectFailed == " + failed);
 
-                    @Override
-                    public void OnPulseCheckStop() {
-                        Log.e(TAG, "OnPulseCheckStop == ");
-                        heartM.setStarted(false);
-                        heartActivity.bindHeartRate(heartM);
-                    }
-                });
+                heartM.setDetectHeartRate(false);
+                heartActivity.bindHeartRate(heartM);
+            }
+
+            @Override
+            public void OnPulseResult(String pulse) {
+                Log.e(TAG, "OnPulseResult == " + pulse);
+
+                heartM.setBeatsPerMinuteValue(pulse);
+                heartActivity.bindHeartRate(heartM);
+            }
+        }).setOnStatusListener(new StatusListener() {
+            @Override
+            public void OnCheckStarted() {
+                Log.e(TAG, "OnCheckStarted == ");
+            }
+
+            @Override
+            public void OnCheckRunning() {
+                Log.e(TAG, "OnCheckRunning == ");
+            }
+
+            @Override
+            public void OnCheckStopped() {
+                Log.e(TAG, "OnCheckStopped == ");
+
+                heartM.setStarted(false);
+                heartActivity.bindHeartRate(heartM);
+            }
+        });
     }
 }

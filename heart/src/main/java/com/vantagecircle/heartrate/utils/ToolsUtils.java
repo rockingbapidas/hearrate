@@ -44,8 +44,7 @@ public class ToolsUtils {
         return true;
     }
 
-    /*
-    private void createGraph() {
+    /*private void createGraph() {
         LineChart mChart = heartActivity.findViewById(R.id.chart);
         mChart.getDescription().setEnabled(false);
         mChart.setDrawGridBackground(false);

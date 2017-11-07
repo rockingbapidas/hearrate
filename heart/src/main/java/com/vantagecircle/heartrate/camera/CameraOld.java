@@ -189,6 +189,7 @@ public class CameraOld implements CameraSupport {
             if (data == null) throw new NullPointerException();
             Camera.Size size = cam.getParameters().getPreviewSize();
             if (size == null) throw new NullPointerException();
+            if(mProcessingSupport == null) throw new NullPointerException();
             int value = mProcessingSupport.YUV420SPtoRedAvg(data, size.width, size.height);
             mCameraCallBack.OnPixelAverage(value);
             cam.addCallbackBuffer(data);

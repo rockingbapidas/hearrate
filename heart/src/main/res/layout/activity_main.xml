@@ -56,11 +56,5 @@
             android:onClick="@{(view) -> mainHandlers.onStartClick()}"
             android:text="@{heart.started ? @string/stop : @string/start}" />
 
-        <com.github.mikephil.charting.charts.LineChart
-            android:id="@+id/chart"
-            android:layout_width="match_parent"
-            android:layout_height="200dp"
-            android:visibility="gone"/>
-
     </LinearLayout>
 </layout>

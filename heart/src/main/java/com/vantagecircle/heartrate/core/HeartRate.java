@@ -17,10 +17,10 @@ public class HeartRate implements HeartSupport, CameraCallBack {
     private static final String TAG = HeartRate.class.getSimpleName();
 
     private CameraSupport cameraSupport;
+    private StatusListener statusListener;
     private PulseListener pulseListener;
 
     private long timeLimit = 0;
-    private long countInterval = 0;
     private boolean isTimeRunning = false;
     private CountDownTimer countDownTimer;
 
@@ -45,18 +45,53 @@ public class HeartRate implements HeartSupport, CameraCallBack {
     }
 
     @Override
-    public HeartSupport startPulseCheck(PulseListener pulseListener) {
+    public HeartSupport startPulseCheck(long timeLimit, PulseListener pulseListener) {
+        this.timeLimit = timeLimit;
         this.pulseListener = pulseListener;
-        if (!cameraSupport.isCameraInUse()) {
-            errorCount = 0;
-            successCount = 0;
-            startTime = System.currentTimeMillis();
-            startTimer();
-            cameraSupport.open().setOnPreviewListener(this);
+        if (cameraSupport != null) {
+            if (!cameraSupport.isCameraInUse()) {
+                errorCount = 0;
+                successCount = 0;
+                startTime = System.currentTimeMillis();
+                startTimer();
+                cameraSupport.open().setOnPreviewListener(this);
+                if (statusListener != null) {
+                    statusListener.OnCheckStarted();
+                }
+            } else {
+                throw new RuntimeException("Camera is already in use state");
+            }
         } else {
-            throw new RuntimeException("Camera is already in use state");
+            throw new RuntimeException("Camera Support is null");
         }
         return this;
+    }
+
+    @Override
+    public HeartSupport startPulseCheck(PulseListener pulseListener) {
+        this.pulseListener = pulseListener;
+        if (cameraSupport != null) {
+            if (!cameraSupport.isCameraInUse()) {
+                errorCount = 0;
+                successCount = 0;
+                startTime = System.currentTimeMillis();
+                startTimer();
+                cameraSupport.open().setOnPreviewListener(this);
+                if (statusListener != null) {
+                    statusListener.OnCheckStarted();
+                }
+            } else {
+                throw new RuntimeException("Camera is already in use state");
+            }
+        } else {
+            throw new RuntimeException("Camera Support is null");
+        }
+        return this;
+    }
+
+    @Override
+    public void setOnStatusListener(StatusListener statusListener) {
+        this.statusListener = statusListener;
     }
 
     @Override
@@ -66,65 +101,67 @@ public class HeartRate implements HeartSupport, CameraCallBack {
 
     @Override
     public void stopPulseCheck() {
-        if (cameraSupport.isCameraInUse()) {
-            cameraSupport.close();
-            if (isTimeRunning) {
-                countDownTimer.cancel();
-                isTimeRunning = false;
+        if (cameraSupport != null) {
+            if (cameraSupport.isCameraInUse()) {
+                cameraSupport.close();
+                if (isTimeRunning) {
+                    countDownTimer.cancel();
+                    isTimeRunning = false;
+                }
+                if (statusListener != null) {
+                    statusListener.OnCheckStopped();
+                }
+            } else {
+                throw new RuntimeException("Camera is already in close state");
             }
-            pulseListener.OnPulseCheckStop();
         } else {
-            throw new RuntimeException("Camera is already in close state");
+            throw new RuntimeException("Camera Support is null");
         }
     }
 
-    @Override
-    public HeartSupport setPulseTimeLimit(long timeLimit, long countInterval) {
-        this.timeLimit = timeLimit;
-        this.countInterval = countInterval;
-        return this;
-    }
-
-    @Override
-    public boolean isTimerRunning() {
-        return isTimeRunning;
-    }
-
     private void startTimer() {
-        if (timeLimit != 0 && countInterval != 0) {
-            Log.e(TAG, "Timer started");
-            countDownTimer = new CountDownTimer(timeLimit, countInterval) {
+        if (timeLimit != 0) {
+            countDownTimer = new CountDownTimer(timeLimit, 1000) {
 
                 public void onTick(long millisUntilFinished) {
                     isTimeRunning = true;
+                    if (statusListener != null) {
+                        statusListener.OnCheckRunning();
+                    }
                 }
 
                 public void onFinish() {
-                    Log.e(TAG, "Timer finish");
                     isTimeRunning = false;
                     stopPulseCheck();
                 }
-            }.start();
+            };
+            countDownTimer.start();
         }
     }
 
     private void calculatePulse(int pixelAverage) {
+        Log.e(TAG, "Pixels == " + pixelAverage);
+
         if (!processing.compareAndSet(false, true)) {
             return;
         }
+
         if (pixelAverage == 0 || pixelAverage >= 255) {
-            errorCount++;
             processing.set(false);
+            return;
+        }
 
-            pulseListener.OnPulseDetectFailed(errorCount);
-        } else if (pixelAverage < 170) {
+        if (pixelAverage < 200) {
             errorCount++;
+            if (pulseListener != null) {
+                pulseListener.OnPulseDetectFailed(errorCount);
+            }
             processing.set(false);
-
-            pulseListener.OnPulseDetectFailed(errorCount);
         } else {
             successCount++;
-            pulseListener.OnPulseDetected(successCount);
+            if (pulseListener != null) {
+                pulseListener.OnPulseDetected(successCount);
+            }
 
             int averageArrayAvg = 0;
             int averageArrayCnt = 0;
@@ -136,6 +173,8 @@ public class HeartRate implements HeartSupport, CameraCallBack {
             }
 
             int rollingAverage = (averageArrayCnt > 0) ? (averageArrayAvg / averageArrayCnt) : 0;
+            Log.e(TAG, "RollingAverage == " + rollingAverage);
+
             TYPE newType = currentType;
             if (pixelAverage < rollingAverage) {
                 newType = TYPE.RED;
@@ -151,7 +190,6 @@ public class HeartRate implements HeartSupport, CameraCallBack {
             averageArray[averageIndex] = pixelAverage;
             averageIndex++;
 
-            // Transitioned from one state to another to the same
             if (newType != currentType) {
                 currentType = newType;
             }
@@ -159,7 +197,7 @@ public class HeartRate implements HeartSupport, CameraCallBack {
             long endTime = System.currentTimeMillis();
             double totalTimeInSecs = (endTime - startTime) / 1000d;
 
-            if (totalTimeInSecs >= 10) {
+            if (totalTimeInSecs >= 20) {
                 double bps = (beats / totalTimeInSecs);
                 int dpm = (int) (bps * 60d);
                 if (dpm < 30 || dpm > 180) {
@@ -186,11 +224,90 @@ public class HeartRate implements HeartSupport, CameraCallBack {
                 int beatsAvg = (beatsArrayAvg / beatsArrayCnt);
                 String beatsPerMinuteValue = String.valueOf(beatsAvg);
 
-                pulseListener.OnPulseResult(beatsPerMinuteValue);
+                if (pulseListener != null) {
+                    pulseListener.OnPulseResult(beatsPerMinuteValue);
+                }
                 startTime = System.currentTimeMillis();
                 beats = 0;
             }
             processing.set(false);
         }
     }
+
+    /*private void calculatePulse(int pixelAverage) {
+        if (!processing.compareAndSet(false, true))
+            return;
+
+        if (pixelAverage == 0 || pixelAverage >= 255) {
+            processing.set(false);
+            return;
+        }
+
+        int averageArrayAvg = 0;
+        int averageArrayCnt = 0;
+        for (int anAverageArray : averageArray) {
+            if (anAverageArray > 0) {
+                averageArrayAvg += anAverageArray;
+                averageArrayCnt++;
+            }
+        }
+
+        int rollingAverage = (averageArrayCnt > 0) ? (averageArrayAvg / averageArrayCnt) : 0;
+        TYPE newType = currentType;
+        if (pixelAverage < rollingAverage) {
+            newType = TYPE.RED;
+            if (newType != currentType) {
+                beats++;
+            }
+        } else if (pixelAverage > rollingAverage) {
+            newType = TYPE.GREEN;
+        }
+
+        if (averageIndex == averageArraySize)
+            averageIndex = 0;
+        averageArray[averageIndex] = pixelAverage;
+        averageIndex++;
+
+        if (newType != currentType) {
+            currentType = newType;
+        }
+
+        long endTime = System.currentTimeMillis();
+        double totalTimeInSecs = (endTime - startTime) / 1000d;
+
+        if (totalTimeInSecs >= 5) {
+            double bps = (beats / totalTimeInSecs);
+            int dpm = (int) (bps * 60d);
+            if (dpm < 30 || dpm > 180) {
+                startTime = System.currentTimeMillis();
+                beats = 0;
+                processing.set(false);
+                return;
+            }
+
+            if (beatsIndex == beatsArraySize)
+                beatsIndex = 0;
+            beatsArray[beatsIndex] = dpm;
+            beatsIndex++;
+
+            int beatsArrayAvg = 0;
+            int beatsArrayCnt = 0;
+            for (int aBeatsArray : beatsArray) {
+                if (aBeatsArray > 0) {
+                    beatsArrayAvg += aBeatsArray;
+                    beatsArrayCnt++;
+                }
+            }
+
+            int beatsAvg = (beatsArrayAvg / beatsArrayCnt);
+            String beatsPerMinuteValue = String.valueOf(beatsAvg);
+
+            if (pulseListener != null) {
+                pulseListener.OnPulseResult(beatsPerMinuteValue);
+            }
+            startTime = System.currentTimeMillis();
+            beats = 0;
+        }
+        processing.set(false);
+    }*/
 }
