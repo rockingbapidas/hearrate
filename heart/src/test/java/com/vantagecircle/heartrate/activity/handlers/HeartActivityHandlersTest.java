@@ -7,7 +7,7 @@ import static org.junit.Assert.*;
 /**
  * Created by bapidas on 13/10/17.
  */
-public class HeartEventHandlersTest {
+public class HeartActivityHandlersTest {
     @Test
     public void onStartClick() throws Exception {
 

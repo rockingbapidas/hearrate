@@ -8,8 +8,8 @@
         <import type="android.view.View" />
 
         <variable
-            name="welcomeHandlers"
-            type="com.vantagecircle.heartrate.activity.handlers.WelcomeEventHandlers" />
+            name="welcomeActivityHandlers"
+            type="com.vantagecircle.heartrate.activity.handlers.WelcomeActivityHandlers" />
     </data>
 
     <LinearLayout
@@ -23,7 +23,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:onClick="@{(view) -> welcomeHandlers.onCheckClick()}"
+            android:onClick="@{(view) -> welcomeActivityHandlers.onCheckClick()}"
             android:text="@string/check_your_heart_rate" />
 
     </LinearLayout>

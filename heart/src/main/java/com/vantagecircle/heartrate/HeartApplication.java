@@ -3,12 +3,15 @@ package com.vantagecircle.heartrate;
 import android.app.Application;
 import android.content.Context;
 
+import com.crashlytics.android.Crashlytics;
 import com.vantagecircle.heartrate.component.AppComponent;
 import com.vantagecircle.heartrate.component.DaggerAppComponent;
 import com.vantagecircle.heartrate.component.UserComponent;
 import com.vantagecircle.heartrate.data.UserM;
 import com.vantagecircle.heartrate.module.AppModule;
 import com.vantagecircle.heartrate.module.UserModule;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by bapidas on 09/10/17.
@@ -25,6 +28,7 @@ public class HeartApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
+        Fabric.with(this, new Crashlytics());
         initAppComponent();
     }
 

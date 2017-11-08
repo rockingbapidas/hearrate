@@ -38,6 +38,10 @@
         <activity
             android:name=".activity.ui.HeartActivity"
             android:screenOrientation="portrait" />
+
+        <meta-data
+            android:name="io.fabric.ApiKey"
+            android:value="e97edd843c7358fb7b6572b207a4c03082ceab68" />
     </application>
 
 </manifest>

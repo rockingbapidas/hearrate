@@ -1,8 +1,5 @@
 package com.vantagecircle.heartrate.activity.module;
 
-import android.util.Log;
-
-import com.vantagecircle.heartrate.activity.handlers.WelcomeEventHandlers;
 import com.vantagecircle.heartrate.activity.presenter.WelcomeActivityPresenter;
 import com.vantagecircle.heartrate.activity.ui.WelcomeActivity;
 import com.vantagecircle.heartrate.scope.ActivityScope;

@@ -5,4 +5,17 @@
     <string name="stop">Stop</string>
     <string name="blank">-----</string>
     <string name="finger_status">Please attach your finger first</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="calculate">CALCULATE</string>
+    <string name="history">HISTORY</string>
+    <string name="place_finger">Place finger on camera lens</string>
+    <string name="bpm">bpm</string>
+    <string name="how_it_works">How it works</string>
+    <string name="default_bpm">000</string>
+    <string name="BPM">BPM</string>
+    <string name="ok_">OKay</string>
+    <string name="measure_title">Measure your Heart Rate</string>
+    <string name="measure_hint">Lightly place your index finger over the camera lens on back of your phone. Make sure the lens and flash are fully covered</string>
 </resources>
