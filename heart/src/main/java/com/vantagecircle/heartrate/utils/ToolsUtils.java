@@ -2,16 +2,8 @@ package com.vantagecircle.heartrate.utils;
 
 import android.content.Context;
 import android.content.pm.PackageManager;
-import android.net.ConnectivityManager;
-import android.net.Network;
-import android.net.NetworkInfo;
 import android.os.Build;
-import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
-import android.text.TextUtils;
-import android.util.Log;
-
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Created by bapidas on 10/07/17.
@@ -86,5 +78,82 @@ public class ToolsUtils {
         LineData d = new LineData(sets);
         d.setValueTypeface(tf);
         return d;
+    }
+
+    private void calculatePulse(int pixelAverage) {
+        if (!processing.compareAndSet(false, true))
+            return;
+
+        if (pixelAverage == 0 || pixelAverage >= 255) {
+            processing.set(false);
+            return;
+        }
+
+        int averageArrayAvg = 0;
+        int averageArrayCnt = 0;
+        for (int anAverageArray : averageArray) {
+            if (anAverageArray > 0) {
+                averageArrayAvg += anAverageArray;
+                averageArrayCnt++;
+            }
+        }
+
+        int rollingAverage = (averageArrayCnt > 0) ? (averageArrayAvg / averageArrayCnt) : 0;
+        TYPE newType = currentType;
+        if (pixelAverage < rollingAverage) {
+            newType = TYPE.RED;
+            if (newType != currentType) {
+                beats++;
+            }
+        } else if (pixelAverage > rollingAverage) {
+            newType = TYPE.GREEN;
+        }
+
+        if (averageIndex == averageArraySize)
+            averageIndex = 0;
+        averageArray[averageIndex] = pixelAverage;
+        averageIndex++;
+
+        if (newType != currentType) {
+            currentType = newType;
+        }
+
+        long endTime = System.currentTimeMillis();
+        double totalTimeInSecs = (endTime - startTime) / 1000d;
+
+        if (totalTimeInSecs >= 5) {
+            double bps = (beats / totalTimeInSecs);
+            int dpm = (int) (bps * 60d);
+            if (dpm < 30 || dpm > 180) {
+                startTime = System.currentTimeMillis();
+                beats = 0;
+                processing.set(false);
+                return;
+            }
+
+            if (beatsIndex == beatsArraySize)
+                beatsIndex = 0;
+            beatsArray[beatsIndex] = dpm;
+            beatsIndex++;
+
+            int beatsArrayAvg = 0;
+            int beatsArrayCnt = 0;
+            for (int aBeatsArray : beatsArray) {
+                if (aBeatsArray > 0) {
+                    beatsArrayAvg += aBeatsArray;
+                    beatsArrayCnt++;
+                }
+            }
+
+            int beatsAvg = (beatsArrayAvg / beatsArrayCnt);
+            String beatsPerMinuteValue = String.valueOf(beatsAvg);
+
+            if (pulseListener != null) {
+                pulseListener.OnPulseResult(beatsPerMinuteValue);
+            }
+            startTime = System.currentTimeMillis();
+            beats = 0;
+        }
+        processing.set(false);
     }*/
 }

@@ -1,26 +1,27 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
+apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
     buildToolsVersion rootProject.ext.buildToolsVersion
 
     defaultConfig {
-        applicationId rootProject.ext.applicationId
+        applicationId "com.vantagecircle.heartrate"
 
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
 
-        versionCode rootProject.ext.versionCode
-        versionName rootProject.ext.versionName
+        versionCode 1
+        versionName "1.0"
 
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
         release {
-            keyAlias rootProject.ext.keyAlias
-            keyPassword rootProject.ext.keyPassword
-            storePassword rootProject.ext.storePassword
+            keyAlias "heart"
+            keyPassword "heartrate"
+            storePassword "heartrate"
             //storeFile file('I:/Android_Projects/HeartRate/heart_rate_key.jks')
 //            storeFile file('/Users/bapidas/AndroidStudioProjects/HeartRate/heart_rate_key.jks')
             storeFile file('/Users/somirsaikia/Documents/AndroidApp/HeartRate/heart_rate_key.jks')
@@ -48,10 +49,10 @@ android {
 
 repositories {
     maven { url "https://jitpack.io" }
-    mavenCentral()
 }
 
 dependencies {
+    implementation 'com.android.support:support-v4:26.1.0'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     //android support dependency
@@ -67,9 +68,11 @@ dependencies {
     compile "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
 
     compile "com.jakewharton:butterknife:${rootProject.ext.butterKnifeVersion}"
-    compile 'com.github.PhilJay:MPAndroidChart:v3.0.2'
     compile 'javax.inject:javax.inject:1'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
+    compile('com.crashlytics.sdk.android:crashlytics:2.7.1@aar') {
+        transitive = true;
+    }
 
     provided 'org.glassfish:javax.annotation:10.0-b28'
     provided 'javax.annotation:jsr250-api:1.0'
