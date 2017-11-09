@@ -31,13 +31,17 @@ public class WelcomeActivity extends BaseActivity {
         mBinding.setWelcomeActivityHandlers(new WelcomeActivityHandlers(welcomeActivityPresenter));
     }
 
-
     @Override
     protected void setupActivityComponent() {
         HeartApplication.get(this)
                 .getAppComponent()
                 .plus(new WelcomeActivityModule(this))
                 .inject(this);
+    }
+
+    @Override
+    protected void init() {
+        //no need to write any code here
     }
 
     @Override

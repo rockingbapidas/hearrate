@@ -16,4 +16,6 @@ public abstract class BaseFragment extends Fragment {
     }
 
     protected abstract void setupActivityComponent();
+
+    protected abstract void init();
 }

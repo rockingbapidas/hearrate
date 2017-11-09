@@ -2,6 +2,8 @@ package com.vantagecircle.heartrate.component;
 
 import com.vantagecircle.heartrate.activity.component.HeartActivityComponent;
 import com.vantagecircle.heartrate.activity.module.HeartActivityModule;
+import com.vantagecircle.heartrate.fragment.component.HeartFragmentComponent;
+import com.vantagecircle.heartrate.fragment.module.HeartFragmentModule;
 import com.vantagecircle.heartrate.module.UserModule;
 import com.vantagecircle.heartrate.scope.UserScope;
 
@@ -18,4 +20,5 @@ import dagger.Subcomponent;
 )
 public interface UserComponent {
     HeartActivityComponent plus (HeartActivityModule heartActivityModule);
+    HeartFragmentComponent plus (HeartFragmentModule heartFragmentModule);
 }

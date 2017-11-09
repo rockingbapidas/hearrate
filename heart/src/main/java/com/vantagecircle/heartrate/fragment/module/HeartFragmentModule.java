@@ -1,10 +1,14 @@
 package com.vantagecircle.heartrate.fragment.module;
 
+import android.content.Context;
+
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.camera.CameraOld;
 import com.vantagecircle.heartrate.camera.CameraSupport;
 import com.vantagecircle.heartrate.core.HeartRate;
 import com.vantagecircle.heartrate.core.HeartSupport;
+import com.vantagecircle.heartrate.fragment.presenter.HeartFragmentPresenter;
+import com.vantagecircle.heartrate.fragment.ui.HeartFragment;
 import com.vantagecircle.heartrate.processing.Processing;
 import com.vantagecircle.heartrate.processing.ProcessingSupport;
 import com.vantagecircle.heartrate.scope.ActivityScope;
@@ -18,6 +22,26 @@ import dagger.Provides;
  */
 @Module
 public class HeartFragmentModule {
+    private HeartFragment mHeartFragment;
+
+    public HeartFragmentModule(HeartFragment mHeartFragment) {
+        this.mHeartFragment = mHeartFragment;
+    }
+
+    @Provides
+    @FragmentScope
+    HeartFragment
+    provideHeartFragment(){
+        return mHeartFragment;
+    }
+
+    @Provides
+    @FragmentScope
+    Context
+    provideContext(HeartFragment heartFragment){
+        return heartFragment.getActivity().getApplicationContext();
+    }
+
     @Provides
     @FragmentScope
     ProcessingSupport
@@ -28,12 +52,13 @@ public class HeartFragmentModule {
     @Provides
     @FragmentScope
     CameraSupport
-    provideCameraSupport(HeartActivity heartActivity, ProcessingSupport processingSupport) {
-        return new CameraOld(heartActivity, processingSupport);
+    provideCameraSupport(Context mContext, ProcessingSupport processingSupport) {
+        return new CameraOld(mContext, processingSupport);
+
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return new CameraNew(heartActivity, processingSupport);
+            return new CameraNew(mContext, processingSupport);
         } else {
-            return new CameraOld(heartActivity, processingSupport);
+            return new CameraOld(mContext, processingSupport);
         }*/
     }
 
@@ -42,5 +67,12 @@ public class HeartFragmentModule {
     HeartSupport
     provideHeartSupport(CameraSupport cameraSupport) {
         return new HeartRate(cameraSupport);
+    }
+
+    @Provides
+    @FragmentScope
+    HeartFragmentPresenter
+    provideHeartFragmentPresenter(HeartSupport heartSupport, HeartFragment heartFragment){
+        return new HeartFragmentPresenter(heartSupport, heartFragment);
     }
 }

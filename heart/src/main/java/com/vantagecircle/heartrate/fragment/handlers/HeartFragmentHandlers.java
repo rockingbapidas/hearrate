@@ -14,6 +14,6 @@ public class HeartFragmentHandlers {
     }
 
     public void onStartClick(){
-
+        mHeartFragmentPresenter.handleClick();
     }
 }

@@ -6,6 +6,7 @@ import com.vantagecircle.heartrate.core.HeartSupport;
 import com.vantagecircle.heartrate.core.PulseListener;
 import com.vantagecircle.heartrate.core.StatusListener;
 import com.vantagecircle.heartrate.data.HeartM;
+import com.vantagecircle.heartrate.fragment.ui.HeartFragment;
 
 /**
  * Created by bapidas on 08/11/17.
@@ -13,17 +14,21 @@ import com.vantagecircle.heartrate.data.HeartM;
 
 public class HeartFragmentPresenter {
     private static final String TAG = HeartFragmentPresenter.class.getSimpleName();
-    private HeartM heartM;
     private HeartSupport heartSupport;
+    private HeartFragment heartFragment;
+
+    private HeartM heartM;
     private long timeLimit = 20000;
 
+    public HeartFragmentPresenter(HeartSupport heartSupport, HeartFragment heartFragment) {
+        this.heartSupport = heartSupport;
+        this.heartFragment = heartFragment;
+    }
 
     public void handleClick() {
         if (heartM != null && heartM.isStarted()) {
             heartSupport.stopPulseCheck();
-
             heartM.setStarted(false);
-
         } else {
             if (heartM != null) {
                 heartM.setStarted(true);
@@ -33,7 +38,6 @@ public class HeartFragmentPresenter {
                 heartM.setStarted(true);
                 heartM.setBeatsPerMinuteValue("-----");
             }
-
             start();
         }
     }
@@ -45,7 +49,6 @@ public class HeartFragmentPresenter {
                 Log.e(TAG, "OnPulseDetected == " + success);
 
                 heartM.setDetectHeartRate(true);
-
             }
 
             @Override
@@ -53,7 +56,6 @@ public class HeartFragmentPresenter {
                 Log.e(TAG, "OnPulseDetectFailed == " + failed);
 
                 heartM.setDetectHeartRate(false);
-
             }
 
             @Override
@@ -61,7 +63,6 @@ public class HeartFragmentPresenter {
                 Log.e(TAG, "OnPulseResult == " + pulse);
 
                 heartM.setBeatsPerMinuteValue(pulse);
-
             }
         }).setOnStatusListener(new StatusListener() {
             @Override
@@ -79,7 +80,6 @@ public class HeartFragmentPresenter {
                 Log.e(TAG, "OnCheckStopped == ");
 
                 heartM.setStarted(false);
-
             }
         });
     }

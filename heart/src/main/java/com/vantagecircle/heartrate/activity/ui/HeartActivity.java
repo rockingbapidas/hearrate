@@ -52,7 +52,6 @@ public class HeartActivity extends BaseActivity {
 
     @Override
     protected void init() {
-        super.init();
         mToolBar = findViewById(R.id.toolbar);
         mTabLayout = findViewById(R.id.tabLayout);
         mViewPager = findViewById(R.id.viewpager);
@@ -103,14 +102,14 @@ public class HeartActivity extends BaseActivity {
     }
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        finish();
-    }
-
-    @Override
     public void finish() {
         super.finish();
         HeartApplication.get(this).releaseUserComponent();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        finish();
     }
 }
