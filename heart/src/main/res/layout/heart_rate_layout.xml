@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools">
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <data class="com.vantagecircle.heartrate.databinding.HeartRateBinding">
 
         <import type="android.view.View" />
 
         <variable
-            name="heartActivityHandlers"
+            name="heartFragmentHandler"
             type="com.vantagecircle.heartrate.fragment.handlers.HeartFragmentHandlers" />
 
         <variable
@@ -20,8 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:gravity="center"
-        android:orientation="vertical"
-        tools:context="com.vantagecircle.heartrate.activity.ui.HeartActivity">
+        android:orientation="vertical">
 
         <TextView
             android:id="@+id/fingerStatus"
@@ -53,7 +51,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
-            android:onClick="@{(view) -> heartActivityHandlers.onStartClick()}"
+            android:onClick="@{(view) -> heartFragmentHandler.onStartClick()}"
             android:text="@{heart.started ? @string/stop : @string/start}" />
 
     </LinearLayout>

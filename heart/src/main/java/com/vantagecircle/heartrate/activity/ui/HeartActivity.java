@@ -17,6 +17,8 @@ import android.widget.Toast;
 import com.vantagecircle.heartrate.HeartApplication;
 import com.vantagecircle.heartrate.R;
 import com.vantagecircle.heartrate.activity.BaseActivity;
+import com.vantagecircle.heartrate.activity.component.DaggerHeartActivityComponent;
+import com.vantagecircle.heartrate.activity.component.HeartActivityComponent;
 import com.vantagecircle.heartrate.activity.module.HeartActivityModule;
 import com.vantagecircle.heartrate.activity.presenter.HeartActivityPresenter;
 import com.vantagecircle.heartrate.utils.Constant;
@@ -24,37 +26,47 @@ import com.vantagecircle.heartrate.utils.ToolsUtils;
 
 import javax.inject.Inject;
 
+import butterknife.BindView;
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
+
 public class HeartActivity extends BaseActivity {
     private final String TAG = HeartActivity.class.getSimpleName();
     @Inject
     HeartActivityPresenter mHeartActivityPresenter;
-
+    @BindView(R.id.tabLayout)
     public TabLayout mTabLayout;
+    @BindView(R.id.viewpager)
     public ViewPager mViewPager;
+    @BindView(R.id.toolbar)
     public Toolbar mToolBar;
+
+    private Unbinder mUnBinder;
     public ActionBar mActionBar;
+    private HeartActivityComponent heartActivityComponent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setupActivityComponent().inject(this);
         setContentView(R.layout.main_activity);
+        mUnBinder = ButterKnife.bind(this);
         askPermission();
         init();
     }
 
-    @Override
-    protected void setupActivityComponent() {
-        HeartApplication.get(this)
-                .getUserComponent()
-                .plus(new HeartActivityModule(this))
-                .inject(this);
+    protected HeartActivityComponent setupActivityComponent() {
+        if (heartActivityComponent == null) {
+            heartActivityComponent = DaggerHeartActivityComponent.builder()
+                    .heartActivityModule(new HeartActivityModule(this))
+                    .appComponent(HeartApplication.get(this).getAppComponent())
+                    .build();
+        }
+        return heartActivityComponent;
     }
 
     @Override
     protected void init() {
-        mToolBar = findViewById(R.id.toolbar);
-        mTabLayout = findViewById(R.id.tabLayout);
-        mViewPager = findViewById(R.id.viewpager);
         mHeartActivityPresenter.setup();
     }
 
@@ -104,12 +116,6 @@ public class HeartActivity extends BaseActivity {
     @Override
     public void finish() {
         super.finish();
-        HeartApplication.get(this).releaseUserComponent();
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        finish();
+        mUnBinder.unbind();
     }
 }

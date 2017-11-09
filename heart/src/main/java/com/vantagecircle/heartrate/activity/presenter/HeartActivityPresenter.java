@@ -28,13 +28,15 @@ public class HeartActivityPresenter {
     private void initToolBar() {
         heartActivity.setSupportActionBar(heartActivity.mToolBar);
         heartActivity.mActionBar = heartActivity.getSupportActionBar();
-        assert heartActivity.mActionBar != null;
-        heartActivity.mActionBar.setTitle("Heart Rate");
-        heartActivity.mActionBar.setDisplayHomeAsUpEnabled(true);
+        if (heartActivity.mActionBar != null) {
+            heartActivity.mActionBar.setTitle("Heart Rate");
+            heartActivity.mActionBar.setDisplayHomeAsUpEnabled(true);
+        }
     }
 
     private void initTabPager() {
-        PagerAdapter adapter = new PagerAdapter(heartActivity.getSupportFragmentManager());
+        PagerAdapter adapter = new PagerAdapter(heartActivity
+                .getSupportFragmentManager());
         adapter.addFragment(HeartFragment.newInstance(),
                 heartActivity.getResources().getString(R.string.calculate));
         adapter.addFragment(HistoryFragment.newInstance(),

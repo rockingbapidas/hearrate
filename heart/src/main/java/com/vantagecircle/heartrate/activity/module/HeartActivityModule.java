@@ -1,8 +1,10 @@
 package com.vantagecircle.heartrate.activity.module;
 
+import android.content.Context;
+
 import com.vantagecircle.heartrate.activity.presenter.HeartActivityPresenter;
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
-import com.vantagecircle.heartrate.scope.ActivityScope;
+import com.vantagecircle.heartrate.scope.ActivityContext;
 
 import dagger.Module;
 import dagger.Provides;
@@ -12,21 +14,26 @@ import dagger.Provides;
  */
 @Module
 public class HeartActivityModule {
-    private HeartActivity heartActivity;
+    private HeartActivity mHeartActivity;
 
     public HeartActivityModule(HeartActivity heartActivity) {
-        this.heartActivity = heartActivity;
+        this.mHeartActivity = heartActivity;
     }
 
     @Provides
-    @ActivityScope
+    @ActivityContext
+    Context
+    provideContext() {
+        return mHeartActivity;
+    }
+
+    @Provides
     HeartActivity
     provideHeartActivity() {
-        return heartActivity;
+        return mHeartActivity;
     }
 
     @Provides
-    @ActivityScope
     HeartActivityPresenter
     provideHeartActivityPresenter(HeartActivity heartActivity) {
         return new HeartActivityPresenter(heartActivity);

@@ -12,10 +12,7 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupActivityComponent();
     }
-
-    protected abstract void setupActivityComponent();
 
     protected abstract void init();
 }

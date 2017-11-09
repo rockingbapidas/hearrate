@@ -1,8 +1,10 @@
 package com.vantagecircle.heartrate.activity.module;
 
+import android.content.Context;
+
 import com.vantagecircle.heartrate.activity.presenter.WelcomeActivityPresenter;
 import com.vantagecircle.heartrate.activity.ui.WelcomeActivity;
-import com.vantagecircle.heartrate.scope.ActivityScope;
+import com.vantagecircle.heartrate.scope.ActivityContext;
 
 import dagger.Module;
 import dagger.Provides;
@@ -12,24 +14,28 @@ import dagger.Provides;
  */
 @Module
 public class WelcomeActivityModule {
-    private final static String TAG = WelcomeActivityModule.class.getSimpleName();
-    private WelcomeActivity welcomeActivity;
+    private WelcomeActivity mWelcomeActivity;
 
     public WelcomeActivityModule(WelcomeActivity welcomeActivity) {
-        this.welcomeActivity = welcomeActivity;
+        this.mWelcomeActivity = welcomeActivity;
     }
 
     @Provides
-    @ActivityScope
+    @ActivityContext
+    Context
+    provideContext() {
+        return mWelcomeActivity;
+    }
+
+    @Provides
     WelcomeActivity
-    provideWelcomeActivity(){
-        return welcomeActivity;
+    provideWelcomeActivity() {
+        return mWelcomeActivity;
     }
 
     @Provides
-    @ActivityScope
     WelcomeActivityPresenter
-    provideWelcomeActivityPresenter(WelcomeActivity welcomeActivity){
+    provideWelcomeActivityPresenter(WelcomeActivity welcomeActivity) {
         return new WelcomeActivityPresenter(welcomeActivity);
     }
 }

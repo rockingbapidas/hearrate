@@ -35,7 +35,6 @@ public class HistoryFragment extends BaseFragment {
         super.onViewCreated(view, savedInstanceState);
     }
 
-    @Override
     protected void setupActivityComponent() {
 
     }

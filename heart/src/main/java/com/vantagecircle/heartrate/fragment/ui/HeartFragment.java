@@ -1,17 +1,19 @@
 package com.vantagecircle.heartrate.fragment.ui;
 
 import android.content.Context;
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.vantagecircle.heartrate.HeartApplication;
 import com.vantagecircle.heartrate.R;
+import com.vantagecircle.heartrate.databinding.HeartRateBinding;
 import com.vantagecircle.heartrate.fragment.BaseFragment;
+import com.vantagecircle.heartrate.fragment.component.HeartFragmentComponent;
+import com.vantagecircle.heartrate.fragment.handlers.HeartFragmentHandlers;
 import com.vantagecircle.heartrate.fragment.module.HeartFragmentModule;
 import com.vantagecircle.heartrate.fragment.presenter.HeartFragmentPresenter;
 
@@ -21,8 +23,8 @@ public class HeartFragment extends BaseFragment {
     private static final String TAG = HeartFragment.class.getSimpleName();
     @Inject
     HeartFragmentPresenter heartFragmentPresenter;
-    private View mView;
-    private Context mContext;
+    private HeartFragmentComponent heartFragmentComponent;
+    public HeartRateBinding mHeartRateBinding;
 
     public static HeartFragment newInstance() {
         return new HeartFragment();
@@ -35,24 +37,31 @@ public class HeartFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.heart_rate_layout, container, false);
-        return mView;
+        mHeartRateBinding = DataBindingUtil.inflate(inflater, R.layout.heart_rate_layout,
+                container, false);
+        mHeartRateBinding.setHeartFragmentHandler(
+                new HeartFragmentHandlers(heartFragmentPresenter));
+        return mHeartRateBinding.getRoot();
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        init();
     }
 
-    @Override
-    protected void setupActivityComponent() {
-        HeartApplication.get(mContext).getUserComponent()
-                .plus(new HeartFragmentModule(this))
-                .inject(this);
+    protected HeartFragmentComponent setupActivityComponent() {
+        if (heartFragmentComponent == null) {
+            heartFragmentComponent = DaggerHeartFragmentComponent.builder()
+                    .heartFragmentModule(new HeartFragmentModule(this))
+                    .appComponent(HeartApplication.get(this).getAppComponent())
+                    .build();
+        }
+        return heartFragmentComponent;
     }
 
     @Override
     protected void init() {
-
+        //initializing code here if needed
     }
 }
