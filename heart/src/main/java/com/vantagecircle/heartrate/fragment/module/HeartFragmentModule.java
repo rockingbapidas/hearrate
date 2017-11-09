@@ -58,14 +58,8 @@ public class HeartFragmentModule {
     }
 
     @Provides
-    HeartSupport
-    provideHeartSupport(CameraSupport cameraSupport) {
+    HeartRate provideHeartSupport(CameraSupport cameraSupport) {
         return new HeartRate(cameraSupport);
     }
 
-    @Provides
-    HeartFragmentPresenter
-    provideHeartFragmentPresenter(HeartSupport heartSupport, HeartFragment heartFragment){
-        return new HeartFragmentPresenter(heartSupport, heartFragment);
-    }
 }

@@ -10,8 +10,13 @@ import android.view.ViewGroup;
 
 import com.vantagecircle.heartrate.HeartApplication;
 import com.vantagecircle.heartrate.R;
+import com.vantagecircle.heartrate.core.HeartRate;
+import com.vantagecircle.heartrate.core.HeartSupport;
+import com.vantagecircle.heartrate.core.PulseListener;
+import com.vantagecircle.heartrate.core.StatusListener;
 import com.vantagecircle.heartrate.databinding.HeartRateBinding;
 import com.vantagecircle.heartrate.fragment.BaseFragment;
+import com.vantagecircle.heartrate.fragment.component.DaggerHeartFragmentComponent;
 import com.vantagecircle.heartrate.fragment.component.HeartFragmentComponent;
 import com.vantagecircle.heartrate.fragment.handlers.HeartFragmentHandlers;
 import com.vantagecircle.heartrate.fragment.module.HeartFragmentModule;
@@ -21,10 +26,12 @@ import javax.inject.Inject;
 
 public class HeartFragment extends BaseFragment {
     private static final String TAG = HeartFragment.class.getSimpleName();
-    @Inject
-    HeartFragmentPresenter heartFragmentPresenter;
+    private HeartFragmentPresenter heartFragmentPresenter;
     private HeartFragmentComponent heartFragmentComponent;
     public HeartRateBinding mHeartRateBinding;
+
+    @Inject
+    HeartRate heartRate;
 
     public static HeartFragment newInstance() {
         return new HeartFragment();
@@ -33,6 +40,11 @@ public class HeartFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        heartFragmentComponent = DaggerHeartFragmentComponent.builder()
+                .heartFragmentModule(new HeartFragmentModule(this)).build();
+        heartFragmentComponent.inject(this);
+
+        heartFragmentPresenter = new HeartFragmentPresenter(heartRate.getHeartSupport());
     }
 
     @Override
@@ -50,7 +62,7 @@ public class HeartFragment extends BaseFragment {
         init();
     }
 
-    protected HeartFragmentComponent setupActivityComponent() {
+    /*protected HeartFragmentComponent setupActivityComponent() {
         if (heartFragmentComponent == null) {
             heartFragmentComponent = DaggerHeartFragmentComponent.builder()
                     .heartFragmentModule(new HeartFragmentModule(this))
@@ -58,7 +70,7 @@ public class HeartFragment extends BaseFragment {
                     .build();
         }
         return heartFragmentComponent;
-    }
+    }*/
 
     @Override
     protected void init() {

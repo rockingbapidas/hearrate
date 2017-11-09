@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.vantagecircle.heartrate.camera.CameraCallBack;
 import com.vantagecircle.heartrate.camera.CameraSupport;
+import com.vantagecircle.heartrate.fragment.ui.HeartFragment;
 import com.vantagecircle.heartrate.utils.TYPE;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -232,5 +233,9 @@ public class HeartRate implements HeartSupport, CameraCallBack {
             }
             processing.set(false);
         }
+    }
+
+    public HeartSupport getHeartSupport() {
+        return this;
     }
 }

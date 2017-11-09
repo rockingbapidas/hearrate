@@ -2,6 +2,7 @@ package com.vantagecircle.heartrate.fragment.presenter;
 
 import android.util.Log;
 
+import com.vantagecircle.heartrate.core.HeartRate;
 import com.vantagecircle.heartrate.core.HeartSupport;
 import com.vantagecircle.heartrate.core.PulseListener;
 import com.vantagecircle.heartrate.core.StatusListener;
@@ -15,14 +16,12 @@ import com.vantagecircle.heartrate.fragment.ui.HeartFragment;
 public class HeartFragmentPresenter {
     private static final String TAG = HeartFragmentPresenter.class.getSimpleName();
     private HeartSupport heartSupport;
-    private HeartFragment heartFragment;
 
     private HeartM heartM;
     private long timeLimit = 20000;
 
-    public HeartFragmentPresenter(HeartSupport heartSupport, HeartFragment heartFragment) {
+    public HeartFragmentPresenter(HeartSupport heartSupport) {
         this.heartSupport = heartSupport;
-        this.heartFragment = heartFragment;
     }
 
     public void handleClick() {
