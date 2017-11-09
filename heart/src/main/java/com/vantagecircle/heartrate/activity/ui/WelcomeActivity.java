@@ -14,8 +14,6 @@ import com.vantagecircle.heartrate.activity.module.WelcomeActivityModule;
 import com.vantagecircle.heartrate.activity.presenter.WelcomeActivityPresenter;
 import com.vantagecircle.heartrate.databinding.WelcomeActivityBinding;
 
-import javax.inject.Inject;
-
 /**
  * Created by bapidas on 09/10/17.
  */
@@ -23,8 +21,7 @@ import javax.inject.Inject;
 public class WelcomeActivity extends BaseActivity {
     private final String TAG = WelcomeActivity.class.getSimpleName();
     private WelcomeActivityComponent welcomeActivityComponent;
-    @Inject
-    WelcomeActivityPresenter welcomeActivityPresenter;
+    private WelcomeActivityPresenter welcomeActivityPresenter;
     public WelcomeActivityBinding mBinding;
 
     @Override
@@ -32,7 +29,7 @@ public class WelcomeActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setupActivityComponent().inject(this);
         mBinding = DataBindingUtil.setContentView(this, R.layout.welcome_activity);
-        mBinding.setWelcomeActivityHandlers(new WelcomeActivityHandlers(welcomeActivityPresenter));
+        init();
     }
 
     protected WelcomeActivityComponent setupActivityComponent() {
@@ -47,7 +44,8 @@ public class WelcomeActivity extends BaseActivity {
 
     @Override
     protected void init() {
-        //no need to write any code here
+        welcomeActivityPresenter = new WelcomeActivityPresenter(this);
+        mBinding.setWelcomeActivityHandlers(new WelcomeActivityHandlers(welcomeActivityPresenter));
     }
 
     @Override

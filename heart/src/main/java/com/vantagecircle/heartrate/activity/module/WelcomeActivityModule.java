@@ -32,10 +32,4 @@ public class WelcomeActivityModule {
     provideWelcomeActivity() {
         return mWelcomeActivity;
     }
-
-    @Provides
-    WelcomeActivityPresenter
-    provideWelcomeActivityPresenter(WelcomeActivity welcomeActivity) {
-        return new WelcomeActivityPresenter(welcomeActivity);
-    }
 }

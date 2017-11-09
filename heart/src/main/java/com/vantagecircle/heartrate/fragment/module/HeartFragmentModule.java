@@ -28,7 +28,6 @@ public class HeartFragmentModule {
     }
 
     @Provides
-    @ActivityContext
     Context
     provideContext(HeartFragment heartFragment){
         return heartFragment.getActivity().getApplicationContext();
@@ -49,17 +48,17 @@ public class HeartFragmentModule {
     @Provides
     CameraSupport
     provideCameraSupport(Context mContext, ProcessingSupport processingSupport) {
-        return new CameraOld(mContext, processingSupport);
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             return new CameraNew(mContext, processingSupport);
         } else {
             return new CameraOld(mContext, processingSupport);
         }*/
+        return new CameraOld(mContext, processingSupport);
     }
 
     @Provides
-    HeartRate provideHeartSupport(CameraSupport cameraSupport) {
+    HeartRate
+    provideHeartSupport(CameraSupport cameraSupport) {
         return new HeartRate(cameraSupport);
     }
-
 }

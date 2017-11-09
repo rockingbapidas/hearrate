@@ -45,6 +45,10 @@ public class HeartRate implements HeartSupport, CameraCallBack {
         this.cameraSupport = cameraSupport;
     }
 
+    public HeartSupport getHeartSupport() {
+        return this;
+    }
+
     @Override
     public HeartSupport startPulseCheck(long timeLimit, PulseListener pulseListener) {
         this.timeLimit = timeLimit;
@@ -233,9 +237,5 @@ public class HeartRate implements HeartSupport, CameraCallBack {
             }
             processing.set(false);
         }
-    }
-
-    public HeartSupport getHeartSupport() {
-        return this;
     }
 }

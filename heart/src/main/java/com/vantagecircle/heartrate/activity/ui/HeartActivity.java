@@ -32,17 +32,16 @@ import butterknife.Unbinder;
 
 public class HeartActivity extends BaseActivity {
     private final String TAG = HeartActivity.class.getSimpleName();
-    @Inject
-    HeartActivityPresenter mHeartActivityPresenter;
     @BindView(R.id.tabLayout)
     public TabLayout mTabLayout;
     @BindView(R.id.viewpager)
     public ViewPager mViewPager;
     @BindView(R.id.toolbar)
     public Toolbar mToolBar;
+    public ActionBar mActionBar;
 
     private Unbinder mUnBinder;
-    public ActionBar mActionBar;
+    private HeartActivityPresenter mHeartActivityPresenter;
     private HeartActivityComponent heartActivityComponent;
 
     @Override
@@ -67,6 +66,7 @@ public class HeartActivity extends BaseActivity {
 
     @Override
     protected void init() {
+        mHeartActivityPresenter = new HeartActivityPresenter(this);
         mHeartActivityPresenter.setup();
     }
 

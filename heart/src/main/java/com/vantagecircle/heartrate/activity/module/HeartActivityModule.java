@@ -32,10 +32,4 @@ public class HeartActivityModule {
     provideHeartActivity() {
         return mHeartActivity;
     }
-
-    @Provides
-    HeartActivityPresenter
-    provideHeartActivityPresenter(HeartActivity heartActivity) {
-        return new HeartActivityPresenter(heartActivity);
-    }
 }
