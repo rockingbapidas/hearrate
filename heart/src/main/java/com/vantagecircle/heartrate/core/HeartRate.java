@@ -178,7 +178,7 @@ public class HeartRate implements HeartSupport, CameraCallBack {
             }
 
             int rollingAverage = (averageArrayCnt > 0) ? (averageArrayAvg / averageArrayCnt) : 0;
-            Log.e(TAG, "RollingAverage == " + rollingAverage);
+            //Log.e(TAG, "RollingAverage == " + rollingAverage);
 
             TYPE newType = currentType;
             if (pixelAverage < rollingAverage) {

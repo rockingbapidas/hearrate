@@ -2,6 +2,7 @@ package com.vantagecircle.heartrate.fragment.module;
 
 import android.content.Context;
 
+import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.camera.CameraOld;
 import com.vantagecircle.heartrate.camera.CameraSupport;
 import com.vantagecircle.heartrate.core.HeartRate;
@@ -28,26 +29,22 @@ public class HeartFragmentModule {
     }
 
     @Provides
-    Context
-    provideContext(HeartFragment heartFragment){
-        return heartFragment.getActivity().getApplicationContext();
-    }
-
-    @Provides
-    HeartFragment
-    provideHeartFragment(){
+    HeartFragment provideHeartFragment(){
         return mHeartFragment;
     }
 
     @Provides
-    ProcessingSupport
-    provideProcessingSupport() {
+    Context provideContext(){
+        return mHeartFragment.getActivity().getApplicationContext();
+    }
+
+    @Provides
+    ProcessingSupport provideProcessingSupport() {
         return new Processing();
     }
 
     @Provides
-    CameraSupport
-    provideCameraSupport(Context mContext, ProcessingSupport processingSupport) {
+    CameraSupport provideCameraSupport(Context mContext, ProcessingSupport processingSupport) {
         /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             return new CameraNew(mContext, processingSupport);
         } else {
@@ -57,8 +54,7 @@ public class HeartFragmentModule {
     }
 
     @Provides
-    HeartRate
-    provideHeartSupport(CameraSupport cameraSupport) {
+    HeartRate provideHeartRate(CameraSupport cameraSupport) {
         return new HeartRate(cameraSupport);
     }
 }

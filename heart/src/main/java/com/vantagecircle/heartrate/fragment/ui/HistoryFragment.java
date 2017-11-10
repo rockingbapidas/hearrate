@@ -9,11 +9,19 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.vantagecircle.heartrate.R;
+import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.fragment.BaseFragment;
+import com.vantagecircle.heartrate.fragment.component.DaggerHistoryFragmentComponent;
+import com.vantagecircle.heartrate.fragment.component.HistoryFragmentComponent;
+import com.vantagecircle.heartrate.fragment.module.HistoryFragmentModule;
+
+import butterknife.ButterKnife;
+import butterknife.Unbinder;
 
 public class HistoryFragment extends BaseFragment {
     private static final String TAG = HistoryFragment.class.getSimpleName();
-    private View mView;
+    private Unbinder mUnBinder;
+    private HistoryFragmentComponent mHistoryFragmentComponent;
 
     public static HistoryFragment newInstance() {
         return new HistoryFragment();
@@ -25,22 +33,37 @@ public class HistoryFragment extends BaseFragment {
     }
 
     @Override
+    protected void setFragmentComponent() {
+        if (mHistoryFragmentComponent == null) {
+            mHistoryFragmentComponent = DaggerHistoryFragmentComponent.builder()
+                    .historyFragmentModule(new HistoryFragmentModule(this))
+                    .heartActivityComponent(((HeartActivity)getActivity()).getHeartActivityComponent())
+                    .build();
+        }
+        mHistoryFragmentComponent.inject(this);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        mView = inflater.inflate(R.layout.history_layout, container, false);
+        View mView = inflater.inflate(R.layout.history_layout, container, false);
+        mUnBinder = ButterKnife.bind(this, mView);
         return mView;
     }
 
     @Override
     public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-    }
-
-    protected void setupActivityComponent() {
-
+        init();
     }
 
     @Override
     protected void init() {
 
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        mUnBinder.unbind();
     }
 }

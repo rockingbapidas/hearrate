@@ -1,16 +1,17 @@
 package com.vantagecircle.heartrate.activity.ui;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
-import android.support.design.widget.TabLayout;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -24,8 +25,6 @@ import com.vantagecircle.heartrate.activity.presenter.HeartActivityPresenter;
 import com.vantagecircle.heartrate.utils.Constant;
 import com.vantagecircle.heartrate.utils.ToolsUtils;
 
-import javax.inject.Inject;
-
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
@@ -38,35 +37,38 @@ public class HeartActivity extends BaseActivity {
     public ViewPager mViewPager;
     @BindView(R.id.toolbar)
     public Toolbar mToolBar;
-    public ActionBar mActionBar;
 
+    public ActionBar mActionBar;
     private Unbinder mUnBinder;
-    private HeartActivityPresenter mHeartActivityPresenter;
-    private HeartActivityComponent heartActivityComponent;
+    private HeartActivityComponent mHeartActivityComponent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setupActivityComponent().inject(this);
         setContentView(R.layout.main_activity);
         mUnBinder = ButterKnife.bind(this);
         askPermission();
         init();
     }
 
-    protected HeartActivityComponent setupActivityComponent() {
-        if (heartActivityComponent == null) {
-            heartActivityComponent = DaggerHeartActivityComponent.builder()
+    @Override
+    protected void setActivityComponent() {
+        if (mHeartActivityComponent == null) {
+            mHeartActivityComponent = DaggerHeartActivityComponent.builder()
                     .heartActivityModule(new HeartActivityModule(this))
                     .appComponent(HeartApplication.get(this).getAppComponent())
                     .build();
         }
-        return heartActivityComponent;
+        mHeartActivityComponent.inject(this);
+    }
+
+    public HeartActivityComponent getHeartActivityComponent() {
+        return mHeartActivityComponent;
     }
 
     @Override
     protected void init() {
-        mHeartActivityPresenter = new HeartActivityPresenter(this);
+        HeartActivityPresenter mHeartActivityPresenter = new HeartActivityPresenter(this);
         mHeartActivityPresenter.setup();
     }
 
@@ -114,8 +116,8 @@ public class HeartActivity extends BaseActivity {
     }
 
     @Override
-    public void finish() {
-        super.finish();
+    protected void onDestroy() {
+        super.onDestroy();
         mUnBinder.unbind();
     }
 }

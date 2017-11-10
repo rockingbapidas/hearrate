@@ -1,6 +1,7 @@
 package com.vantagecircle.heartrate.activity.presenter;
 
 import android.content.Intent;
+import android.view.View;
 
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.activity.ui.WelcomeActivity;
@@ -16,7 +17,7 @@ public class WelcomeActivityPresenter {
         this.welcomeActivity = welcomeActivity;
     }
 
-    public void goToHeartScreen() {
+    public void goToHeartScreen(View view) {
         welcomeActivity.startActivity(new Intent(welcomeActivity, HeartActivity.class));
     }
 }

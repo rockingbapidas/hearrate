@@ -5,7 +5,9 @@
     <color name="colorAccent">#371052</color>
 
     <color name="orange">#F78828</color>
-    <color name="colorPrimaryTranslucent">#be371052</color>
+    <color name="colorPrimaryTranslucent">#33371052</color>
+    <color name="colorPrimaryFaid">#4d3360</color>
     <color name="white">#ffffff</color>
-    <color name="grey">#d7d7d7</color>
+    <color name="black">#565656</color>
+    <color name="grey">#CCffffff</color>
 </resources>

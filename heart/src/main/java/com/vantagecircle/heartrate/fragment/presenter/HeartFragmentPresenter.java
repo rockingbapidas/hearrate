@@ -1,67 +1,102 @@
 package com.vantagecircle.heartrate.fragment.presenter;
 
+import android.databinding.BaseObservable;
+import android.databinding.Bindable;
+import android.support.v7.app.AlertDialog;
 import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
 
-import com.vantagecircle.heartrate.core.HeartRate;
+import com.vantagecircle.heartrate.BR;
+import com.vantagecircle.heartrate.HeartApplication;
+import com.vantagecircle.heartrate.R;
 import com.vantagecircle.heartrate.core.HeartSupport;
 import com.vantagecircle.heartrate.core.PulseListener;
 import com.vantagecircle.heartrate.core.StatusListener;
-import com.vantagecircle.heartrate.data.HeartM;
-import com.vantagecircle.heartrate.fragment.ui.HeartFragment;
 
 /**
  * Created by bapidas on 08/11/17.
  */
 
-public class HeartFragmentPresenter {
+public class HeartFragmentPresenter extends BaseObservable {
     private static final String TAG = HeartFragmentPresenter.class.getSimpleName();
-    private HeartSupport heartSupport;
 
-    private HeartM heartM;
-    private long timeLimit = 20000;
+    private HeartSupport mHeartSupport;
+    private boolean isStarted;
+    private String beatsPerMinute;
+    private boolean isFingerDetected;
 
-    public HeartFragmentPresenter(HeartSupport heartSupport) {
-        this.heartSupport = heartSupport;
+    public HeartFragmentPresenter(HeartSupport mHeartSupport) {
+        this.mHeartSupport = mHeartSupport;
     }
 
-    public void handleClick() {
-        if (heartM != null && heartM.isStarted()) {
-            heartSupport.stopPulseCheck();
-            heartM.setStarted(false);
+    @Bindable
+    public boolean isStarted() {
+        return isStarted;
+    }
+
+    @Bindable
+    public String getBeatsPerMinute() {
+        return beatsPerMinute;
+    }
+
+    @Bindable
+    public boolean isFingerDetected() {
+        return isFingerDetected;
+    }
+
+    private void setStarted(boolean started) {
+        isStarted = started;
+        notifyPropertyChanged(BR.started);
+    }
+
+    private void setBeatsPerMinute(String beatsPerMinute) {
+        this.beatsPerMinute = beatsPerMinute;
+        notifyPropertyChanged(BR.beatsPerMinute);
+    }
+
+    private void setFingerDetected(boolean fingerDetected) {
+        isFingerDetected = fingerDetected;
+        notifyPropertyChanged(BR.fingerDetected);
+    }
+
+    public void onHelpClick(View view){
+        AlertDialog.Builder dialog = new AlertDialog.Builder(view.getContext());
+        View mView = LayoutInflater.from(view.getContext()).inflate(R.layout.hint_diaog, null);
+        dialog.setView(mView);
+        AlertDialog alertDialog = dialog.create();
+        alertDialog.show();
+    }
+
+    public void onStartClick(View view) {
+        if (isStarted()) {
+            setStarted(false);
+            mHeartSupport.stopPulseCheck();
         } else {
-            if (heartM != null) {
-                heartM.setStarted(true);
-                heartM.setBeatsPerMinuteValue("-----");
-            } else {
-                heartM = new HeartM();
-                heartM.setStarted(true);
-                heartM.setBeatsPerMinuteValue("-----");
-            }
+            setStarted(true);
+            setBeatsPerMinute("-----");
             start();
         }
     }
 
     private void start() {
-        heartSupport.startPulseCheck(new PulseListener() {
+        mHeartSupport.startPulseCheck(new PulseListener() {
             @Override
             public void OnPulseDetected(int success) {
                 Log.e(TAG, "OnPulseDetected == " + success);
-
-                heartM.setDetectHeartRate(true);
+                setFingerDetected(true);
             }
 
             @Override
             public void OnPulseDetectFailed(int failed) {
                 Log.e(TAG, "OnPulseDetectFailed == " + failed);
-
-                heartM.setDetectHeartRate(false);
+                setFingerDetected(false);
             }
 
             @Override
             public void OnPulseResult(String pulse) {
                 Log.e(TAG, "OnPulseResult == " + pulse);
-
-                heartM.setBeatsPerMinuteValue(pulse);
+                setBeatsPerMinute(pulse);
             }
         }).setOnStatusListener(new StatusListener() {
             @Override
@@ -77,8 +112,7 @@ public class HeartFragmentPresenter {
             @Override
             public void OnCheckStopped() {
                 Log.e(TAG, "OnCheckStopped == ");
-
-                heartM.setStarted(false);
+                setStarted(false);
             }
         });
     }

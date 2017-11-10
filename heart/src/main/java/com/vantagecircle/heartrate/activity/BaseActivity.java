@@ -12,7 +12,10 @@ public abstract class BaseActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        setActivityComponent();
     }
+
+    protected abstract void setActivityComponent();
 
     protected abstract void init();
 }
