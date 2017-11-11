@@ -15,4 +15,19 @@
         <item name="android:maxHeight">300dip</item>
     </style>
 
+    <style name="RippleStyle">
+        <item name="mrl_rippleOverlay">true</item>
+        <item name="mrl_rippleDelayClick">true</item>
+        <item name="mrl_rippleHover">true</item>
+        <item name="mrl_rippleAlpha">0.2</item>
+    </style>
+
+    <style name="RippleStyle.White">
+        <item name="mrl_rippleColor">@color/white80</item>
+    </style>
+
+    <style name="RippleStyle.Light">
+        <item name="mrl_rippleColor">@color/light_color</item>
+    </style>
+
 </resources>

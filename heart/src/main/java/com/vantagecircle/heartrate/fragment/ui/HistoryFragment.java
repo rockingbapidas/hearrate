@@ -3,6 +3,7 @@ package com.vantagecircle.heartrate.fragment.ui;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,7 +15,9 @@ import com.vantagecircle.heartrate.fragment.BaseFragment;
 import com.vantagecircle.heartrate.fragment.component.DaggerHistoryFragmentComponent;
 import com.vantagecircle.heartrate.fragment.component.HistoryFragmentComponent;
 import com.vantagecircle.heartrate.fragment.module.HistoryFragmentModule;
+import com.vantagecircle.heartrate.fragment.presenter.HistoryFragmentPresenter;
 
+import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
 
@@ -22,6 +25,10 @@ public class HistoryFragment extends BaseFragment {
     private static final String TAG = HistoryFragment.class.getSimpleName();
     private Unbinder mUnBinder;
     private HistoryFragmentComponent mHistoryFragmentComponent;
+    private HistoryFragmentPresenter mHistoryFragmentPresenter;
+
+    @BindView(R.id.recycler_view)
+    private RecyclerView mRecyclerView;
 
     public static HistoryFragment newInstance() {
         return new HistoryFragment();
@@ -58,7 +65,7 @@ public class HistoryFragment extends BaseFragment {
 
     @Override
     protected void init() {
-
+        mHistoryFragmentPresenter = new HistoryFragmentPresenter();
     }
 
     @Override

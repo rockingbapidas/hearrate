@@ -6,6 +6,7 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.Button;
 
 import com.vantagecircle.heartrate.BR;
 import com.vantagecircle.heartrate.HeartApplication;
@@ -14,17 +15,19 @@ import com.vantagecircle.heartrate.core.HeartSupport;
 import com.vantagecircle.heartrate.core.PulseListener;
 import com.vantagecircle.heartrate.core.StatusListener;
 
+import butterknife.ButterKnife;
+
 /**
  * Created by bapidas on 08/11/17.
  */
 
 public class HeartFragmentPresenter extends BaseObservable {
     private static final String TAG = HeartFragmentPresenter.class.getSimpleName();
-
     private HeartSupport mHeartSupport;
     private boolean isStarted;
     private String beatsPerMinute;
     private boolean isFingerDetected;
+    private AlertDialog alertDialog;
 
     public HeartFragmentPresenter(HeartSupport mHeartSupport) {
         this.mHeartSupport = mHeartSupport;
@@ -63,8 +66,15 @@ public class HeartFragmentPresenter extends BaseObservable {
     public void onHelpClick(View view){
         AlertDialog.Builder dialog = new AlertDialog.Builder(view.getContext());
         View mView = LayoutInflater.from(view.getContext()).inflate(R.layout.hint_diaog, null);
+        Button btnOk = mView.findViewById(R.id.btnOk);
+        btnOk.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                alertDialog.dismiss();
+            }
+        });
         dialog.setView(mView);
-        AlertDialog alertDialog = dialog.create();
+        alertDialog = dialog.create();
         alertDialog.show();
     }
 

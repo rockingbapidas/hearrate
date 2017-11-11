@@ -52,13 +52,20 @@
         android:textColor="@color/black"
         android:textSize="16sp" />
 
-    <Button
+    <com.balysv.materialripple.MaterialRippleLayout
+        style="@style/RippleStyle.White"
         android:layout_width="150dp"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:background="@drawable/button_shape_round"
-        android:text="@string/ok_"
-        android:textColor="@color/white" />
+        android:layout_marginTop="20dp">
+
+        <Button
+            android:id="@+id/btnOk"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@drawable/button_shape_round"
+            android:text="@string/ok_"
+            android:textColor="@color/white" />
+    </com.balysv.materialripple.MaterialRippleLayout>
 
 </LinearLayout>

@@ -22,9 +22,9 @@ android {
             keyAlias "heart"
             keyPassword "heartrate"
             storePassword "heartrate"
-            //storeFile file('I:/Android_Projects/HeartRate/heart_rate_key.jks')
-//            storeFile file('/Users/bapidas/AndroidStudioProjects/HeartRate/heart_rate_key.jks')
-            storeFile file('/Users/somirsaikia/Documents/AndroidApp/HeartRate/heart_rate_key.jks')
+            storeFile file('I:/Android_Projects/HeartRate/heart_rate_key.jks')
+            //storeFile file('/Users/bapidas/AndroidStudioProjects/HeartRate/heart_rate_key.jks')
+            //storeFile file('/Users/somirsaikia/Documents/AndroidApp/HeartRate/heart_rate_key.jks')
         }
     }
     buildTypes {
@@ -52,7 +52,6 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.android.support:support-v4:26.1.0'
     compile fileTree(dir: 'libs', include: ['*.jar'])
 
     //android support dependency
@@ -70,9 +69,8 @@ dependencies {
     compile "com.jakewharton:butterknife:${rootProject.ext.butterKnifeVersion}"
     compile 'javax.inject:javax.inject:1'
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-    compile('com.crashlytics.sdk.android:crashlytics:2.7.1@aar') {
-        transitive = true;
-    }
+    compile('com.crashlytics.sdk.android:crashlytics:2.7.1@aar') { transitive = true; }
+    compile 'com.balysv:material-ripple:1.0.2'
 
     provided 'org.glassfish:javax.annotation:10.0-b28'
     provided 'javax.annotation:jsr250-api:1.0'

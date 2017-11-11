@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<layout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<layout xmlns:android="http://schemas.android.com/apk/res/android">
+
     <data>
         <import type="android.view.View" />
         <variable
@@ -79,15 +79,22 @@
             </LinearLayout>
         </RelativeLayout>
 
-        <Button
-            android:id="@+id/btnStart"
+        <com.balysv.materialripple.MaterialRippleLayout
+            style="@style/RippleStyle.White"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
-            android:background="@drawable/button_shape"
-            android:onClick="@{(view) -> heartPresenter.onHelpClick(view)}"
-            android:text="@string/how_it_works"
-            android:textColor="@color/white" />
+            android:layout_marginTop="20dp">
+
+            <Button
+                android:id="@+id/btnStart"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@drawable/button_shape"
+                android:onClick="@{(view) -> heartPresenter.onHelpClick(view)}"
+                android:text="@string/how_it_works"
+                android:textColor="@color/white" />
+
+        </com.balysv.materialripple.MaterialRippleLayout>
 
     </LinearLayout>
 </layout>
