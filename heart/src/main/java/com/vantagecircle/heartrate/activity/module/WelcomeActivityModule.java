@@ -21,15 +21,13 @@ public class WelcomeActivityModule {
     }
 
     @Provides
-    WelcomeActivity
-    provideWelcomeActivity() {
+    @ActivityContext
+    Context provideContext() {
         return mWelcomeActivity;
     }
 
     @Provides
-    @ActivityContext
-    Context
-    provideContext() {
+    WelcomeActivity provideWelcomeActivity() {
         return mWelcomeActivity;
     }
 }

@@ -28,7 +28,7 @@ public class HistoryFragment extends BaseFragment {
     private HistoryFragmentPresenter mHistoryFragmentPresenter;
 
     @BindView(R.id.recycler_view)
-    private RecyclerView mRecyclerView;
+    public RecyclerView mRecyclerView;
 
     public static HistoryFragment newInstance() {
         return new HistoryFragment();

@@ -63,7 +63,7 @@ public class HeartFragmentPresenter extends BaseObservable {
         notifyPropertyChanged(BR.fingerDetected);
     }
 
-    public void onHelpClick(View view){
+    public void onHelpClick(View view) {
         AlertDialog.Builder dialog = new AlertDialog.Builder(view.getContext());
         View mView = LayoutInflater.from(view.getContext()).inflate(R.layout.hint_diaog, null);
         Button btnOk = mView.findViewById(R.id.btnOk);
@@ -108,7 +108,8 @@ public class HeartFragmentPresenter extends BaseObservable {
                 Log.e(TAG, "OnPulseResult == " + pulse);
                 setBeatsPerMinute(pulse);
             }
-        }).setOnStatusListener(new StatusListener() {
+        });
+        mHeartSupport.setOnStatusListener(new StatusListener() {
             @Override
             public void OnCheckStarted() {
                 Log.e(TAG, "OnCheckStarted == ");

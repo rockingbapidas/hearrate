@@ -3,13 +3,14 @@ package com.vantagecircle.heartrate.scope;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
-import javax.inject.Scope;
+import javax.inject.Qualifier;
 
 /**
- * Created by bapidas on 08/11/17.
+ * Created by SiD on 11/12/2017.
  */
-@Scope
+
+@Qualifier
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PerFragment {
+public @interface DatabaseInfo {
 
 }

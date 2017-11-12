@@ -4,6 +4,7 @@ import android.app.Application;
 import android.content.Context;
 
 import com.vantagecircle.heartrate.scope.ApplicationContext;
+import com.vantagecircle.heartrate.scope.DatabaseInfo;
 
 import dagger.Module;
 import dagger.Provides;
@@ -20,15 +21,26 @@ public class AppModule {
     }
 
     @Provides
-    Application
-    provideApplication() {
+    @ApplicationContext
+    Context provideContext() {
         return mApplication;
     }
 
     @Provides
-    @ApplicationContext
-    Context
-    provideContext() {
+    Application provideApplication() {
         return mApplication;
+    }
+
+
+    @Provides
+    @DatabaseInfo
+    String provideDatabaseName() {
+        return "heart-rate.db";
+    }
+
+    @Provides
+    @DatabaseInfo
+    Integer provideDatabaseVersion() {
+        return 1;
     }
 }

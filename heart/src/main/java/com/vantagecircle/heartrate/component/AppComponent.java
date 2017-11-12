@@ -4,6 +4,8 @@ import android.app.Application;
 import android.content.Context;
 
 import com.vantagecircle.heartrate.HeartApplication;
+import com.vantagecircle.heartrate.data.DataManager;
+import com.vantagecircle.heartrate.data.DatabaseHelper;
 import com.vantagecircle.heartrate.module.AppModule;
 import com.vantagecircle.heartrate.scope.ApplicationContext;
 
@@ -27,4 +29,8 @@ public interface AppComponent {
     Context getContext();
 
     Application getApplication();
+
+    DataManager getDataManager();
+
+    DatabaseHelper getDatabaseHelper();
 }

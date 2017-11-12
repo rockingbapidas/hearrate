@@ -36,7 +36,7 @@ ext {
     supportLibVersion = "26.1.0"
     constraintLayoutVersion = "1.0.2"
 
-    googleVersion = "11.4.2"
+    googleVersion = "11.6.0"
     daggerVersion = "2.8"
     gsonVersion = "2.8.1"
 

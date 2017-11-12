@@ -21,15 +21,13 @@ public class HeartActivityModule {
     }
 
     @Provides
-    HeartActivity
-    provideHeartActivity() {
+    @ActivityContext
+    Context provideContext() {
         return mHeartActivity;
     }
 
     @Provides
-    @ActivityContext
-    Context
-    provideContext() {
+    HeartActivity provideHeartActivity() {
         return mHeartActivity;
     }
 }
