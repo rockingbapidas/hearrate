@@ -53,7 +53,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@string/default_bpm"
+                    android:text="@{heartPresenter.beatsPerMinute == null ? @string/default_bpm : heartPresenter.beatsPerMinute"
                     android:textColor="@color/white"
                     android:textSize="60sp"
                     android:textStyle="bold" />
