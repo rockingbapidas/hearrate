@@ -32,7 +32,7 @@ public class HistoryAdapter extends RecyclerView.Adapter<HistoryViewHolder> {
     @Override
     public void onBindViewHolder(HistoryViewHolder holder, int position) {
         HistoryModel model = arrayList.get(position);
-        holder.getBinding().setVariable(BR.history, model.getHeartRate());
+        holder.getBinding().setVariable(BR.history, model);
     }
 
     @Override

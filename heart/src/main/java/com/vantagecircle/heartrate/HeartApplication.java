@@ -19,8 +19,6 @@ import io.fabric.sdk.android.Fabric;
 
 public class HeartApplication extends Application {
     private AppComponent appComponent;
-    @Inject
-    DataManager dataManager;
 
     public static HeartApplication get(Context context) {
         return (HeartApplication) context.getApplicationContext();

@@ -12,7 +12,7 @@ import android.view.View;
 public class HistoryViewHolder extends RecyclerView.ViewHolder {
     private ViewDataBinding binding;
 
-    public HistoryViewHolder(View rowView) {
+    HistoryViewHolder(View rowView) {
         super(rowView);
         binding = DataBindingUtil.bind(rowView);
     }
