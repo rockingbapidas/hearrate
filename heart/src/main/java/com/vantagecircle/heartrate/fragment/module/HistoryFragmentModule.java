@@ -3,6 +3,8 @@ package com.vantagecircle.heartrate.fragment.module;
 import android.content.Context;
 
 import com.vantagecircle.heartrate.fragment.ui.HistoryFragment;
+import com.vantagecircle.heartrate.scope.ActivityContext;
+import com.vantagecircle.heartrate.scope.ApplicationContext;
 
 import dagger.Module;
 import dagger.Provides;
@@ -19,12 +21,13 @@ public class HistoryFragmentModule {
     }
 
     @Provides
-    HistoryFragment provideHeartFragment(){
-        return mHistoryFragment;
+    @ActivityContext
+    Context provideContext(){
+        return mHistoryFragment.getActivity();
     }
 
     @Provides
-    Context provideContext(){
-        return mHistoryFragment.getActivity().getApplicationContext();
+    HistoryFragment provideHeartFragment(){
+        return mHistoryFragment;
     }
 }

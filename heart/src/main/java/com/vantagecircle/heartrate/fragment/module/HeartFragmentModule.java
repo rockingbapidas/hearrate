@@ -12,6 +12,7 @@ import com.vantagecircle.heartrate.fragment.ui.HeartFragment;
 import com.vantagecircle.heartrate.processing.Processing;
 import com.vantagecircle.heartrate.processing.ProcessingSupport;
 import com.vantagecircle.heartrate.scope.ActivityContext;
+import com.vantagecircle.heartrate.scope.ApplicationContext;
 import com.vantagecircle.heartrate.scope.PerFragment;
 
 import dagger.Module;
@@ -31,7 +32,7 @@ public class HeartFragmentModule {
     @Provides
     @ActivityContext
     Context provideContext(){
-        return mHeartFragment.getActivity().getApplicationContext();
+        return mHeartFragment.getActivity();
     }
 
     @Provides

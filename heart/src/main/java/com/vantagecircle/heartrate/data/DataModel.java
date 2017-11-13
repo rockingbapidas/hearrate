@@ -11,13 +11,15 @@ public class DataModel {
     static final String HISTORY_TABLE = "history_table";
     static final String COLUMN_ID = "id";
     static final String COLUMN_HEART_RATE = "heart_rate";
-    static final String COLUMN_TIME_STAMP = "timeStamp";
+    static final String COLUMN_DATE_STRING = "date_string";
+    static final String COLUMN_TIME_STRING = "time_string";
 
     static final String CREATE_HEART_TABLE_QUERY =
             "CREATE TABLE IF NOT EXISTS " + HISTORY_TABLE + " (" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + COMMA_SEP +
                     COLUMN_HEART_RATE + TEXT_TYPE + COMMA_SEP +
-                    COLUMN_TIME_STAMP + TEXT_TYPE +
+                    COLUMN_DATE_STRING + TEXT_TYPE + COMMA_SEP +
+                    COLUMN_TIME_STRING + TEXT_TYPE +
                     ")";
     static final String GET_HISTORY_QUERY = "SELECT * FROM " + HISTORY_TABLE;
 }

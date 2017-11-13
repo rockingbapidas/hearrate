@@ -6,7 +6,10 @@ import android.content.Context;
 import com.crashlytics.android.Crashlytics;
 import com.vantagecircle.heartrate.component.AppComponent;
 import com.vantagecircle.heartrate.component.DaggerAppComponent;
+import com.vantagecircle.heartrate.data.DataManager;
 import com.vantagecircle.heartrate.module.AppModule;
+
+import javax.inject.Inject;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -16,6 +19,8 @@ import io.fabric.sdk.android.Fabric;
 
 public class HeartApplication extends Application {
     private AppComponent appComponent;
+    @Inject
+    DataManager dataManager;
 
     public static HeartApplication get(Context context) {
         return (HeartApplication) context.getApplicationContext();

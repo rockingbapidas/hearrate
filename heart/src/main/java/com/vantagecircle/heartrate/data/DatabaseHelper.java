@@ -44,10 +44,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (cursor != null) {
                 cursor.moveToFirst();
                 if (cursor.getCount() > 0) {
-                    String id = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_ID));
                     String heartRate = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_HEART_RATE));
-                    String timeStamp = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_TIME_STAMP));
-                    HistoryModel historyModel = new HistoryModel(id, heartRate, Long.parseLong(timeStamp));
+                    String date = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_DATE_STRING));
+                    String time = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_TIME_STRING));
+                    HistoryModel historyModel = new HistoryModel(heartRate, date, time);
                     arrayList.add(historyModel);
                 }
             }
@@ -68,10 +68,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             if (cursor != null) {
                 cursor.moveToFirst();
                 if (cursor.getCount() > 0) {
-                    String id = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_ID));
                     String heartRate = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_HEART_RATE));
-                    String timeStamp = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_TIME_STAMP));
-                    HistoryModel historyModel = new HistoryModel(id, heartRate, Long.parseLong(timeStamp));
+                    String date = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_DATE_STRING));
+                    String time = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_TIME_STRING));
+                    HistoryModel historyModel = new HistoryModel(heartRate, date, time);
                     arrayList.add(historyModel);
                 }
             }
@@ -88,7 +88,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         try {
             ContentValues cValues = new ContentValues();
             cValues.put(DataModel.COLUMN_HEART_RATE, historyModel.getHeartRate());
-            cValues.put(DataModel.COLUMN_TIME_STAMP, historyModel.getTimeStamp());
+            cValues.put(DataModel.COLUMN_DATE_STRING, historyModel.getDateString());
+            cValues.put(DataModel.COLUMN_TIME_STRING, historyModel.getTimeString());
             return getReadableDatabase().insert(DataModel.HISTORY_TABLE, null, cValues) > 0;
         } catch (Exception e) {
             e.printStackTrace();

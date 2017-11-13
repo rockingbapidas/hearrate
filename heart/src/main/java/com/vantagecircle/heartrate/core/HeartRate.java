@@ -1,11 +1,9 @@
 package com.vantagecircle.heartrate.core;
 
 import android.os.CountDownTimer;
-import android.util.Log;
 
 import com.vantagecircle.heartrate.camera.CameraCallBack;
 import com.vantagecircle.heartrate.camera.CameraSupport;
-import com.vantagecircle.heartrate.fragment.ui.HeartFragment;
 import com.vantagecircle.heartrate.utils.TYPE;
 
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -17,9 +15,10 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class HeartRate implements HeartSupport, CameraCallBack {
     private static final String TAG = HeartRate.class.getSimpleName();
 
-    private CameraSupport cameraSupport;
-    private StatusListener statusListener;
-    private PulseListener pulseListener;
+    private CameraSupport mCameraSupport;
+    private TimerListener mTimerListener;
+    private PulseListener mPulseListener;
+    private FingerListener mFingerListener;
 
     private long timeLimit = 0;
     private boolean isTimeRunning = false;
@@ -41,8 +40,8 @@ public class HeartRate implements HeartSupport, CameraCallBack {
     private int errorCount = 0;
     private int successCount = 0;
 
-    public HeartRate(CameraSupport cameraSupport) {
-        this.cameraSupport = cameraSupport;
+    public HeartRate(CameraSupport mCameraSupport) {
+        this.mCameraSupport = mCameraSupport;
     }
 
     public HeartSupport getHeartSupport() {
@@ -50,18 +49,17 @@ public class HeartRate implements HeartSupport, CameraCallBack {
     }
 
     @Override
-    public HeartSupport startPulseCheck(long timeLimit, PulseListener pulseListener) {
+    public HeartSupport startPulseCheck(long timeLimit) {
         this.timeLimit = timeLimit;
-        this.pulseListener = pulseListener;
-        if (cameraSupport != null) {
-            if (!cameraSupport.isCameraInUse()) {
+        if (mCameraSupport != null) {
+            if (!mCameraSupport.isCameraInUse()) {
                 errorCount = 0;
                 successCount = 0;
                 startTime = System.currentTimeMillis();
                 startTimer();
-                cameraSupport.open().setOnPreviewListener(this);
-                if (statusListener != null) {
-                    statusListener.OnCheckStarted();
+                mCameraSupport.open().setOnPreviewListener(this);
+                if (mTimerListener != null) {
+                    mTimerListener.OnTimerStarted();
                 }
             } else {
                 throw new RuntimeException("Camera is already in use state");
@@ -73,17 +71,16 @@ public class HeartRate implements HeartSupport, CameraCallBack {
     }
 
     @Override
-    public HeartSupport startPulseCheck(PulseListener pulseListener) {
-        this.pulseListener = pulseListener;
-        if (cameraSupport != null) {
-            if (!cameraSupport.isCameraInUse()) {
+    public HeartSupport startPulseCheck() {
+        if (mCameraSupport != null) {
+            if (!mCameraSupport.isCameraInUse()) {
                 errorCount = 0;
                 successCount = 0;
                 startTime = System.currentTimeMillis();
                 startTimer();
-                cameraSupport.open().setOnPreviewListener(this);
-                if (statusListener != null) {
-                    statusListener.OnCheckStarted();
+                mCameraSupport.open().setOnPreviewListener(this);
+                if (mTimerListener != null) {
+                    mTimerListener.OnTimerStarted();
                 }
             } else {
                 throw new RuntimeException("Camera is already in use state");
@@ -95,26 +92,34 @@ public class HeartRate implements HeartSupport, CameraCallBack {
     }
 
     @Override
-    public void setOnStatusListener(StatusListener statusListener) {
-        this.statusListener = statusListener;
+    public HeartSupport addOnResultListener(PulseListener pulseListener) {
+        this.mPulseListener = pulseListener;
+        return this;
     }
 
     @Override
-    public void OnPixelAverage(int pixelAverage) {
-        calculatePulse(pixelAverage);
+    public HeartSupport addOnFingerListener(FingerListener fingerListener) {
+        this.mFingerListener = fingerListener;
+        return this;
+    }
+
+    @Override
+    public HeartSupport addOnTimerListener(TimerListener timerListener) {
+        this.mTimerListener = timerListener;
+        return this;
     }
 
     @Override
     public void stopPulseCheck() {
-        if (cameraSupport != null) {
-            if (cameraSupport.isCameraInUse()) {
-                cameraSupport.close();
+        if (mCameraSupport != null) {
+            if (mCameraSupport.isCameraInUse()) {
+                mCameraSupport.close();
                 if (isTimeRunning) {
                     countDownTimer.cancel();
                     isTimeRunning = false;
                 }
-                if (statusListener != null) {
-                    statusListener.OnCheckStopped();
+                if (mTimerListener != null) {
+                    mTimerListener.OnTimerStopped();
                 }
             } else {
                 throw new RuntimeException("Camera is already in close state");
@@ -124,14 +129,19 @@ public class HeartRate implements HeartSupport, CameraCallBack {
         }
     }
 
+    @Override
+    public void OnPixelAverage(int pixelAverage) {
+        calculatePulse(pixelAverage);
+    }
+
     private void startTimer() {
         if (timeLimit != 0) {
             countDownTimer = new CountDownTimer(timeLimit, 1000) {
 
                 public void onTick(long millisUntilFinished) {
                     isTimeRunning = true;
-                    if (statusListener != null) {
-                        statusListener.OnCheckRunning();
+                    if (mTimerListener != null) {
+                        mTimerListener.OnTimerRunning(millisUntilFinished);
                     }
                 }
 
@@ -145,8 +155,6 @@ public class HeartRate implements HeartSupport, CameraCallBack {
     }
 
     private void calculatePulse(int pixelAverage) {
-        Log.e(TAG, "Pixels == " + pixelAverage);
-
         if (!processing.compareAndSet(false, true)) {
             return;
         }
@@ -158,14 +166,14 @@ public class HeartRate implements HeartSupport, CameraCallBack {
 
         if (pixelAverage < 200) {
             errorCount++;
-            if (pulseListener != null) {
-                pulseListener.OnPulseDetectFailed(errorCount);
+            if (mFingerListener != null) {
+                mFingerListener.OnFingerDetectFailed(errorCount);
             }
             processing.set(false);
         } else {
             successCount++;
-            if (pulseListener != null) {
-                pulseListener.OnPulseDetected(successCount);
+            if (mFingerListener != null) {
+                mFingerListener.OnFingerDetected(successCount);
             }
 
             int averageArrayAvg = 0;
@@ -178,8 +186,6 @@ public class HeartRate implements HeartSupport, CameraCallBack {
             }
 
             int rollingAverage = (averageArrayCnt > 0) ? (averageArrayAvg / averageArrayCnt) : 0;
-            //Log.e(TAG, "RollingAverage == " + rollingAverage);
-
             TYPE newType = currentType;
             if (pixelAverage < rollingAverage) {
                 newType = TYPE.RED;
@@ -202,7 +208,7 @@ public class HeartRate implements HeartSupport, CameraCallBack {
             long endTime = System.currentTimeMillis();
             double totalTimeInSecs = (endTime - startTime) / 1000d;
 
-            if (totalTimeInSecs >= 20) {
+            if (totalTimeInSecs >= 5) {
                 double bps = (beats / totalTimeInSecs);
                 int dpm = (int) (bps * 60d);
                 if (dpm < 30 || dpm > 180) {
@@ -229,8 +235,8 @@ public class HeartRate implements HeartSupport, CameraCallBack {
                 int beatsAvg = (beatsArrayAvg / beatsArrayCnt);
                 String beatsPerMinuteValue = String.valueOf(beatsAvg);
 
-                if (pulseListener != null) {
-                    pulseListener.OnPulseResult(beatsPerMinuteValue);
+                if (mPulseListener != null) {
+                    mPulseListener.OnPulseResult(beatsPerMinuteValue);
                 }
                 startTime = System.currentTimeMillis();
                 beats = 0;

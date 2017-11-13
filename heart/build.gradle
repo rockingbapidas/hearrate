@@ -22,8 +22,8 @@ android {
             keyAlias "heart"
             keyPassword "heartrate"
             storePassword "heartrate"
-            storeFile file('I:/Android_Projects/HeartRate/heart_rate_key.jks')
-            //storeFile file('/Users/bapidas/AndroidStudioProjects/HeartRate/heart_rate_key.jks')
+            //storeFile file('I:/Android_Projects/HeartRate/heart_rate_key.jks')
+            storeFile file('/Users/bapidas/AndroidStudioProjects/HeartRate/heart_rate_key.jks')
             //storeFile file('/Users/somirsaikia/Documents/AndroidApp/HeartRate/heart_rate_key.jks')
         }
     }

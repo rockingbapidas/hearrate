@@ -11,11 +11,14 @@ import android.widget.TextView;
 
 import com.vantagecircle.heartrate.R;
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
+import com.vantagecircle.heartrate.data.DataManager;
 import com.vantagecircle.heartrate.fragment.BaseFragment;
 import com.vantagecircle.heartrate.fragment.component.DaggerHistoryFragmentComponent;
 import com.vantagecircle.heartrate.fragment.component.HistoryFragmentComponent;
 import com.vantagecircle.heartrate.fragment.module.HistoryFragmentModule;
 import com.vantagecircle.heartrate.fragment.presenter.HistoryFragmentPresenter;
+
+import javax.inject.Inject;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
@@ -65,7 +68,8 @@ public class HistoryFragment extends BaseFragment {
 
     @Override
     protected void init() {
-        mHistoryFragmentPresenter = new HistoryFragmentPresenter();
+        mHistoryFragmentPresenter = new HistoryFragmentPresenter(null,
+                this.getActivity().getApplicationContext());
     }
 
     @Override

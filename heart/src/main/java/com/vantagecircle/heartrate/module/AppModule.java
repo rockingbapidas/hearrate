@@ -31,7 +31,6 @@ public class AppModule {
         return mApplication;
     }
 
-
     @Provides
     @DatabaseInfo
     String provideDatabaseName() {

@@ -2,7 +2,9 @@
 <layout xmlns:android="http://schemas.android.com/apk/res/android">
 
     <data>
+
         <import type="android.view.View" />
+
         <variable
             name="heartPresenter"
             type="com.vantagecircle.heartrate.fragment.presenter.HeartFragmentPresenter" />
@@ -20,19 +22,21 @@
             android:layout_height="wrap_content">
 
             <ProgressBar
+                android:id="@+id/progress"
                 style="@style/CustomProgressBar"
                 android:layout_width="300dp"
                 android:layout_height="300dp"
                 android:layout_centerInParent="true"
                 android:max="100"
                 android:progress="20"
-                android:secondaryProgress="40" />
+                android:secondaryProgress="@{heartPresenter.progress}" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_centerInParent="true"
                 android:gravity="center"
+                android:onClick="@{(view) -> heartPresenter.onStartClick(view)}"
                 android:orientation="vertical">
 
                 <TextView
@@ -46,10 +50,11 @@
                     android:textSize="20sp" />
 
                 <TextView
+                    android:id="@+id/heartRate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:text="@string/default_bpm"
+                    android:text="@{heartPresenter.beatsPerMinute == null ? @string/default_bpm : heartPresenter.beatsPerMinute}"
                     android:textColor="@color/white"
                     android:textSize="60sp"
                     android:textStyle="bold" />
@@ -70,7 +75,6 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
-                        android:layout_marginStart="10dp"
                         android:text="@string/bpm"
                         android:textColor="@color/grey"
                         android:textSize="20sp" />
@@ -86,7 +90,7 @@
             android:layout_marginTop="20dp">
 
             <Button
-                android:id="@+id/btnStart"
+                android:id="@+id/btnHint"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/button_shape"
