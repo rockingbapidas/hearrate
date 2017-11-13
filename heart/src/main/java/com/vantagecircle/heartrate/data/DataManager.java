@@ -2,6 +2,7 @@ package com.vantagecircle.heartrate.data;
 
 import android.content.Context;
 
+import com.vantagecircle.heartrate.model.HistoryModel;
 import com.vantagecircle.heartrate.scope.ApplicationContext;
 
 import java.util.ArrayList;

@@ -1,6 +1,5 @@
 package com.vantagecircle.heartrate.adapter;
 
-import android.databinding.DataBindingUtil;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,7 +7,7 @@ import android.view.ViewGroup;
 
 import com.vantagecircle.heartrate.BR;
 import com.vantagecircle.heartrate.R;
-import com.vantagecircle.heartrate.data.HistoryModel;
+import com.vantagecircle.heartrate.model.HistoryModel;
 
 import java.util.ArrayList;
 

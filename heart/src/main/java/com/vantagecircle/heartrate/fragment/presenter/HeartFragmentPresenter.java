@@ -1,6 +1,5 @@
 package com.vantagecircle.heartrate.fragment.presenter;
 
-import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
@@ -8,7 +7,6 @@ import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.animation.DecelerateInterpolator;
 import android.widget.Button;
 
 import com.vantagecircle.heartrate.BR;
@@ -17,9 +15,7 @@ import com.vantagecircle.heartrate.core.HeartSupport;
 import com.vantagecircle.heartrate.core.PulseListener;
 import com.vantagecircle.heartrate.core.TimerListener;
 import com.vantagecircle.heartrate.data.DataManager;
-import com.vantagecircle.heartrate.data.HistoryModel;
-import com.vantagecircle.heartrate.scope.ActivityContext;
-import com.vantagecircle.heartrate.scope.ApplicationContext;
+import com.vantagecircle.heartrate.model.HistoryModel;
 
 /**
  * Created by bapidas on 08/11/17.

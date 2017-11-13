@@ -1,4 +1,4 @@
-package com.vantagecircle.heartrate.data;
+package com.vantagecircle.heartrate.model;
 
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;

@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
+import com.vantagecircle.heartrate.model.HistoryModel;
 import com.vantagecircle.heartrate.scope.ApplicationContext;
 import com.vantagecircle.heartrate.scope.DatabaseInfo;
 
