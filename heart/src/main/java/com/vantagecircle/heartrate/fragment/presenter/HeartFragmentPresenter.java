@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.vantagecircle.heartrate.BR;
 import com.vantagecircle.heartrate.R;
@@ -62,18 +63,20 @@ public class HeartFragmentPresenter extends BaseObservable {
     }
 
     public void onHelpClick(View view) {
-        AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-        View mView = LayoutInflater.from(mContext).inflate(R.layout.hint_diaog, null);
-        Button btnOk = mView.findViewById(R.id.btnOk);
-        btnOk.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                alertDialog.dismiss();
-            }
-        });
-        dialog.setView(mView);
-        alertDialog = dialog.create();
-        alertDialog.show();
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+            View mView = LayoutInflater.from(mContext).inflate(R.layout.hint_diaog, null);
+            Button btnOk = mView.findViewById(R.id.btnOk);
+            btnOk.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    alertDialog.dismiss();
+                }
+            });
+            dialog.setView(mView);
+            alertDialog = dialog.create();
+            alertDialog.show();
+        }
     }
 
     public void onStartClick(View view) {
@@ -117,12 +120,37 @@ public class HeartFragmentPresenter extends BaseObservable {
             @Override
             public void OnTimerStopped() {
                 isStarted = false;
-                Log.e(TAG, "Final heart rate == " + getBeatsPerMinute());
+                showFinalBpm();
             }
         }).startPulseCheck(timeLimit);
     }
 
     private void showFinalBpm() {
-        mDataManager.insertHistory(new HistoryModel(getBeatsPerMinute(), "", ""));
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+            View mView = LayoutInflater.from(mContext).inflate(R.layout.result_dialog, null);
+            TextView textView = mView.findViewById(R.id.txtheart);
+            textView.setText(getBeatsPerMinute());
+            Button btnCancel = mView.findViewById(R.id.btn_cancel);
+            btnCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    alertDialog.dismiss();
+                }
+            });
+
+            Button btnSave = mView.findViewById(R.id.btn_save);
+            btnSave.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mDataManager.insertHistory(new HistoryModel(getBeatsPerMinute(),
+                            "", ""));
+                    alertDialog.dismiss();
+                }
+            });
+            dialog.setView(mView);
+            alertDialog = dialog.create();
+            alertDialog.show();
+        }
     }
 }

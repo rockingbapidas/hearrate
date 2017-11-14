@@ -70,7 +70,7 @@ public class HistoryFragment extends BaseFragment {
     protected void init() {
         mHistoryFragmentPresenter = new HistoryFragmentPresenter(this.getActivity(),
                 null, mRecyclerView);
-        mHistoryFragmentPresenter.initialize();
+        //mHistoryFragmentPresenter.initialize();
     }
 
     @Override

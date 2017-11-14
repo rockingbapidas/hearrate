@@ -10,7 +10,6 @@ import android.view.ViewGroup;
 import com.vantagecircle.heartrate.R;
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.core.HeartRate;
-import com.vantagecircle.heartrate.data.DataManager;
 import com.vantagecircle.heartrate.databinding.HeartRateLayoutBinding;
 import com.vantagecircle.heartrate.fragment.BaseFragment;
 import com.vantagecircle.heartrate.fragment.component.DaggerHeartFragmentComponent;
@@ -26,7 +25,7 @@ public class HeartFragment extends BaseFragment {
     HeartRate heartRate;
 
     private HeartFragmentComponent heartFragmentComponent;
-    public HeartRateLayoutBinding mHeartRateLayoutBinding;
+    private HeartRateLayoutBinding mHeartRateLayoutBinding;
 
     public static HeartFragment newInstance() {
         return new HeartFragment();
@@ -64,7 +63,7 @@ public class HeartFragment extends BaseFragment {
     @Override
     protected void init() {
         HeartFragmentPresenter mHeartFragmentPresenter = new HeartFragmentPresenter(
-                this.getActivity().getApplicationContext(),
+                this.getActivity(),
                 heartRate.getHeartSupport(), null);
         mHeartRateLayoutBinding.setHeartPresenter(mHeartFragmentPresenter);
     }

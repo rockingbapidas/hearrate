@@ -19,4 +19,7 @@
     <string name="measure_title">Measure your Heart Rate</string>
     <string name="measure_hint">Lightly place your index finger over the camera lens on back of your phone. Make sure the lens and flash are fully covered.</string>
     <string name="image">image</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
+    <string name="your_heart_rate">Your heart rate</string>
 </resources>
