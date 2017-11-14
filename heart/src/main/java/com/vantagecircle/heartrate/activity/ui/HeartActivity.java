@@ -1,7 +1,6 @@
 package com.vantagecircle.heartrate.activity.ui;
 
 import android.Manifest;
-import android.content.Context;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -17,10 +16,10 @@ import android.widget.Toast;
 
 import com.vantagecircle.heartrate.HeartApplication;
 import com.vantagecircle.heartrate.R;
+import com.vantagecircle.heartrate.activity.ActivityComponent;
+import com.vantagecircle.heartrate.activity.ActivityModule;
 import com.vantagecircle.heartrate.activity.BaseActivity;
-import com.vantagecircle.heartrate.activity.component.DaggerHeartActivityComponent;
-import com.vantagecircle.heartrate.activity.component.HeartActivityComponent;
-import com.vantagecircle.heartrate.activity.module.HeartActivityModule;
+import com.vantagecircle.heartrate.activity.DaggerActivityComponent;
 import com.vantagecircle.heartrate.activity.presenter.HeartActivityPresenter;
 import com.vantagecircle.heartrate.utils.Constant;
 import com.vantagecircle.heartrate.utils.ToolsUtils;
@@ -40,7 +39,7 @@ public class HeartActivity extends BaseActivity {
 
     public ActionBar mActionBar;
     private Unbinder mUnBinder;
-    private HeartActivityComponent mHeartActivityComponent;
+    private ActivityComponent mActivityComponent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -53,17 +52,13 @@ public class HeartActivity extends BaseActivity {
 
     @Override
     protected void setActivityComponent() {
-        if (mHeartActivityComponent == null) {
-            mHeartActivityComponent = DaggerHeartActivityComponent.builder()
-                    .heartActivityModule(new HeartActivityModule(this))
+        if (mActivityComponent == null) {
+            mActivityComponent = DaggerActivityComponent.builder()
+                    .activityModule(new ActivityModule(this))
                     .appComponent(HeartApplication.get(this).getAppComponent())
                     .build();
         }
-        mHeartActivityComponent.inject(this);
-    }
-
-    public HeartActivityComponent getHeartActivityComponent() {
-        return mHeartActivityComponent;
+        mActivityComponent.inject(this);
     }
 
     @Override

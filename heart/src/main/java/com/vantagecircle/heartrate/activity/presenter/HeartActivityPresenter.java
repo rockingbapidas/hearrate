@@ -15,6 +15,7 @@ import com.vantagecircle.heartrate.fragment.ui.HistoryFragment;
 public class HeartActivityPresenter {
     private final String TAG = HeartActivityPresenter.class.getSimpleName();
     private HeartActivity heartActivity;
+    private PagerAdapter mPagerAdapter;
 
     public HeartActivityPresenter(HeartActivity heartActivity) {
         this.heartActivity = heartActivity;
@@ -35,13 +36,12 @@ public class HeartActivityPresenter {
     }
 
     private void initTabPager() {
-        PagerAdapter adapter = new PagerAdapter(heartActivity
-                .getSupportFragmentManager());
-        adapter.addFragment(HeartFragment.newInstance(),
+        mPagerAdapter = new PagerAdapter(heartActivity.getSupportFragmentManager());
+        mPagerAdapter.addFragment(HeartFragment.newInstance(),
                 heartActivity.getResources().getString(R.string.calculate));
-        adapter.addFragment(HistoryFragment.newInstance(),
+        mPagerAdapter.addFragment(HistoryFragment.newInstance(),
                 heartActivity.getResources().getString(R.string.history));
-        heartActivity.mViewPager.setAdapter(adapter);
+        heartActivity.mViewPager.setAdapter(mPagerAdapter);
         heartActivity.mViewPager.addOnPageChangeListener(new TabLayout
                 .TabLayoutOnPageChangeListener(heartActivity.mTabLayout));
         heartActivity.mTabLayout.setupWithViewPager(heartActivity.mViewPager);
@@ -49,6 +49,7 @@ public class HeartActivityPresenter {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 heartActivity.mViewPager.setCurrentItem(tab.getPosition());
+                mPagerAdapter.getItem(tab.getPosition()).onResume();
             }
 
             @Override

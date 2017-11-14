@@ -6,10 +6,10 @@ import android.support.annotation.Nullable;
 
 import com.vantagecircle.heartrate.HeartApplication;
 import com.vantagecircle.heartrate.R;
+import com.vantagecircle.heartrate.activity.ActivityComponent;
+import com.vantagecircle.heartrate.activity.ActivityModule;
 import com.vantagecircle.heartrate.activity.BaseActivity;
-import com.vantagecircle.heartrate.activity.component.DaggerWelcomeActivityComponent;
-import com.vantagecircle.heartrate.activity.component.WelcomeActivityComponent;
-import com.vantagecircle.heartrate.activity.module.WelcomeActivityModule;
+import com.vantagecircle.heartrate.activity.DaggerActivityComponent;
 import com.vantagecircle.heartrate.activity.presenter.WelcomeActivityPresenter;
 import com.vantagecircle.heartrate.databinding.WelcomeActivityBinding;
 
@@ -19,7 +19,7 @@ import com.vantagecircle.heartrate.databinding.WelcomeActivityBinding;
 
 public class WelcomeActivity extends BaseActivity {
     private final String TAG = WelcomeActivity.class.getSimpleName();
-    private WelcomeActivityComponent welcomeActivityComponent;
+    private ActivityComponent mActivityComponent;
     private WelcomeActivityBinding mBinding;
 
     @Override
@@ -31,13 +31,13 @@ public class WelcomeActivity extends BaseActivity {
 
     @Override
     protected void setActivityComponent() {
-        if (welcomeActivityComponent == null) {
-            welcomeActivityComponent = DaggerWelcomeActivityComponent.builder()
-                    .welcomeActivityModule(new WelcomeActivityModule(this))
+        if (mActivityComponent == null) {
+            mActivityComponent = DaggerActivityComponent.builder()
+                    .activityModule(new ActivityModule(this))
                     .appComponent(HeartApplication.get(this).getAppComponent())
                     .build();
         }
-        welcomeActivityComponent.inject(this);
+        mActivityComponent.inject(this);
     }
 
     @Override

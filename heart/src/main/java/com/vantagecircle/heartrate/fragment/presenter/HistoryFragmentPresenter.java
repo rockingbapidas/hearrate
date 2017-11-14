@@ -3,6 +3,7 @@ package com.vantagecircle.heartrate.fragment.presenter;
 import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 
 import com.vantagecircle.heartrate.adapter.HistoryAdapter;
 import com.vantagecircle.heartrate.data.DataManager;
@@ -15,12 +16,10 @@ import java.util.ArrayList;
  */
 
 public class HistoryFragmentPresenter {
+    private static final String TAG = HistoryFragmentPresenter.class.getSimpleName();
     private DataManager mDataManger;
     private Context mContext;
     private RecyclerView mRecyclerView;
-    private LinearLayoutManager mLinearLayoutManager;
-    private ArrayList<HistoryModel> mArrayList;
-    private HistoryAdapter mHistoryAdapter;
 
     public HistoryFragmentPresenter(Context mContext, DataManager mDataManger, RecyclerView mRecyclerView) {
         this.mDataManger = mDataManger;
@@ -29,13 +28,13 @@ public class HistoryFragmentPresenter {
     }
 
     public void initialize() {
-        mLinearLayoutManager = new LinearLayoutManager(mContext);
+        LinearLayoutManager mLinearLayoutManager = new LinearLayoutManager(mContext);
         mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
         mRecyclerView.setLayoutManager(mLinearLayoutManager);
         mRecyclerView.scrollToPosition(0);
-        mArrayList = mDataManger.getHistory();
+        ArrayList<HistoryModel> mArrayList = mDataManger.getHistory();
         if (mArrayList != null && mArrayList.size() > 0) {
-            mHistoryAdapter = new HistoryAdapter(mArrayList);
+            HistoryAdapter mHistoryAdapter = new HistoryAdapter(mArrayList);
             mRecyclerView.setAdapter(mHistoryAdapter);
         }
     }

@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.vantagecircle.heartrate.BR;
 import com.vantagecircle.heartrate.R;
@@ -17,6 +18,10 @@ import com.vantagecircle.heartrate.core.PulseListener;
 import com.vantagecircle.heartrate.core.TimerListener;
 import com.vantagecircle.heartrate.data.DataManager;
 import com.vantagecircle.heartrate.model.HistoryModel;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * Created by bapidas on 08/11/17.
@@ -143,14 +148,36 @@ public class HeartFragmentPresenter extends BaseObservable {
             btnSave.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    mDataManager.insertHistory(new HistoryModel(getBeatsPerMinute(),
-                            "", ""));
-                    alertDialog.dismiss();
+                    saveHeartRate();
                 }
             });
             dialog.setView(mView);
             alertDialog = dialog.create();
             alertDialog.show();
         }
+    }
+
+    private void saveHeartRate() {
+        long timeStamp = System.currentTimeMillis();
+        String date = getDate(timeStamp);
+        String time = getTime(timeStamp);
+        if (mDataManager.insertHistory(new HistoryModel(getBeatsPerMinute(), date, time))) {
+            alertDialog.dismiss();
+            Toast.makeText(mContext, "Heart rate saved", Toast.LENGTH_SHORT).show();
+        } else {
+            Toast.makeText(mContext, "Heart rate not saved", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private String getTime(long timestamp) {
+        SimpleDateFormat newformat = new SimpleDateFormat("hh:mm a", Locale.ENGLISH);
+        Date date = new Date(timestamp);
+        return newformat.format(date);
+    }
+
+    private String getDate(long timestamp) {
+        SimpleDateFormat newformat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
+        Date date = new Date(timestamp);
+        return newformat.format(date);
     }
 }

@@ -7,24 +7,28 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.vantagecircle.heartrate.HeartApplication;
 import com.vantagecircle.heartrate.R;
-import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.core.HeartRate;
+import com.vantagecircle.heartrate.data.DataManager;
 import com.vantagecircle.heartrate.databinding.HeartRateLayoutBinding;
 import com.vantagecircle.heartrate.fragment.BaseFragment;
-import com.vantagecircle.heartrate.fragment.component.DaggerHeartFragmentComponent;
-import com.vantagecircle.heartrate.fragment.component.HeartFragmentComponent;
-import com.vantagecircle.heartrate.fragment.module.HeartFragmentModule;
+import com.vantagecircle.heartrate.fragment.DaggerFragmentComponent;
+import com.vantagecircle.heartrate.fragment.FragmentComponent;
+import com.vantagecircle.heartrate.fragment.FragmentModule;
 import com.vantagecircle.heartrate.fragment.presenter.HeartFragmentPresenter;
 
 import javax.inject.Inject;
 
 public class HeartFragment extends BaseFragment {
     private static final String TAG = HeartFragment.class.getSimpleName();
+
     @Inject
     HeartRate heartRate;
+    @Inject
+    DataManager mDataManager;
 
-    private HeartFragmentComponent heartFragmentComponent;
+    private FragmentComponent mFragmentComponent;
     private HeartRateLayoutBinding mHeartRateLayoutBinding;
 
     public static HeartFragment newInstance() {
@@ -51,20 +55,19 @@ public class HeartFragment extends BaseFragment {
 
     @Override
     protected void setFragmentComponent() {
-        if (heartFragmentComponent == null) {
-            heartFragmentComponent = DaggerHeartFragmentComponent.builder()
-                    .heartFragmentModule(new HeartFragmentModule(this))
-                    .heartActivityComponent(((HeartActivity)getActivity()).getHeartActivityComponent())
+        if (mFragmentComponent == null) {
+            mFragmentComponent = DaggerFragmentComponent.builder()
+                    .fragmentModule(new FragmentModule(this))
+                    .appComponent(HeartApplication.get(this.getContext()).getAppComponent())
                     .build();
         }
-        heartFragmentComponent.inject(this);
+        mFragmentComponent.inject(this);
     }
 
     @Override
     protected void init() {
         HeartFragmentPresenter mHeartFragmentPresenter = new HeartFragmentPresenter(
-                this.getActivity(),
-                heartRate.getHeartSupport(), null);
+                this.getActivity(), heartRate.getHeartSupport(), mDataManager);
         mHeartRateLayoutBinding.setHeartPresenter(mHeartFragmentPresenter);
     }
 }

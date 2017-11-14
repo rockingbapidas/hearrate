@@ -4,12 +4,6 @@ import android.app.Application;
 import android.content.Context;
 
 import com.crashlytics.android.Crashlytics;
-import com.vantagecircle.heartrate.component.AppComponent;
-import com.vantagecircle.heartrate.component.DaggerAppComponent;
-import com.vantagecircle.heartrate.data.DataManager;
-import com.vantagecircle.heartrate.module.AppModule;
-
-import javax.inject.Inject;
 
 import io.fabric.sdk.android.Fabric;
 

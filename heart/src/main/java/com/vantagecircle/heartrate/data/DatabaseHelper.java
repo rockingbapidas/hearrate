@@ -22,7 +22,7 @@ import javax.inject.Singleton;
 public class DatabaseHelper extends SQLiteOpenHelper {
 
     @Inject
-    public DatabaseHelper(@ApplicationContext Context context, @DatabaseInfo String name, @DatabaseInfo Integer version) {
+    DatabaseHelper(@ApplicationContext Context context, @DatabaseInfo String name, @DatabaseInfo Integer version) {
         super(context, name, null, version);
     }
 
@@ -37,7 +37,32 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    protected ArrayList<HistoryModel> getHistory() {
+    ArrayList<HistoryModel> getHistory() {
+        ArrayList<HistoryModel> arrayList = new ArrayList<>();
+        Cursor cursor = null;
+        try {
+            cursor = getReadableDatabase().rawQuery(DataModel.GET_HISTORY_QUERY, null);
+            if (cursor != null) {
+                cursor.moveToFirst();
+                while (!cursor.isAfterLast()) {
+                    String heartRate = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_HEART_RATE));
+                    String date = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_DATE_STRING));
+                    String time = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_TIME_STRING));
+                    HistoryModel historyModel = new HistoryModel(heartRate, date, time);
+                    arrayList.add(historyModel);
+                    cursor.moveToNext();
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (cursor != null)
+                cursor.close();
+        }
+        return arrayList;
+    }
+
+    ArrayList<HistoryModel> getHistory(int limit) {
         ArrayList<HistoryModel> arrayList = new ArrayList<>();
         Cursor cursor = null;
         try {
@@ -61,31 +86,7 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return arrayList;
     }
 
-    protected ArrayList<HistoryModel> getHistory(int limit) {
-        ArrayList<HistoryModel> arrayList = new ArrayList<>();
-        Cursor cursor = null;
-        try {
-            cursor = getReadableDatabase().rawQuery(DataModel.GET_HISTORY_QUERY, null);
-            if (cursor != null) {
-                cursor.moveToFirst();
-                if (cursor.getCount() > 0) {
-                    String heartRate = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_HEART_RATE));
-                    String date = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_DATE_STRING));
-                    String time = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_TIME_STRING));
-                    HistoryModel historyModel = new HistoryModel(heartRate, date, time);
-                    arrayList.add(historyModel);
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (cursor != null)
-                cursor.close();
-        }
-        return arrayList;
-    }
-
-    protected boolean insertHistory(HistoryModel historyModel) {
+    boolean insertHistory(HistoryModel historyModel) {
         try {
             ContentValues cValues = new ContentValues();
             cValues.put(DataModel.COLUMN_HEART_RATE, historyModel.getHeartRate());
