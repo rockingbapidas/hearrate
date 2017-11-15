@@ -8,7 +8,7 @@ import com.vantagecircle.heartrate.camera.CameraSupport;
 import com.vantagecircle.heartrate.core.HeartRate;
 import com.vantagecircle.heartrate.processing.Processing;
 import com.vantagecircle.heartrate.processing.ProcessingSupport;
-import com.vantagecircle.heartrate.scope.ActivityContext;
+import com.vantagecircle.heartrate.annotation.ActivityContext;
 
 import dagger.Module;
 import dagger.Provides;

@@ -3,8 +3,8 @@ package com.vantagecircle.heartrate;
 import android.app.Application;
 import android.content.Context;
 
-import com.vantagecircle.heartrate.scope.ApplicationContext;
-import com.vantagecircle.heartrate.scope.DatabaseInfo;
+import com.vantagecircle.heartrate.annotation.ApplicationContext;
+import com.vantagecircle.heartrate.annotation.DatabaseInfo;
 
 import dagger.Module;
 import dagger.Provides;

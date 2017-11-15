@@ -1,16 +1,16 @@
-package com.vantagecircle.heartrate.scope;
+package com.vantagecircle.heartrate.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 
 import javax.inject.Qualifier;
-import javax.inject.Scope;
 
 /**
- * Created by bapidas on 06/10/17.
+ * Created by SiD on 11/12/2017.
  */
+
 @Qualifier
 @Retention(RetentionPolicy.RUNTIME)
-public @interface ActivityContext {
+public @interface DatabaseInfo {
 
 }

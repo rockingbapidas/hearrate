@@ -7,8 +7,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 import com.vantagecircle.heartrate.model.HistoryModel;
-import com.vantagecircle.heartrate.scope.ApplicationContext;
-import com.vantagecircle.heartrate.scope.DatabaseInfo;
+import com.vantagecircle.heartrate.annotation.ApplicationContext;
+import com.vantagecircle.heartrate.annotation.DatabaseInfo;
 
 import java.util.ArrayList;
 

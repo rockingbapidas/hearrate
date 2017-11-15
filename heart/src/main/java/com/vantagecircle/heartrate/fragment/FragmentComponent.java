@@ -3,7 +3,7 @@ package com.vantagecircle.heartrate.fragment;
 import com.vantagecircle.heartrate.AppComponent;
 import com.vantagecircle.heartrate.fragment.ui.HeartFragment;
 import com.vantagecircle.heartrate.fragment.ui.HistoryFragment;
-import com.vantagecircle.heartrate.scope.PerFragment;
+import com.vantagecircle.heartrate.annotation.PerFragment;
 
 import dagger.Component;
 

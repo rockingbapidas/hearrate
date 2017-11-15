@@ -4,7 +4,7 @@ package com.vantagecircle.heartrate.data;
  * Created by SiD on 11/12/2017.
  */
 
-public class DataModel {
+class DataModel {
     private static final String TEXT_TYPE = " VARCHAR";
     private static final String COMMA_SEP = ", ";
 

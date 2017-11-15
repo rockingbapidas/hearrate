@@ -5,7 +5,7 @@ import android.content.Context;
 
 import com.vantagecircle.heartrate.data.DataManager;
 import com.vantagecircle.heartrate.data.DatabaseHelper;
-import com.vantagecircle.heartrate.scope.ApplicationContext;
+import com.vantagecircle.heartrate.annotation.ApplicationContext;
 
 import javax.inject.Singleton;
 

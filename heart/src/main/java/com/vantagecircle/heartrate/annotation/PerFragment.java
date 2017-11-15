@@ -1,4 +1,4 @@
-package com.vantagecircle.heartrate.scope;
+package com.vantagecircle.heartrate.annotation;
 
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
@@ -6,10 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import javax.inject.Scope;
 
 /**
- * Created by bapidas on 06/10/17.
+ * Created by bapidas on 08/11/17.
  */
 @Scope
 @Retention(RetentionPolicy.RUNTIME)
-public @interface PerActivity {
+public @interface PerFragment {
 
 }

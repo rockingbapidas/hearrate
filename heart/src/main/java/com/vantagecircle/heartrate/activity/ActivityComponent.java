@@ -3,7 +3,7 @@ package com.vantagecircle.heartrate.activity;
 import com.vantagecircle.heartrate.AppComponent;
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.activity.ui.WelcomeActivity;
-import com.vantagecircle.heartrate.scope.PerActivity;
+import com.vantagecircle.heartrate.annotation.PerActivity;
 
 import dagger.Component;
 
