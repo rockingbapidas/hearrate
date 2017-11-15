@@ -40,8 +40,9 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     ArrayList<HistoryModel> getHistory() {
         ArrayList<HistoryModel> arrayList = new ArrayList<>();
         Cursor cursor = null;
+        String query = DataModel.GET_HISTORY_QUERY + " ORDER BY " + DataModel.COLUMN_ID + " DESC";
         try {
-            cursor = getReadableDatabase().rawQuery(DataModel.GET_HISTORY_QUERY, null);
+            cursor = getReadableDatabase().rawQuery(query, null);
             if (cursor != null) {
                 cursor.moveToFirst();
                 while (!cursor.isAfterLast()) {
@@ -65,16 +66,18 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     ArrayList<HistoryModel> getHistory(int limit) {
         ArrayList<HistoryModel> arrayList = new ArrayList<>();
         Cursor cursor = null;
+        String query = DataModel.GET_HISTORY_QUERY + " ORDER BY " + DataModel.COLUMN_ID + " DESC " + "LIMIT " + limit;
         try {
-            cursor = getReadableDatabase().rawQuery(DataModel.GET_HISTORY_QUERY, null);
+            cursor = getReadableDatabase().rawQuery(query, null);
             if (cursor != null) {
                 cursor.moveToFirst();
-                if (cursor.getCount() > 0) {
+                while (!cursor.isAfterLast()) {
                     String heartRate = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_HEART_RATE));
                     String date = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_DATE_STRING));
                     String time = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_TIME_STRING));
                     HistoryModel historyModel = new HistoryModel(heartRate, date, time);
                     arrayList.add(historyModel);
+                    cursor.moveToNext();
                 }
             }
         } catch (Exception e) {

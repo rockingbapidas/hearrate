@@ -22,7 +22,6 @@ import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Surface;
 
-import com.vantagecircle.heartrate.core.HeartSupport;
 import com.vantagecircle.heartrate.processing.ProcessingSupport;
 
 import java.util.ArrayList;
@@ -48,7 +47,7 @@ public class CameraNew implements CameraSupport {
     private boolean mFlashSupported;
     private PowerManager.WakeLock mWakeLock;
 
-    private CameraCallBack mCameraCallBack;
+    private CameraPreviewListener mCameraPreviewListener;
     private ProcessingSupport processingSupport;
 
     public CameraNew(Context context, ProcessingSupport processingSupport) {
@@ -111,8 +110,8 @@ public class CameraNew implements CameraSupport {
     }
 
     @Override
-    public void setOnPreviewListener(CameraCallBack callBack) {
-        this.mCameraCallBack = callBack;
+    public void addOnPreviewListener(CameraPreviewListener callBack) {
+        this.mCameraPreviewListener = callBack;
     }
 
     @Override
@@ -235,8 +234,8 @@ public class CameraNew implements CameraSupport {
             if (processingSupport == null) throw new NullPointerException();
             byte[] data = processingSupport.YUV_420_888toNV21(image);
             int value = processingSupport.YUV420SPtoRedAvg(data, image.getWidth(), image.getHeight());
-            if (mCameraCallBack == null) throw new NullPointerException();
-            mCameraCallBack.OnPixelAverage(value);
+            if (mCameraPreviewListener == null) throw new NullPointerException();
+            mCameraPreviewListener.OnPixelAverage(value);
             image.close();
         }
     };

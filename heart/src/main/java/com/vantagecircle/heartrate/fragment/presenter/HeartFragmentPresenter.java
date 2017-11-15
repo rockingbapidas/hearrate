@@ -1,13 +1,16 @@
 package com.vantagecircle.heartrate.fragment.presenter;
 
+import android.animation.ObjectAnimator;
 import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
+import android.databinding.BindingAdapter;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.animation.LinearInterpolator;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -18,10 +21,7 @@ import com.vantagecircle.heartrate.core.PulseListener;
 import com.vantagecircle.heartrate.core.TimerListener;
 import com.vantagecircle.heartrate.data.DataManager;
 import com.vantagecircle.heartrate.model.HistoryModel;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
+import com.vantagecircle.heartrate.utils.ToolsUtils;
 
 /**
  * Created by bapidas on 08/11/17.
@@ -32,12 +32,11 @@ public class HeartFragmentPresenter extends BaseObservable {
     private HeartSupport mHeartSupport;
     private DataManager mDataManager;
     private Context mContext;
-
     private AlertDialog alertDialog;
     private boolean isStarted;
     private long timeLimit = 20000;
 
-    //bind data fields
+    //android data binding fields
     private String beatsPerMinute;
     private int progress;
 
@@ -67,6 +66,14 @@ public class HeartFragmentPresenter extends BaseObservable {
         notifyPropertyChanged(BR.progress);
     }
 
+    @BindingAdapter("updateProgress")
+    public static void setProgressAnimation(ProgressBar mProgressBar, int progress) {
+        ObjectAnimator animation = ObjectAnimator.ofInt(mProgressBar, "progress", progress);
+        animation.setDuration(500);
+        animation.setInterpolator(new LinearInterpolator());
+        animation.start();
+    }
+
     public void onHelpClick(View view) {
         if (alertDialog == null || !alertDialog.isShowing()) {
             AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
@@ -87,8 +94,6 @@ public class HeartFragmentPresenter extends BaseObservable {
     public void onStartClick(View view) {
         if (isStarted) {
             isStarted = false;
-            setBeatsPerMinute("000");
-            setProgress(0);
             mHeartSupport.stopPulseCheck();
         } else {
             start();
@@ -104,7 +109,6 @@ public class HeartFragmentPresenter extends BaseObservable {
                 } else {
                     setBeatsPerMinute(pulse);
                 }
-
             }
         }).addOnTimerListener(new TimerListener() {
             @Override
@@ -125,15 +129,19 @@ public class HeartFragmentPresenter extends BaseObservable {
             @Override
             public void OnTimerStopped() {
                 isStarted = false;
-                showFinalBpm();
+                if(getBeatsPerMinute().equals("000")){
+                    showErrorDialog();
+                } else {
+                    showSuccessDialog();
+                }
             }
         }).startPulseCheck(timeLimit);
     }
 
-    private void showFinalBpm() {
+    private void showSuccessDialog() {
         if (alertDialog == null || !alertDialog.isShowing()) {
             AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-            View mView = LayoutInflater.from(mContext).inflate(R.layout.result_dialog, null);
+            View mView = LayoutInflater.from(mContext).inflate(R.layout.result_success_dialog, null);
             TextView textView = mView.findViewById(R.id.txtheart);
             textView.setText(getBeatsPerMinute());
             Button btnCancel = mView.findViewById(R.id.btn_cancel);
@@ -159,8 +167,8 @@ public class HeartFragmentPresenter extends BaseObservable {
 
     private void saveHeartRate() {
         long timeStamp = System.currentTimeMillis();
-        String date = getDate(timeStamp);
-        String time = getTime(timeStamp);
+        String date = ToolsUtils.getInstance().getDate(timeStamp);
+        String time = ToolsUtils.getInstance().getTime(timeStamp);
         if (mDataManager.insertHistory(new HistoryModel(getBeatsPerMinute(), date, time))) {
             alertDialog.dismiss();
             Toast.makeText(mContext, "Heart rate saved", Toast.LENGTH_SHORT).show();
@@ -169,15 +177,22 @@ public class HeartFragmentPresenter extends BaseObservable {
         }
     }
 
-    private String getTime(long timestamp) {
-        SimpleDateFormat newformat = new SimpleDateFormat("hh:mm a", Locale.ENGLISH);
-        Date date = new Date(timestamp);
-        return newformat.format(date);
-    }
-
-    private String getDate(long timestamp) {
-        SimpleDateFormat newformat = new SimpleDateFormat("dd/MM/yyyy", Locale.ENGLISH);
-        Date date = new Date(timestamp);
-        return newformat.format(date);
+    private void showErrorDialog() {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+            View mView = LayoutInflater.from(mContext).inflate(R.layout.result_error_dialog, null);
+            Button btn_try = mView.findViewById(R.id.btn_try);
+            btn_try.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    alertDialog.dismiss();
+                    setBeatsPerMinute("000");
+                    setProgress(0);
+                }
+            });
+            dialog.setView(mView);
+            alertDialog = dialog.create();
+            alertDialog.show();
+        }
     }
 }

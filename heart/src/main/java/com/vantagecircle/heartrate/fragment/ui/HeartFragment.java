@@ -66,8 +66,8 @@ public class HeartFragment extends BaseFragment {
 
     @Override
     protected void init() {
-        HeartFragmentPresenter mHeartFragmentPresenter = new HeartFragmentPresenter(
-                this.getActivity(), heartRate.getHeartSupport(), mDataManager);
+        HeartFragmentPresenter mHeartFragmentPresenter = new HeartFragmentPresenter(this.getActivity(),
+                heartRate.getHeartSupport(), mDataManager);
         mHeartRateLayoutBinding.setHeartPresenter(mHeartFragmentPresenter);
     }
 }

@@ -17,9 +17,9 @@ public class DataModel {
     static final String CREATE_HEART_TABLE_QUERY =
             "CREATE TABLE IF NOT EXISTS " + HISTORY_TABLE + " (" +
                     COLUMN_ID + " INTEGER PRIMARY KEY AUTOINCREMENT" + COMMA_SEP +
-                    COLUMN_HEART_RATE + TEXT_TYPE + COMMA_SEP +
+                    COLUMN_HEART_RATE  + TEXT_TYPE + COMMA_SEP +
                     COLUMN_DATE_STRING + TEXT_TYPE + COMMA_SEP +
                     COLUMN_TIME_STRING + TEXT_TYPE +
                     ")";
-    static final String GET_HISTORY_QUERY = "SELECT * FROM " + HISTORY_TABLE;
+    static final String GET_HISTORY_QUERY = "SELECT * FROM " + HISTORY_TABLE ;
 }

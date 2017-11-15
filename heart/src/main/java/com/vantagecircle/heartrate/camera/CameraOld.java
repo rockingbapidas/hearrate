@@ -19,7 +19,7 @@ import java.util.List;
 public class CameraOld implements CameraSupport {
     private Camera mCamera;
     private PowerManager.WakeLock mWakeLock;
-    private CameraCallBack mCameraCallBack;
+    private CameraPreviewListener mCameraPreviewListener;
     private final Object mObject = new Object();
     private SurfaceTexture mSurfaceTexture = null;
     private ProcessingSupport mProcessingSupport;
@@ -39,7 +39,7 @@ public class CameraOld implements CameraSupport {
             try {
                 this.mWakeLock.acquire(10 * 60 * 1000L);
                 this.mCamera = Camera.open();
-                setCamera();
+                setCameraOutputs();
             } catch (Exception e) {
                 throw new RuntimeException("Interrupted while trying to open camera.", e);
             }
@@ -64,8 +64,8 @@ public class CameraOld implements CameraSupport {
     }
 
     @Override
-    public void setOnPreviewListener(CameraCallBack callBack) {
-        this.mCameraCallBack = callBack;
+    public void addOnPreviewListener(CameraPreviewListener callBack) {
+        this.mCameraPreviewListener = callBack;
     }
 
     @Override
@@ -73,7 +73,7 @@ public class CameraOld implements CameraSupport {
         return mCamera != null;
     }
 
-    private void setCamera() {
+    private void setCameraOutputs() {
         try {
             if (mCamera == null) {
                 return;
@@ -113,7 +113,7 @@ public class CameraOld implements CameraSupport {
             }
             this.mCamera.addCallbackBuffer(new byte[bitsPerPixel]);
             this.mCamera.setPreviewCallbackWithBuffer(mPreviewCallback);
-            this.mCamera.setPreviewTexture(surfaceTexture());
+            this.mCamera.setPreviewTexture(createSurfaceTexture());
             this.mCamera.setParameters(parameters);
             this.mCamera.startPreview();
 
@@ -132,7 +132,7 @@ public class CameraOld implements CameraSupport {
         }
     }
 
-    private SurfaceTexture surfaceTexture() {
+    private SurfaceTexture createSurfaceTexture() {
         SurfaceTexture surfaceTexture;
         synchronized (this.mObject) {
             if (this.mSurfaceTexture != null) {
@@ -191,7 +191,7 @@ public class CameraOld implements CameraSupport {
             if (size == null) throw new NullPointerException();
             if(mProcessingSupport == null) throw new NullPointerException();
             int value = mProcessingSupport.YUV420SPtoRedAvg(data, size.width, size.height);
-            mCameraCallBack.OnPixelAverage(value);
+            mCameraPreviewListener.OnPixelAverage(value);
             cam.addCallbackBuffer(data);
         }
     };
