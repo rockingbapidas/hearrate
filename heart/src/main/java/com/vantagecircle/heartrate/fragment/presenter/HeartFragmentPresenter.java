@@ -129,7 +129,7 @@ public class HeartFragmentPresenter extends BaseObservable {
             @Override
             public void OnTimerStopped() {
                 isStarted = false;
-                if(getBeatsPerMinute().equals("000")){
+                if (getBeatsPerMinute().equals("000")) {
                     showErrorDialog();
                 } else {
                     showSuccessDialog();
