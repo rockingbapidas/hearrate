@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
-    android:background="@color/colorPrimaryFaid">
+    android:background="@color/white">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -15,32 +15,43 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/your_heart_rate"
-            android:textColor="@android:color/white"
-            android:textSize="20sp"
+            android:textColor="@android:color/black"
+            android:textSize="22sp"
+            android:textStyle="normal"
+            android:layout_marginTop="20dp"/>
+
+        <TextView
+            android:id="@+id/txtheart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/default_bpm"
+            android:textColor="@color/black"
+            android:textSize="38sp"
             android:textStyle="bold" />
 
-        <RelativeLayout
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:orientation="horizontal">
 
             <ImageView
-                android:layout_width="120dp"
-                android:layout_height="120dp"
-                android:layout_centerInParent="true"
+                android:layout_width="30dp"
+                android:layout_height="30dp"
                 android:contentDescription="@string/image"
                 android:src="@drawable/hearts" />
-
             <TextView
-                android:id="@+id/txtheart"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_centerInParent="true"
-                android:text="@string/default_bpm"
-                android:textColor="@color/white"
-                android:textSize="35sp"
-                android:textStyle="bold" />
-        </RelativeLayout>
+                android:text="@string/bpm"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:layout_marginStart="10dp"
+                android:layout_marginLeft="10dp"
+                android:textStyle="normal" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
@@ -63,9 +74,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:layout_weight="0.5"
-                android:background="@color/colorPrimaryTranslucent"
+                android:background="@color/white90"
                 android:text="@string/cancel"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:textSize="18sp" />
         </com.balysv.materialripple.MaterialRippleLayout>
 

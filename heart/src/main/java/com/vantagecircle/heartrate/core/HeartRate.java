@@ -1,6 +1,7 @@
 package com.vantagecircle.heartrate.core;
 
 import android.os.CountDownTimer;
+import android.util.Log;
 
 import com.vantagecircle.heartrate.camera.CameraPreviewListener;
 import com.vantagecircle.heartrate.camera.CameraSupport;
@@ -155,6 +156,7 @@ public class HeartRate implements HeartSupport, CameraPreviewListener {
     }
 
     private void calculatePulse(int pixelAverage) {
+        Log.e(TAG, "pixel === " + pixelAverage);
         if (!processing.compareAndSet(false, true)) {
             return;
         }
@@ -164,7 +166,7 @@ public class HeartRate implements HeartSupport, CameraPreviewListener {
             return;
         }
 
-        if (pixelAverage < 200) {
+        /*if (pixelAverage < 200) {
             errorCount++;
             if (mFingerListener != null) {
                 mFingerListener.OnFingerDetectFailed(errorCount);
@@ -175,73 +177,73 @@ public class HeartRate implements HeartSupport, CameraPreviewListener {
             if (mFingerListener != null) {
                 mFingerListener.OnFingerDetected(successCount);
             }
+        }*/
 
-            int averageArrayAvg = 0;
-            int averageArrayCnt = 0;
-            for (int anAverageArray : averageArray) {
-                if (anAverageArray > 0) {
-                    averageArrayAvg += anAverageArray;
-                    averageArrayCnt++;
-                }
+        int averageArrayAvg = 0;
+        int averageArrayCnt = 0;
+        for (int anAverageArray : averageArray) {
+            if (anAverageArray > 0) {
+                averageArrayAvg += anAverageArray;
+                averageArrayCnt++;
             }
+        }
 
-            int rollingAverage = (averageArrayCnt > 0) ? (averageArrayAvg / averageArrayCnt) : 0;
-            TYPE newType = currentType;
-            if (pixelAverage < rollingAverage) {
-                newType = TYPE.RED;
-                if (newType != currentType) {
-                    beats++;
-                }
-            } else if (pixelAverage > rollingAverage) {
-                newType = TYPE.GREEN;
-            }
-
-            if (averageIndex == averageArraySize)
-                averageIndex = 0;
-            averageArray[averageIndex] = pixelAverage;
-            averageIndex++;
-
+        int rollingAverage = (averageArrayCnt > 0) ? (averageArrayAvg / averageArrayCnt) : 0;
+        TYPE newType = currentType;
+        if (pixelAverage < rollingAverage) {
+            newType = TYPE.RED;
             if (newType != currentType) {
-                currentType = newType;
+                beats++;
             }
+        } else if (pixelAverage > rollingAverage) {
+            newType = TYPE.GREEN;
+        }
 
-            long endTime = System.currentTimeMillis();
-            double totalTimeInSecs = (endTime - startTime) / 1000d;
+        if (averageIndex == averageArraySize)
+            averageIndex = 0;
+        averageArray[averageIndex] = pixelAverage;
+        averageIndex++;
 
-            if (totalTimeInSecs >= 5) {
-                double bps = (beats / totalTimeInSecs);
-                int dpm = (int) (bps * 60d);
-                if (dpm < 30 || dpm > 180) {
-                    startTime = System.currentTimeMillis();
-                    beats = 0;
-                    processing.set(false);
-                    return;
-                }
+        if (newType != currentType) {
+            currentType = newType;
+        }
 
-                if (beatsIndex == beatsArraySize)
-                    beatsIndex = 0;
-                beatsArray[beatsIndex] = dpm;
-                beatsIndex++;
+        long endTime = System.currentTimeMillis();
+        double totalTimeInSecs = (endTime - startTime) / 1000d;
 
-                int beatsArrayAvg = 0;
-                int beatsArrayCnt = 0;
-                for (int aBeatsArray : beatsArray) {
-                    if (aBeatsArray > 0) {
-                        beatsArrayAvg += aBeatsArray;
-                        beatsArrayCnt++;
-                    }
-                }
-
-                int beatsAvg = (beatsArrayAvg / beatsArrayCnt);
-                String beatsPerMinuteValue = String.valueOf(beatsAvg);
-
-                if (mPulseListener != null) {
-                    mPulseListener.OnPulseResult(beatsPerMinuteValue);
-                }
+        if (totalTimeInSecs >= 5) {
+            double bps = (beats / totalTimeInSecs);
+            int dpm = (int) (bps * 60d);
+            if (dpm < 30 || dpm > 180) {
                 startTime = System.currentTimeMillis();
                 beats = 0;
+                processing.set(false);
+                return;
             }
-            processing.set(false);
+
+            if (beatsIndex == beatsArraySize)
+                beatsIndex = 0;
+            beatsArray[beatsIndex] = dpm;
+            beatsIndex++;
+
+            int beatsArrayAvg = 0;
+            int beatsArrayCnt = 0;
+            for (int aBeatsArray : beatsArray) {
+                if (aBeatsArray > 0) {
+                    beatsArrayAvg += aBeatsArray;
+                    beatsArrayCnt++;
+                }
+            }
+
+            int beatsAvg = (beatsArrayAvg / beatsArrayCnt);
+            String beatsPerMinuteValue = String.valueOf(beatsAvg);
+
+            if (mPulseListener != null) {
+                mPulseListener.OnPulseResult(beatsPerMinuteValue);
+            }
+            startTime = System.currentTimeMillis();
+            beats = 0;
         }
+        processing.set(false);
     }
 }

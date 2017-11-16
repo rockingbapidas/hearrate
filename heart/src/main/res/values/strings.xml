@@ -21,7 +21,7 @@
     <string name="image">image</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
-    <string name="your_heart_rate">Your heart rate</string>
+    <string name="your_heart_rate">Your Heart Rate</string>
     <string name="try_again">Try Again</string>
     <string name="fail">Your pulse is not detected properly please attach your finger gently don\'t press too hard, try again.</string>
     <string name="failed">Failed</string>

@@ -6,6 +6,7 @@ import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
 import android.support.v7.app.AlertDialog;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -100,6 +101,68 @@ public class HeartFragmentPresenter extends BaseObservable {
         }
     }
 
+    private void showSuccessDialog() {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+            View mView = LayoutInflater.from(mContext).inflate(R.layout.result_success_dialog, null);
+            TextView textView = mView.findViewById(R.id.txtheart);
+            textView.setText(getBeatsPerMinute());
+            Button btnCancel = mView.findViewById(R.id.btn_cancel);
+            btnCancel.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    alertDialog.dismiss();
+                    setBeatsPerMinute("000");
+                    setProgress(0);
+                }
+            });
+
+            Button btnSave = mView.findViewById(R.id.btn_save);
+            btnSave.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    saveHeartRate();
+                }
+            });
+            dialog.setView(mView);
+            alertDialog = dialog.create();
+            alertDialog.show();
+        }
+    }
+
+    private void showErrorDialog() {
+        if (alertDialog == null || !alertDialog.isShowing()) {
+            AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
+            View mView = LayoutInflater.from(mContext).inflate(R.layout.result_error_dialog, null);
+            Button btn_try = mView.findViewById(R.id.btn_try);
+            btn_try.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    alertDialog.dismiss();
+                    setBeatsPerMinute("000");
+                    setProgress(0);
+                }
+            });
+            dialog.setView(mView);
+            alertDialog = dialog.create();
+            alertDialog.show();
+        }
+    }
+
+    private void saveHeartRate() {
+        long timeStamp = System.currentTimeMillis();
+        String date = ToolsUtils.getInstance().getDate(timeStamp);
+        String time = ToolsUtils.getInstance().getTime(timeStamp);
+        if (mDataManager.insertHistory(new HistoryModel(getBeatsPerMinute(), date, time))) {
+            Toast.makeText(mContext, "Heart rate saved", Toast.LENGTH_SHORT).show();
+            alertDialog.dismiss();
+            setBeatsPerMinute("000");
+            setProgress(0);
+        } else {
+            Toast.makeText(mContext, "Heart rate not saved", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void start() {
         mHeartSupport.addOnResultListener(new PulseListener() {
             @Override
@@ -129,70 +192,13 @@ public class HeartFragmentPresenter extends BaseObservable {
             @Override
             public void OnTimerStopped() {
                 isStarted = false;
-                if (getBeatsPerMinute().equals("000")) {
+                int value = Integer.parseInt(getBeatsPerMinute());
+                if (value == 0 || value < 50) {
                     showErrorDialog();
                 } else {
                     showSuccessDialog();
                 }
             }
         }).startPulseCheck(timeLimit);
-    }
-
-    private void showSuccessDialog() {
-        if (alertDialog == null || !alertDialog.isShowing()) {
-            AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-            View mView = LayoutInflater.from(mContext).inflate(R.layout.result_success_dialog, null);
-            TextView textView = mView.findViewById(R.id.txtheart);
-            textView.setText(getBeatsPerMinute());
-            Button btnCancel = mView.findViewById(R.id.btn_cancel);
-            btnCancel.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    alertDialog.dismiss();
-                }
-            });
-
-            Button btnSave = mView.findViewById(R.id.btn_save);
-            btnSave.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    saveHeartRate();
-                }
-            });
-            dialog.setView(mView);
-            alertDialog = dialog.create();
-            alertDialog.show();
-        }
-    }
-
-    private void saveHeartRate() {
-        long timeStamp = System.currentTimeMillis();
-        String date = ToolsUtils.getInstance().getDate(timeStamp);
-        String time = ToolsUtils.getInstance().getTime(timeStamp);
-        if (mDataManager.insertHistory(new HistoryModel(getBeatsPerMinute(), date, time))) {
-            alertDialog.dismiss();
-            Toast.makeText(mContext, "Heart rate saved", Toast.LENGTH_SHORT).show();
-        } else {
-            Toast.makeText(mContext, "Heart rate not saved", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void showErrorDialog() {
-        if (alertDialog == null || !alertDialog.isShowing()) {
-            AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-            View mView = LayoutInflater.from(mContext).inflate(R.layout.result_error_dialog, null);
-            Button btn_try = mView.findViewById(R.id.btn_try);
-            btn_try.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    alertDialog.dismiss();
-                    setBeatsPerMinute("000");
-                    setProgress(0);
-                }
-            });
-            dialog.setView(mView);
-            alertDialog = dialog.create();
-            alertDialog.show();
-        }
     }
 }
