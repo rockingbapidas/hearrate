@@ -15,19 +15,19 @@ import java.util.Random;
  * Created by bapidas on 30/10/17.
  */
 
-public class DemoView extends View {
+public class DrawGraph extends View {
     int[] dataX = new int[30];
     int[] dataY = new int[30];
 
-    public DemoView(Context context) {
+    public DrawGraph(Context context) {
         super(context);
     }
 
-    public DemoView(Context context, AttributeSet attrs) {
+    public DrawGraph(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public DemoView(Context context, AttributeSet attrs, int defStyleAttr) {
+    public DrawGraph(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
 

@@ -19,7 +19,7 @@ import java.util.List;
 public class CameraOld implements CameraSupport {
     private Camera mCamera;
     private PowerManager.WakeLock mWakeLock;
-    private CameraPreviewListener mCameraPreviewListener;
+    private PreviewListener mPreviewListener;
     private final Object mObject = new Object();
     private SurfaceTexture mSurfaceTexture = null;
     private ProcessingSupport mProcessingSupport;
@@ -64,8 +64,8 @@ public class CameraOld implements CameraSupport {
     }
 
     @Override
-    public void addOnPreviewListener(CameraPreviewListener callBack) {
-        this.mCameraPreviewListener = callBack;
+    public void addOnPreviewListener(PreviewListener callBack) {
+        this.mPreviewListener = callBack;
     }
 
     @Override
@@ -188,9 +188,10 @@ public class CameraOld implements CameraSupport {
             //pixel calculation done here
             Camera.Size size = cam.getParameters().getPreviewSize();
             if (data != null && size != null) {
+                mPreviewListener.OnCameraRawData(data);
                 if (mProcessingSupport != null) {
                     int value = mProcessingSupport.YUV420SPtoRedAvg(data, size.width, size.height);
-                    mCameraPreviewListener.OnPixelAverage(value);
+                    mPreviewListener.OnPixelAverage(value);
                 }
                 cam.addCallbackBuffer(data);
             }

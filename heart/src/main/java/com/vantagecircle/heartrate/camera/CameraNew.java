@@ -47,7 +47,7 @@ public class CameraNew implements CameraSupport {
     private boolean mFlashSupported;
     private PowerManager.WakeLock mWakeLock;
 
-    private CameraPreviewListener mCameraPreviewListener;
+    private PreviewListener mPreviewListener;
     private ProcessingSupport processingSupport;
 
     public CameraNew(Context context, ProcessingSupport processingSupport) {
@@ -110,8 +110,8 @@ public class CameraNew implements CameraSupport {
     }
 
     @Override
-    public void addOnPreviewListener(CameraPreviewListener callBack) {
-        this.mCameraPreviewListener = callBack;
+    public void addOnPreviewListener(PreviewListener callBack) {
+        this.mPreviewListener = callBack;
     }
 
     @Override
@@ -231,10 +231,11 @@ public class CameraNew implements CameraSupport {
             //pixel calculation done here
             Image image = reader.acquireLatestImage();
             if (image != null) {
-                if (processingSupport != null && mCameraPreviewListener != null) {
+                if (processingSupport != null && mPreviewListener != null) {
                     byte[] data = processingSupport.YUV_420_888toNV21(image);
+                    mPreviewListener.OnCameraRawData(data);
                     int value = processingSupport.YUV420SPtoRedAvg(data, image.getWidth(), image.getHeight());
-                    mCameraPreviewListener.OnPixelAverage(value);
+                    mPreviewListener.OnPixelAverage(value);
                 }
                 image.close();
             }

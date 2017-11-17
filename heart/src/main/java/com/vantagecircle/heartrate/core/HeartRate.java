@@ -3,7 +3,7 @@ package com.vantagecircle.heartrate.core;
 import android.os.CountDownTimer;
 import android.util.Log;
 
-import com.vantagecircle.heartrate.camera.CameraPreviewListener;
+import com.vantagecircle.heartrate.camera.PreviewListener;
 import com.vantagecircle.heartrate.camera.CameraSupport;
 import com.vantagecircle.heartrate.utils.TYPE;
 
@@ -13,7 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * Created by bapidas on 03/11/17.
  */
 
-public class HeartRate implements HeartSupport, CameraPreviewListener {
+public class HeartRate implements HeartSupport, PreviewListener {
     private static final String TAG = HeartRate.class.getSimpleName();
 
     private CameraSupport mCameraSupport;
@@ -131,13 +131,18 @@ public class HeartRate implements HeartSupport, CameraPreviewListener {
     }
 
     @Override
+    public void OnCameraRawData(byte[] data) {
+        //TODO
+    }
+
+    @Override
     public void OnPixelAverage(int pixelAverage) {
         calculatePulse(pixelAverage);
     }
 
     private void startTimer() {
         if (timeLimit != 0) {
-            countDownTimer = new CountDownTimer(timeLimit, 1000) {
+            countDownTimer = new CountDownTimer(timeLimit, 500) {
 
                 public void onTick(long millisUntilFinished) {
                     isTimeRunning = true;

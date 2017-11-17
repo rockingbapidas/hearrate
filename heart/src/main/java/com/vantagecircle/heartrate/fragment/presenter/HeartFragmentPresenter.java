@@ -5,6 +5,7 @@ import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
+import android.os.Handler;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -22,6 +23,7 @@ import com.vantagecircle.heartrate.core.PulseListener;
 import com.vantagecircle.heartrate.core.TimerListener;
 import com.vantagecircle.heartrate.data.DataManager;
 import com.vantagecircle.heartrate.model.HistoryModel;
+import com.vantagecircle.heartrate.utils.ProgressAnimation;
 import com.vantagecircle.heartrate.utils.ToolsUtils;
 
 /**
@@ -36,6 +38,7 @@ public class HeartFragmentPresenter extends BaseObservable {
     private AlertDialog alertDialog;
     private boolean isStarted;
     private long timeLimit = 20000;
+    private long interval = 500;
 
     //android data binding fields
     private String beatsPerMinute;
@@ -76,6 +79,23 @@ public class HeartFragmentPresenter extends BaseObservable {
     }
 
     public void onHelpClick(View view) {
+        showHintDialog();
+    }
+
+    public void onStartClick(View view) {
+        start();
+    }
+
+    private void start(){
+        if (isStarted) {
+            isStarted = false;
+            mHeartSupport.stopPulseCheck();
+        } else {
+            initHeart();
+        }
+    }
+
+    private void showHintDialog(){
         if (alertDialog == null || !alertDialog.isShowing()) {
             AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
             View mView = LayoutInflater.from(mContext).inflate(R.layout.hint_diaog, null);
@@ -89,15 +109,6 @@ public class HeartFragmentPresenter extends BaseObservable {
             dialog.setView(mView);
             alertDialog = dialog.create();
             alertDialog.show();
-        }
-    }
-
-    public void onStartClick(View view) {
-        if (isStarted) {
-            isStarted = false;
-            mHeartSupport.stopPulseCheck();
-        } else {
-            start();
         }
     }
 
@@ -134,13 +145,21 @@ public class HeartFragmentPresenter extends BaseObservable {
         if (alertDialog == null || !alertDialog.isShowing()) {
             AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
             View mView = LayoutInflater.from(mContext).inflate(R.layout.result_error_dialog, null);
-            Button btn_try = mView.findViewById(R.id.btn_try);
-            btn_try.setOnClickListener(new View.OnClickListener() {
+            Button btnCancel = mView.findViewById(R.id.btn_cancel);
+            btnCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
                     alertDialog.dismiss();
                     setBeatsPerMinute("000");
                     setProgress(0);
+                }
+            });
+            Button btn_try = mView.findViewById(R.id.btn_try);
+            btn_try.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    alertDialog.dismiss();
+                    start();
                 }
             });
             dialog.setView(mView);
@@ -163,7 +182,7 @@ public class HeartFragmentPresenter extends BaseObservable {
         }
     }
 
-    private void start() {
+    private void initHeart() {
         mHeartSupport.addOnResultListener(new PulseListener() {
             @Override
             public void OnPulseResult(String pulse) {
@@ -184,20 +203,25 @@ public class HeartFragmentPresenter extends BaseObservable {
             @Override
             public void OnTimerRunning(long milliSecond) {
                 long n = timeLimit - milliSecond;
-                Long p = n * 100 / timeLimit;
-                int progress = p.intValue();
+                int progress = (int) (n * 100 / timeLimit);
                 setProgress(progress);
             }
 
             @Override
             public void OnTimerStopped() {
-                isStarted = false;
-                int value = Integer.parseInt(getBeatsPerMinute());
-                if (value == 0 || value < 50) {
-                    showErrorDialog();
-                } else {
-                    showSuccessDialog();
-                }
+                setProgress(100);
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        isStarted = false;
+                        int value = Integer.parseInt(getBeatsPerMinute());
+                        if (value == 0 || value < 50) {
+                            showErrorDialog();
+                        } else {
+                            showSuccessDialog();
+                        }
+                    }
+                }, 800);
             }
         }).startPulseCheck(timeLimit);
     }
