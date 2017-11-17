@@ -1,11 +1,13 @@
-package com.vantagecircle.heartrate;
+package com.vantagecircle.heartrate.component;
 
 import android.app.Application;
 import android.content.Context;
 
+import com.vantagecircle.heartrate.HeartApplication;
 import com.vantagecircle.heartrate.data.DataManager;
 import com.vantagecircle.heartrate.data.DatabaseHelper;
 import com.vantagecircle.heartrate.annotation.ApplicationContext;
+import com.vantagecircle.heartrate.module.AppModule;
 
 import javax.inject.Singleton;
 

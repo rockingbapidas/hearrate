@@ -1,6 +1,6 @@
-package com.vantagecircle.heartrate.activity;
+package com.vantagecircle.heartrate.component;
 
-import com.vantagecircle.heartrate.AppComponent;
+import com.vantagecircle.heartrate.module.ActivityModule;
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.activity.ui.WelcomeActivity;
 import com.vantagecircle.heartrate.annotation.PerActivity;

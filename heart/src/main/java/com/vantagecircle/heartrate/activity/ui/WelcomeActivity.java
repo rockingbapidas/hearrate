@@ -6,10 +6,10 @@ import android.support.annotation.Nullable;
 
 import com.vantagecircle.heartrate.HeartApplication;
 import com.vantagecircle.heartrate.R;
-import com.vantagecircle.heartrate.activity.ActivityComponent;
-import com.vantagecircle.heartrate.activity.ActivityModule;
+import com.vantagecircle.heartrate.component.ActivityComponent;
+import com.vantagecircle.heartrate.component.DaggerActivityComponent;
+import com.vantagecircle.heartrate.module.ActivityModule;
 import com.vantagecircle.heartrate.activity.BaseActivity;
-import com.vantagecircle.heartrate.activity.DaggerActivityComponent;
 import com.vantagecircle.heartrate.activity.presenter.WelcomeActivityPresenter;
 import com.vantagecircle.heartrate.databinding.WelcomeActivityBinding;
 

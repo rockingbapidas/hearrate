@@ -1,9 +1,9 @@
-package com.vantagecircle.heartrate.fragment;
+package com.vantagecircle.heartrate.component;
 
-import com.vantagecircle.heartrate.AppComponent;
+import com.vantagecircle.heartrate.annotation.PerFragment;
 import com.vantagecircle.heartrate.fragment.ui.HeartFragment;
 import com.vantagecircle.heartrate.fragment.ui.HistoryFragment;
-import com.vantagecircle.heartrate.annotation.PerFragment;
+import com.vantagecircle.heartrate.module.FragmentModule;
 
 import dagger.Component;
 

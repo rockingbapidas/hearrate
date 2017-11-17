@@ -9,11 +9,11 @@ import android.view.ViewGroup;
 
 import com.vantagecircle.heartrate.HeartApplication;
 import com.vantagecircle.heartrate.R;
+import com.vantagecircle.heartrate.component.DaggerFragmentComponent;
 import com.vantagecircle.heartrate.data.DataManager;
 import com.vantagecircle.heartrate.fragment.BaseFragment;
-import com.vantagecircle.heartrate.fragment.DaggerFragmentComponent;
-import com.vantagecircle.heartrate.fragment.FragmentComponent;
-import com.vantagecircle.heartrate.fragment.FragmentModule;
+import com.vantagecircle.heartrate.component.FragmentComponent;
+import com.vantagecircle.heartrate.module.FragmentModule;
 import com.vantagecircle.heartrate.fragment.presenter.HistoryFragmentPresenter;
 
 import javax.inject.Inject;

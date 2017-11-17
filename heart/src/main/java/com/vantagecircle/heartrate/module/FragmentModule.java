@@ -1,4 +1,4 @@
-package com.vantagecircle.heartrate.fragment;
+package com.vantagecircle.heartrate.module;
 
 import android.content.Context;
 import android.os.Build;
