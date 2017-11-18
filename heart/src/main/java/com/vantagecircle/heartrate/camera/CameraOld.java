@@ -197,12 +197,4 @@ public class CameraOld implements CameraSupport {
             }
         }
     };
-
-    private class Example implements Camera.PreviewCallback{
-
-        @Override
-        public void onPreviewFrame(byte[] bytes, Camera camera) {
-
-        }
-    }
 }
