@@ -31,7 +31,7 @@ public class HeartRate implements HeartSupport, PreviewListener {
 
     private int beatsIndex = 0;
     private final int beatsArraySize = 3;
-    private final int[] beatsArray = new int[beatsArraySize];
+    private final double[] beatsArray = new double[beatsArraySize];
 
     private double beats = 0;
     private final AtomicBoolean processing = new AtomicBoolean(false);
@@ -216,9 +216,11 @@ public class HeartRate implements HeartSupport, PreviewListener {
         long endTime = System.currentTimeMillis();
         double totalTimeInSecs = (endTime - startTime) / 1000d;
 
-        if (totalTimeInSecs >= 5) {
+        if (totalTimeInSecs >= 10) {
             double bps = (beats / totalTimeInSecs);
-            int dpm = (int) (bps * 60d);
+            Log.d(TAG, "BPS:" + bps);
+            double dpm =  (bps * 60d);
+            Log.d(TAG, "BPS:" + dpm);
             if (dpm < 30 || dpm > 180) {
                 startTime = System.currentTimeMillis();
                 beats = 0;
@@ -233,7 +235,7 @@ public class HeartRate implements HeartSupport, PreviewListener {
 
             int beatsArrayAvg = 0;
             int beatsArrayCnt = 0;
-            for (int aBeatsArray : beatsArray) {
+            for (double aBeatsArray : beatsArray) {
                 if (aBeatsArray > 0) {
                     beatsArrayAvg += aBeatsArray;
                     beatsArrayCnt++;

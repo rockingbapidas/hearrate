@@ -44,12 +44,12 @@ public class FragmentModule {
 
     @Provides
     CameraSupport provideCameraSupport(@ActivityContext Context mContext, ProcessingSupport processingSupport) {
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             return new CameraNew(mContext, processingSupport);
         } else {
             return new CameraOld(mContext, processingSupport);
-        }*/
-        return new CameraOld(mContext, processingSupport);
+        }
+//        return new CameraOld(mContext, processingSupport);
     }
 
     @Provides
