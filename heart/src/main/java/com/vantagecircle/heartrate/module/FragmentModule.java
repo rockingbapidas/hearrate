@@ -1,5 +1,6 @@
 package com.vantagecircle.heartrate.module;
 
+import android.app.Activity;
 import android.content.Context;
 import android.os.Build;
 import android.support.v4.app.Fragment;
@@ -28,7 +29,7 @@ public class FragmentModule {
 
     @Provides
     @ActivityContext
-    Context provideContext(){
+    Activity provideContext(){
         return mFragment.getActivity();
     }
 
@@ -43,13 +44,13 @@ public class FragmentModule {
     }
 
     @Provides
-    CameraSupport provideCameraSupport(@ActivityContext Context mContext, ProcessingSupport processingSupport) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+    CameraSupport provideCameraSupport(@ActivityContext Activity mActivity, ProcessingSupport processingSupport) {
+        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             return new CameraNew(mContext, processingSupport);
         } else {
             return new CameraOld(mContext, processingSupport);
-        }
-//        return new CameraOld(mContext, processingSupport);
+        }*/
+        return new CameraOld(mActivity, processingSupport);
     }
 
     @Provides

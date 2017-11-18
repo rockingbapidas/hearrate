@@ -218,9 +218,7 @@ public class HeartRate implements HeartSupport, PreviewListener {
 
         if (totalTimeInSecs >= 10) {
             double bps = (beats / totalTimeInSecs);
-            Log.d(TAG, "BPS:" + bps);
             double dpm =  (bps * 60d);
-            Log.d(TAG, "BPS:" + dpm);
             if (dpm < 30 || dpm > 180) {
                 startTime = System.currentTimeMillis();
                 beats = 0;

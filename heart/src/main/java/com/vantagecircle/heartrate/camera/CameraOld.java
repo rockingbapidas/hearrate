@@ -1,11 +1,13 @@
 package com.vantagecircle.heartrate.camera;
 
+import android.app.Activity;
 import android.content.Context;
 import android.graphics.ImageFormat;
 import android.graphics.SurfaceTexture;
 import android.hardware.Camera;
 import android.os.PowerManager;
 import android.util.Log;
+import android.view.Surface;
 
 import com.vantagecircle.heartrate.processing.ProcessingSupport;
 
@@ -17,16 +19,19 @@ import java.util.List;
  */
 @SuppressWarnings("deprecation")
 public class CameraOld implements CameraSupport {
+    private Activity mActivity;
     private Camera mCamera;
+    private int mCameraId = 0;
     private PowerManager.WakeLock mWakeLock;
     private PreviewListener mPreviewListener;
     private final Object mObject = new Object();
     private SurfaceTexture mSurfaceTexture = null;
     private ProcessingSupport mProcessingSupport;
 
-    public CameraOld(Context mContext, ProcessingSupport mProcessingSupport) {
+    public CameraOld(Activity mActivity, ProcessingSupport mProcessingSupport) {
         Log.e("TAG", "CameraOld Run");
-        PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+        this.mActivity = mActivity;
+        PowerManager powerManager = (PowerManager) mActivity.getSystemService(Context.POWER_SERVICE);
         if (powerManager != null) {
             this.mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
         }
@@ -38,7 +43,7 @@ public class CameraOld implements CameraSupport {
         if (mCamera == null) {
             try {
                 this.mWakeLock.acquire(10 * 60 * 1000L);
-                this.mCamera = Camera.open();
+                this.mCamera = Camera.open(mCameraId);
                 setCameraOutputs();
             } catch (Exception e) {
                 throw new RuntimeException("Interrupted while trying to open camera.", e);
@@ -79,6 +84,27 @@ public class CameraOld implements CameraSupport {
                 return;
             }
             Camera.Parameters parameters = mCamera.getParameters();
+            parameters.setPreviewFormat(ImageFormat.NV21);
+
+            int i4 = 0;
+            Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
+            Camera.getCameraInfo(mCameraId, cameraInfo);
+            switch (mActivity.getWindowManager().getDefaultDisplay().getRotation()) {
+                case Surface.ROTATION_90:
+                    i4 = 90;
+                    break;
+                case Surface.ROTATION_180:
+                    i4 = 180;
+                    break;
+                case Surface.ROTATION_270:
+                    i4 = 270;
+                    break;
+                case Surface.ROTATION_0:
+                    break;
+            }
+            this.mCamera.setDisplayOrientation(cameraInfo.facing == 1 ?
+                    (360 - ((i4 + cameraInfo.orientation) % 360)) % 360 :
+                    ((cameraInfo.orientation - i4) + 360) % 360);
 
             Camera.Size size = getSmallestPreviewSize(parameters);
             if (size != null) {
@@ -96,8 +122,6 @@ public class CameraOld implements CameraSupport {
                 }
             }
 
-            parameters.setPreviewFormat(ImageFormat.NV21);
-
             List supportedFocusModes = parameters.getSupportedFocusModes();
             if (supportedFocusModes != null && supportedFocusModes
                     .contains(Camera.Parameters.FOCUS_MODE_INFINITY)) {
@@ -111,11 +135,6 @@ public class CameraOld implements CameraSupport {
             if (size != null) {
                 bitsPerPixel = (bitsPerPixel * (size.width * size.height)) / 8;
             }
-            this.mCamera.addCallbackBuffer(new byte[bitsPerPixel]);
-            this.mCamera.setPreviewCallbackWithBuffer(mPreviewCallback);
-            this.mCamera.setPreviewTexture(createSurfaceTexture());
-            this.mCamera.setParameters(parameters);
-            this.mCamera.startPreview();
 
             List supportedFlashModes = parameters.getSupportedFlashModes();
             boolean isFlash = !(supportedFlashModes == null || supportedFlashModes.isEmpty()
@@ -126,7 +145,12 @@ public class CameraOld implements CameraSupport {
             } else {
                 parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
             }
+
+            this.mCamera.addCallbackBuffer(new byte[bitsPerPixel]);
+            this.mCamera.setPreviewCallbackWithBuffer(mPreviewCallback);
+            this.mCamera.setPreviewTexture(createSurfaceTexture());
             this.mCamera.setParameters(parameters);
+            this.mCamera.startPreview();
         } catch (Exception e) {
             throw new RuntimeException("Interrupted while trying to setup camera.", e);
         }
@@ -190,7 +214,7 @@ public class CameraOld implements CameraSupport {
             if (data != null && size != null) {
                 mPreviewListener.OnPreviewData(data);
                 if (mProcessingSupport != null) {
-                    int value = mProcessingSupport.YUV420SPtoRedAvg(data, size.width, size.height);
+                    int value = mProcessingSupport.YUV420SPtoRedAvg(data.clone(), size.width, size.height);
                     mPreviewListener.OnPreviewCount(value);
                 }
                 cam.addCallbackBuffer(data);
