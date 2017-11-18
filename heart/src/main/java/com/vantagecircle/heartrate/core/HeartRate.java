@@ -171,7 +171,7 @@ public class HeartRate implements HeartSupport, PreviewListener {
             return;
         }
 
-        /*if (pixelAverage < 200) {
+        if (pixelAverage < 200) {
             errorCount++;
             if (mFingerListener != null) {
                 mFingerListener.OnFingerDetectFailed(errorCount);
@@ -182,73 +182,74 @@ public class HeartRate implements HeartSupport, PreviewListener {
             if (mFingerListener != null) {
                 mFingerListener.OnFingerDetected(successCount);
             }
-        }*/
 
-        int averageArrayAvg = 0;
-        int averageArrayCnt = 0;
-        for (int anAverageArray : averageArray) {
-            if (anAverageArray > 0) {
-                averageArrayAvg += anAverageArray;
-                averageArrayCnt++;
-            }
-        }
 
-        int rollingAverage = (averageArrayCnt > 0) ? (averageArrayAvg / averageArrayCnt) : 0;
-        TYPE newType = currentType;
-        if (pixelAverage < rollingAverage) {
-            newType = TYPE.RED;
-            if (newType != currentType) {
-                beats++;
-            }
-        } else if (pixelAverage > rollingAverage) {
-            newType = TYPE.GREEN;
-        }
-
-        if (averageIndex == averageArraySize)
-            averageIndex = 0;
-        averageArray[averageIndex] = pixelAverage;
-        averageIndex++;
-
-        if (newType != currentType) {
-            currentType = newType;
-        }
-
-        long endTime = System.currentTimeMillis();
-        double totalTimeInSecs = (endTime - startTime) / 1000d;
-
-        if (totalTimeInSecs >= 5) {
-            double bps = (beats / totalTimeInSecs);
-            int dpm = (int) (bps * 60d);
-            if (dpm < 30 || dpm > 180) {
-                startTime = System.currentTimeMillis();
-                beats = 0;
-                processing.set(false);
-                return;
-            }
-
-            if (beatsIndex == beatsArraySize)
-                beatsIndex = 0;
-            beatsArray[beatsIndex] = dpm;
-            beatsIndex++;
-
-            int beatsArrayAvg = 0;
-            int beatsArrayCnt = 0;
-            for (int aBeatsArray : beatsArray) {
-                if (aBeatsArray > 0) {
-                    beatsArrayAvg += aBeatsArray;
-                    beatsArrayCnt++;
+            int averageArrayAvg = 0;
+            int averageArrayCnt = 0;
+            for (int anAverageArray : averageArray) {
+                if (anAverageArray > 0) {
+                    averageArrayAvg += anAverageArray;
+                    averageArrayCnt++;
                 }
             }
 
-            int beatsAvg = (beatsArrayAvg / beatsArrayCnt);
-            String beatsPerMinuteValue = String.valueOf(beatsAvg);
-
-            if (mPulseListener != null) {
-                mPulseListener.OnPulseResult(beatsPerMinuteValue);
+            int rollingAverage = (averageArrayCnt > 0) ? (averageArrayAvg / averageArrayCnt) : 0;
+            TYPE newType = currentType;
+            if (pixelAverage < rollingAverage) {
+                newType = TYPE.RED;
+                if (newType != currentType) {
+                    beats++;
+                }
+            } else if (pixelAverage > rollingAverage) {
+                newType = TYPE.GREEN;
             }
-            startTime = System.currentTimeMillis();
-            beats = 0;
+
+            if (averageIndex == averageArraySize)
+                averageIndex = 0;
+            averageArray[averageIndex] = pixelAverage;
+            averageIndex++;
+
+            if (newType != currentType) {
+                currentType = newType;
+            }
+
+            long endTime = System.currentTimeMillis();
+            double totalTimeInSecs = (endTime - startTime) / 1000d;
+
+            if (totalTimeInSecs >= 5) {
+                double bps = (beats / totalTimeInSecs);
+                int dpm = (int) (bps * 60d);
+                if (dpm < 30 || dpm > 180) {
+                    startTime = System.currentTimeMillis();
+                    beats = 0;
+                    processing.set(false);
+                    return;
+                }
+
+                if (beatsIndex == beatsArraySize)
+                    beatsIndex = 0;
+                beatsArray[beatsIndex] = dpm;
+                beatsIndex++;
+
+                int beatsArrayAvg = 0;
+                int beatsArrayCnt = 0;
+                for (int aBeatsArray : beatsArray) {
+                    if (aBeatsArray > 0) {
+                        beatsArrayAvg += aBeatsArray;
+                        beatsArrayCnt++;
+                    }
+                }
+
+                int beatsAvg = (beatsArrayAvg / beatsArrayCnt);
+                String beatsPerMinuteValue = String.valueOf(beatsAvg);
+
+                if (mPulseListener != null) {
+                    mPulseListener.OnPulseResult(beatsPerMinuteValue);
+                }
+                startTime = System.currentTimeMillis();
+                beats = 0;
+            }
+            processing.set(false);
         }
-        processing.set(false);
     }
 }
