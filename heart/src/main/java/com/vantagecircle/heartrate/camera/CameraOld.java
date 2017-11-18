@@ -79,6 +79,7 @@ public class CameraOld implements CameraSupport {
                 return;
             }
             Camera.Parameters parameters = mCamera.getParameters();
+            parameters.setPreviewFormat(ImageFormat.NV21);
 
             Camera.Size size = getSmallestPreviewSize(parameters);
             if (size != null) {
@@ -96,8 +97,6 @@ public class CameraOld implements CameraSupport {
                 }
             }
 
-            parameters.setPreviewFormat(ImageFormat.NV21);
-
             List supportedFocusModes = parameters.getSupportedFocusModes();
             if (supportedFocusModes != null && supportedFocusModes
                     .contains(Camera.Parameters.FOCUS_MODE_INFINITY)) {
@@ -111,11 +110,6 @@ public class CameraOld implements CameraSupport {
             if (size != null) {
                 bitsPerPixel = (bitsPerPixel * (size.width * size.height)) / 8;
             }
-            this.mCamera.addCallbackBuffer(new byte[bitsPerPixel]);
-            this.mCamera.setPreviewCallbackWithBuffer(mPreviewCallback);
-            this.mCamera.setPreviewTexture(surfaceTexture());
-            this.mCamera.setParameters(parameters);
-            this.mCamera.startPreview();
 
             List supportedFlashModes = parameters.getSupportedFlashModes();
             boolean isFlash = !(supportedFlashModes == null || supportedFlashModes.isEmpty()
@@ -126,7 +120,12 @@ public class CameraOld implements CameraSupport {
             } else {
                 parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
             }
+
+            this.mCamera.addCallbackBuffer(new byte[bitsPerPixel]);
+            this.mCamera.setPreviewCallbackWithBuffer(mPreviewCallback);
+            this.mCamera.setPreviewTexture(surfaceTexture());
             this.mCamera.setParameters(parameters);
+            this.mCamera.startPreview();
         } catch (Exception e) {
             throw new RuntimeException("Interrupted while trying to setup camera.", e);
         }
@@ -190,7 +189,7 @@ public class CameraOld implements CameraSupport {
             Camera.Size size = cam.getParameters().getPreviewSize();
             if (size == null) throw new NullPointerException();
             if(mProcessingSupport == null) throw new NullPointerException();
-            int value = mProcessingSupport.YUV420SPtoRedAvg(data, size.width, size.height);
+            int value = mProcessingSupport.YUV420SPtoRedAvg(data.clone(), size.width, size.height);
             mCameraCallBack.OnPixelAverage(value);
             cam.addCallbackBuffer(data);
         }
