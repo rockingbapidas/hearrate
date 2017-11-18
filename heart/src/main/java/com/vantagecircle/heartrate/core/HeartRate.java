@@ -131,13 +131,13 @@ public class HeartRate implements HeartSupport, PreviewListener {
     }
 
     @Override
-    public void OnCameraRawData(byte[] data) {
+    public void OnPreviewData(byte[] data) {
         //TODO
     }
 
     @Override
-    public void OnPixelAverage(int pixelAverage) {
-        calculatePulse(pixelAverage);
+    public void OnPreviewCount(int count) {
+        calculatePulse(count);
     }
 
     private void startTimer() {

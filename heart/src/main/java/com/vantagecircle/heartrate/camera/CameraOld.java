@@ -188,13 +188,21 @@ public class CameraOld implements CameraSupport {
             //pixel calculation done here
             Camera.Size size = cam.getParameters().getPreviewSize();
             if (data != null && size != null) {
-                mPreviewListener.OnCameraRawData(data);
+                mPreviewListener.OnPreviewData(data);
                 if (mProcessingSupport != null) {
                     int value = mProcessingSupport.YUV420SPtoRedAvg(data, size.width, size.height);
-                    mPreviewListener.OnPixelAverage(value);
+                    mPreviewListener.OnPreviewCount(value);
                 }
                 cam.addCallbackBuffer(data);
             }
         }
     };
+
+    private class Example implements Camera.PreviewCallback{
+
+        @Override
+        public void onPreviewFrame(byte[] bytes, Camera camera) {
+
+        }
+    }
 }

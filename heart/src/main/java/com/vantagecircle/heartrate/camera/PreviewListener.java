@@ -5,6 +5,6 @@ package com.vantagecircle.heartrate.camera;
  */
 
 public interface PreviewListener {
-    void OnCameraRawData(byte[] data);
-    void OnPixelAverage(int pixelAverage);
+    void OnPreviewData(byte[] data);
+    void OnPreviewCount(int count);
 }
