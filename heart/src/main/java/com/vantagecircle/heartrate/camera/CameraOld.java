@@ -111,11 +111,6 @@ public class CameraOld implements CameraSupport {
             if (size != null) {
                 bitsPerPixel = (bitsPerPixel * (size.width * size.height)) / 8;
             }
-            this.mCamera.addCallbackBuffer(new byte[bitsPerPixel]);
-            this.mCamera.setPreviewCallbackWithBuffer(mPreviewCallback);
-            this.mCamera.setPreviewTexture(createSurfaceTexture());
-            this.mCamera.setParameters(parameters);
-            this.mCamera.startPreview();
 
             List supportedFlashModes = parameters.getSupportedFlashModes();
             boolean isFlash = !(supportedFlashModes == null || supportedFlashModes.isEmpty()
@@ -126,7 +121,12 @@ public class CameraOld implements CameraSupport {
             } else {
                 parameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
             }
+
+            this.mCamera.addCallbackBuffer(new byte[bitsPerPixel]);
+            this.mCamera.setPreviewCallbackWithBuffer(mPreviewCallback);
+            this.mCamera.setPreviewTexture(createSurfaceTexture());
             this.mCamera.setParameters(parameters);
+            this.mCamera.startPreview();
         } catch (Exception e) {
             throw new RuntimeException("Interrupted while trying to setup camera.", e);
         }
@@ -190,7 +190,7 @@ public class CameraOld implements CameraSupport {
             if (data != null && size != null) {
                 mPreviewListener.OnPreviewData(data);
                 if (mProcessingSupport != null) {
-                    int value = mProcessingSupport.YUV420SPtoRedAvg(data, size.width, size.height);
+                    int value = mProcessingSupport.YUV420SPtoRedAvg(data.clone(), size.width, size.height);
                     mPreviewListener.OnPreviewCount(value);
                 }
                 cam.addCallbackBuffer(data);
