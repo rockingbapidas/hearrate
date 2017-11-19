@@ -1,4 +1,4 @@
-package com.vantagecircle.heartrate.processing;
+package com.vantagecircle.heartrate.other;
 
 import android.graphics.Color;
 
@@ -17,7 +17,10 @@ public class Calculation implements CalculationSupport {
         int[] a = m15971a((int) b[0], (int) b[1], (int) b[2]);
         float[] r2 = new float[3];
         Color.RGBToHSV(a[0], a[1], a[2], r2);
-        return new double[]{Math.cos(((double) (r2[0] / 180.0f)) * 3.141592653589793d), (double) r2[1], (double) r2[2], b[0]};
+        return new double[]{
+                Math.cos(((double) (r2[0] / 180.0f)) * 3.141592653589793d),
+                (double) r2[1], (double) r2[2], b[0]
+        };
     }
 
     private double[] m15972b(byte[] bArr, int i, int i2) {
@@ -52,7 +55,11 @@ public class Calculation implements CalculationSupport {
             i5 += 5;
             i4 = i6;
         }
-        return new double[]{((double) iArr[0]) / ((double) i4), ((double) iArr[1]) / ((double) i4), ((double) iArr[2]) / ((double) i4)};
+        return new double[]{
+                ((double) iArr[0]) / ((double) i4),
+                ((double) iArr[1]) / ((double) i4),
+                ((double) iArr[2]) / ((double) i4)
+        };
     }
 
     private int[] m15971a(int i, int i2, int i3) {

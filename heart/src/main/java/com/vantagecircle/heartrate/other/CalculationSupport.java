@@ -1,4 +1,4 @@
-package com.vantagecircle.heartrate.processing;
+package com.vantagecircle.heartrate.other;
 
 /**
  * Created by bapidas on 18/11/17.

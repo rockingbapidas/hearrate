@@ -86,25 +86,25 @@ public class CameraOld implements CameraSupport {
             Camera.Parameters parameters = mCamera.getParameters();
             parameters.setPreviewFormat(ImageFormat.NV21);
 
-            int i4 = 0;
+            int rotation = 0;
             Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
             Camera.getCameraInfo(mCameraId, cameraInfo);
             switch (mActivity.getWindowManager().getDefaultDisplay().getRotation()) {
                 case Surface.ROTATION_90:
-                    i4 = 90;
+                    rotation = 90;
                     break;
                 case Surface.ROTATION_180:
-                    i4 = 180;
+                    rotation = 180;
                     break;
                 case Surface.ROTATION_270:
-                    i4 = 270;
+                    rotation = 270;
                     break;
                 case Surface.ROTATION_0:
                     break;
             }
             this.mCamera.setDisplayOrientation(cameraInfo.facing == 1 ?
-                    (360 - ((i4 + cameraInfo.orientation) % 360)) % 360 :
-                    ((cameraInfo.orientation - i4) + 360) % 360);
+                    (360 - ((rotation + cameraInfo.orientation) % 360)) % 360 :
+                    ((cameraInfo.orientation - rotation) + 360) % 360);
 
             Camera.Size size = getSmallestPreviewSize(parameters);
             if (size != null) {
