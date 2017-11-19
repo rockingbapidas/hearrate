@@ -190,7 +190,7 @@ public class CameraOld implements CameraSupport {
             if (data != null && size != null) {
                 mPreviewListener.OnPreviewData(data);
                 if (mProcessingSupport != null) {
-                    int value = mProcessingSupport.YUV420SPtoRedAvg(data.clone(), size.width, size.height);
+                    int value = mProcessingSupport.YUV420SPtoRedAvg(data, size.width, size.height);
                     mPreviewListener.OnPreviewCount(value);
                 }
                 cam.addCallbackBuffer(data);

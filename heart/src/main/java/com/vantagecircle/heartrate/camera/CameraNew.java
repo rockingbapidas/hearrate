@@ -234,7 +234,7 @@ public class CameraNew implements CameraSupport {
                 if (processingSupport != null && mPreviewListener != null) {
                     byte[] data = processingSupport.YUV_420_888toNV21(image);
                     mPreviewListener.OnPreviewData(data);
-                    int value = processingSupport.YUV420SPtoRedAvg(data.clone(), image.getWidth(), image.getHeight());
+                    int value = processingSupport.YUV420SPtoRedAvg(data, image.getWidth(), image.getHeight());
                     mPreviewListener.OnPreviewCount(value);
                 }
                 image.close();
