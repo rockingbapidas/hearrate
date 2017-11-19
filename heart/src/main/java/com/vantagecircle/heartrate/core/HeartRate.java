@@ -56,7 +56,13 @@ public class HeartRate implements HeartSupport, PreviewListener {
             if (!mCameraSupport.isCameraInUse()) {
                 errorCount = 0;
                 successCount = 0;
+
+                averageIndex = 0;
+                beatsIndex = 0;
+                beats = 0;
+                currentType = TYPE.GREEN;
                 startTime = System.currentTimeMillis();
+
                 startTimer();
                 mCameraSupport.open().addOnPreviewListener(this);
                 if (mTimerListener != null) {
@@ -77,7 +83,13 @@ public class HeartRate implements HeartSupport, PreviewListener {
             if (!mCameraSupport.isCameraInUse()) {
                 errorCount = 0;
                 successCount = 0;
+
+                averageIndex = 0;
+                beatsIndex = 0;
+                beats = 0;
+                currentType = TYPE.GREEN;
                 startTime = System.currentTimeMillis();
+
                 startTimer();
                 mCameraSupport.open().addOnPreviewListener(this);
                 if (mTimerListener != null) {
@@ -216,7 +228,7 @@ public class HeartRate implements HeartSupport, PreviewListener {
         long endTime = System.currentTimeMillis();
         double totalTimeInSecs = (endTime - startTime) / 1000d;
 
-        if (totalTimeInSecs >= 10) {
+        if (totalTimeInSecs >= 5) {
             double bps = (beats / totalTimeInSecs);
             double dpm =  (bps * 60d);
             if (dpm < 30 || dpm > 180) {
