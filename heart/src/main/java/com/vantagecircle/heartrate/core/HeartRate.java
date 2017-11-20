@@ -25,21 +25,20 @@ public class HeartRate implements HeartSupport, PreviewListener {
     private boolean isTimeRunning = false;
     private CountDownTimer countDownTimer;
 
-    private int averageIndex = 0;
     private final int averageArraySize = 4;
     private final int[] averageArray = new int[averageArraySize];
 
-    private int beatsIndex = 0;
     private final int beatsArraySize = 3;
     private final double[] beatsArray = new double[beatsArraySize];
 
+    private int averageIndex = 0;
+    private int beatsIndex = 0;
     private double beats = 0;
-    private final AtomicBoolean processing = new AtomicBoolean(false);
-    private long startTime = 0;
+    private long startTime = System.currentTimeMillis();
     private TYPE currentType = TYPE.GREEN;
-
     private int errorCount = 0;
     private int successCount = 0;
+    private final AtomicBoolean processing = new AtomicBoolean(false);
 
     public HeartRate(CameraSupport mCameraSupport) {
         this.mCameraSupport = mCameraSupport;
@@ -54,15 +53,7 @@ public class HeartRate implements HeartSupport, PreviewListener {
         this.timeLimit = timeLimit;
         if (mCameraSupport != null) {
             if (!mCameraSupport.isCameraInUse()) {
-                errorCount = 0;
-                successCount = 0;
-
-                averageIndex = 0;
-                beatsIndex = 0;
-                beats = 0;
-                currentType = TYPE.GREEN;
-                startTime = System.currentTimeMillis();
-
+                reset();
                 startTimer();
                 mCameraSupport.open().addOnPreviewListener(this);
                 if (mTimerListener != null) {
@@ -81,15 +72,7 @@ public class HeartRate implements HeartSupport, PreviewListener {
     public HeartSupport startPulseCheck() {
         if (mCameraSupport != null) {
             if (!mCameraSupport.isCameraInUse()) {
-                errorCount = 0;
-                successCount = 0;
-
-                averageIndex = 0;
-                beatsIndex = 0;
-                beats = 0;
-                currentType = TYPE.GREEN;
-                startTime = System.currentTimeMillis();
-
+                reset();
                 startTimer();
                 mCameraSupport.open().addOnPreviewListener(this);
                 if (mTimerListener != null) {
@@ -150,6 +133,17 @@ public class HeartRate implements HeartSupport, PreviewListener {
     @Override
     public void OnPreviewCount(int count) {
         calculatePulse(count);
+    }
+
+    private void reset(){
+        errorCount = 0;
+        successCount = 0;
+
+        averageIndex = 0;
+        beatsIndex = 0;
+        beats = 0;
+        currentType = TYPE.GREEN;
+        startTime = System.currentTimeMillis();
     }
 
     private void startTimer() {
