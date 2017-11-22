@@ -1,6 +1,7 @@
 package com.vantagecircle.heartrate.camera;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.ImageFormat;
@@ -34,7 +35,7 @@ import java.util.concurrent.TimeUnit;
  */
 @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
 public class CameraNew implements CameraSupport {
-    private Context mContext;
+    private Activity mActivity;
     private CameraDevice mCameraDevice;
     private CameraManager mCameraManager;
     private CameraCaptureSession mCaptureSession;
@@ -50,12 +51,12 @@ public class CameraNew implements CameraSupport {
     private PreviewListener mPreviewListener;
     private ProcessingSupport processingSupport;
 
-    public CameraNew(Context context, ProcessingSupport processingSupport) {
+    public CameraNew(Activity mActivity, ProcessingSupport processingSupport) {
         Log.e("TAG", "CameraNew Run");
-        this.mContext = context;
-        this.mCameraManager = (CameraManager) context.getSystemService(Context.CAMERA_SERVICE);
+        this.mActivity = mActivity;
+        this.mCameraManager = (CameraManager) mActivity.getSystemService(Context.CAMERA_SERVICE);
         this.processingSupport = processingSupport;
-        PowerManager powerManager = (PowerManager) mContext.getSystemService(Context.POWER_SERVICE);
+        PowerManager powerManager = (PowerManager) mActivity.getSystemService(Context.POWER_SERVICE);
         if (powerManager != null) {
             this.mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
         }
@@ -69,7 +70,7 @@ public class CameraNew implements CameraSupport {
             if (!mCameraOpenCloseLock.tryAcquire(2500, TimeUnit.MILLISECONDS)) {
                 throw new RuntimeException("Time out waiting to acquire lock while camera opening.");
             }
-            if (ActivityCompat.checkSelfPermission(mContext, Manifest.permission.CAMERA) ==
+            if (ActivityCompat.checkSelfPermission(mActivity, Manifest.permission.CAMERA) ==
                     PackageManager.PERMISSION_GRANTED) {
                 this.mWakeLock.acquire(10 * 60 * 1000L);
                 this.mCameraManager.openCamera(mCameraId, mStateCallback, mBackgroundHandler);
@@ -234,7 +235,7 @@ public class CameraNew implements CameraSupport {
                 if (processingSupport != null && mPreviewListener != null) {
                     byte[] data = processingSupport.YUV_420_888toNV21(image);
                     mPreviewListener.OnPreviewData(data);
-                    int value = processingSupport.YUV420SPtoRedAvg(data, image.getWidth(), image.getHeight());
+                    int value = processingSupport.YUV420SPtoRedAvg(data.clone(), image.getWidth(), image.getHeight());
                     mPreviewListener.OnPreviewCount(value);
                 }
                 image.close();
