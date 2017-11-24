@@ -46,7 +46,6 @@ public class HeartActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         mUnBinder = ButterKnife.bind(this);
-        askPermission();
         init();
     }
 
@@ -65,40 +64,6 @@ public class HeartActivity extends BaseActivity {
     protected void init() {
         HeartActivityPresenter mHeartActivityPresenter = new HeartActivityPresenter(this);
         mHeartActivityPresenter.setup();
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        checkPermission(requestCode, grantResults);
-    }
-
-    public void askPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ToolsUtils.getInstance().isHasPermissions(this,
-                    Manifest.permission.CAMERA)) {
-                Log.d(TAG, "Permission already accepted");
-            } else {
-                ActivityCompat.requestPermissions(this,
-                        new String[]{Manifest.permission.CAMERA},
-                        Constant.REQUEST_CAMERA_PERMISSION);
-            }
-        } else {
-            Log.d(TAG, "No need permission");
-        }
-    }
-
-    public void checkPermission(int requestCode, int[] grantResults) {
-        if (requestCode == Constant.REQUEST_CAMERA_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "Permission granted");
-            } else {
-                Log.d(TAG, "Permission not granted");
-                Toast.makeText(this, "You have to give permission " +
-                        "to access this window", Toast.LENGTH_SHORT).show();
-                finish();
-            }
-        }
     }
 
     @Override

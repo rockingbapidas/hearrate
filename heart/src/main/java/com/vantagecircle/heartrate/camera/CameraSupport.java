@@ -1,12 +1,26 @@
 package com.vantagecircle.heartrate.camera;
 
+import android.view.SurfaceHolder;
+
 /**
- * Created by bapidas on 12/10/17.
+ * Created by bapidas on 22/11/17.
  */
 
 public interface CameraSupport {
-    CameraSupport open();
-    void close();
-    boolean isCameraInUse();
-    void addOnPreviewListener(PreviewListener callBack);
+    void openCamera();
+    void prepareCamera();
+    void setPreviewHolder(SurfaceHolder mSurfaceHolder);
+    void preparePreview(int mWidth, int mHeight);
+    void startPreview();
+    void releaseCamera();
+    boolean isAutoExposureLockSupported();
+    boolean isAutoExposureLockEnabled();
+    void enableAutoExposureLock();
+    void disableAutoExposureLock();
+    boolean isFlashSupported();
+    boolean isFlashEnabled();
+    void enableFlash();
+    void disableFlash();
+    int getLightIntensity();
+    void addOnPreviewListener(PreviewListener mPreviewListener);
 }

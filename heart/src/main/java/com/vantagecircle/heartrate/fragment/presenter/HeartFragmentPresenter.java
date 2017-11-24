@@ -1,14 +1,19 @@
 package com.vantagecircle.heartrate.fragment.presenter;
 
 import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
+import android.databinding.BindingMethod;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.support.v7.app.AlertDialog;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
@@ -18,12 +23,10 @@ import android.widget.Toast;
 
 import com.vantagecircle.heartrate.BR;
 import com.vantagecircle.heartrate.R;
-import com.vantagecircle.heartrate.core.HeartSupport;
 import com.vantagecircle.heartrate.core.PulseListener;
-import com.vantagecircle.heartrate.core.TimerListener;
+import com.vantagecircle.heartrate.core.PulseSupport;
 import com.vantagecircle.heartrate.data.DataManager;
 import com.vantagecircle.heartrate.model.HistoryModel;
-import com.vantagecircle.heartrate.utils.ProgressAnimation;
 import com.vantagecircle.heartrate.utils.ToolsUtils;
 
 /**
@@ -32,22 +35,26 @@ import com.vantagecircle.heartrate.utils.ToolsUtils;
 
 public class HeartFragmentPresenter extends BaseObservable {
     private static final String TAG = HeartFragmentPresenter.class.getSimpleName();
-    private HeartSupport mHeartSupport;
+    private PulseSupport mPulseSupport;
     private DataManager mDataManager;
     private Context mContext;
     private AlertDialog alertDialog;
-    private boolean isStarted;
-    private long timeLimit = 20000;
-    private long interval = 500;
+    private int mMeasurementTime = 15;
+    private Vibrator mVibrate;
+
+    private static ProgressBar mProgressBar;
+    private static ObjectAnimator mObjectAnimator;
 
     //android data binding fields
     private String beatsPerMinute;
+    private int heartColor;
     private int progress;
 
-    public HeartFragmentPresenter(Context mContext, HeartSupport mHeartSupport, DataManager mDataManager) {
-        this.mHeartSupport = mHeartSupport;
+    public HeartFragmentPresenter(Context mContext, PulseSupport mPulseSupport, DataManager mDataManager) {
+        this.mPulseSupport = mPulseSupport;
         this.mDataManager = mDataManager;
         this.mContext = mContext;
+        this.mVibrate = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);;
     }
 
     @Bindable
@@ -61,41 +68,74 @@ public class HeartFragmentPresenter extends BaseObservable {
     }
 
     @Bindable
+    public int getHeartColor() {
+        return heartColor;
+    }
+
+    public void setHeartColor(int heartColor) {
+        this.heartColor = heartColor;
+        notifyPropertyChanged(BR.heartColor);
+    }
+
+    @Bindable
     public int getProgress() {
         return progress;
     }
 
-    private void setProgress(int progress) {
+    public void setProgress(int progress) {
         this.progress = progress;
         notifyPropertyChanged(BR.progress);
     }
 
-    @BindingAdapter("updateProgress")
-    public static void setProgressAnimation(ProgressBar mProgressBar, int progress) {
-        ObjectAnimator animation = ObjectAnimator.ofInt(mProgressBar, "progress", progress);
-        animation.setDuration(500);
-        animation.setInterpolator(new LinearInterpolator());
-        animation.start();
+    @BindingAdapter("setProgressAnimation")
+    public static void setProgressAnimation(ProgressBar mProgressBar, boolean bind) {
+        mObjectAnimator = ObjectAnimator.ofInt(mProgressBar, "progress", 1, 200);
+        mObjectAnimator.setInterpolator(new LinearInterpolator());
     }
+
+    public void start() {
+        mPulseSupport.setMeasurementTime(mMeasurementTime).startMeasure().addOnPulseListener(new PulseListener() {
+            @Override
+            public void OnPulseCheckStarted() {
+                mVibrate.vibrate(50);
+                mObjectAnimator.setValues(PropertyValuesHolder.ofInt("progress", 0, 200));
+                mObjectAnimator.setDuration((long) mMeasurementTime * 1000);
+                mObjectAnimator.start();
+            }
+
+            @Override
+            public void OnPulseCheckStopped() {
+                if (getProgress() < 200) {
+                    mObjectAnimator.setValues(PropertyValuesHolder.ofInt("progress", 0, 0));
+                    mObjectAnimator.setDuration(1000);
+                    mObjectAnimator.start();
+                }
+            }
+
+            @Override
+            public void OnPulseCheckFinished(String mPulseRate, boolean isComplete) {
+                mVibrate.vibrate(50);
+                setBeatsPerMinute(mPulseRate);
+                showSuccessDialog();
+            }
+
+            @Override
+            public void OnPulseCheckRate(String mPulseRate) {
+                setBeatsPerMinute(mPulseRate);
+            }
+        });
+    }
+
+    public void stop() {
+        mPulseSupport.stopMeasure();
+    }
+
 
     public void onHelpClick(View view) {
         showHintDialog();
     }
 
-    public void onStartClick(View view) {
-        start();
-    }
-
-    private void start(){
-        if (isStarted) {
-            isStarted = false;
-            mHeartSupport.stopPulseCheck();
-        } else {
-            initHeart();
-        }
-    }
-
-    private void showHintDialog(){
+    private void showHintDialog() {
         if (alertDialog == null || !alertDialog.isShowing()) {
             AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
             View mView = LayoutInflater.from(mContext).inflate(R.layout.hint_diaog, null);
@@ -123,8 +163,6 @@ public class HeartFragmentPresenter extends BaseObservable {
                 @Override
                 public void onClick(View v) {
                     alertDialog.dismiss();
-                    setBeatsPerMinute("000");
-                    setProgress(0);
                 }
             });
 
@@ -150,8 +188,6 @@ public class HeartFragmentPresenter extends BaseObservable {
                 @Override
                 public void onClick(View v) {
                     alertDialog.dismiss();
-                    setBeatsPerMinute("000");
-                    setProgress(0);
                 }
             });
             Button btn_try = mView.findViewById(R.id.btn_try);
@@ -159,7 +195,6 @@ public class HeartFragmentPresenter extends BaseObservable {
                 @Override
                 public void onClick(View v) {
                     alertDialog.dismiss();
-                    start();
                 }
             });
             dialog.setView(mView);
@@ -175,54 +210,8 @@ public class HeartFragmentPresenter extends BaseObservable {
         if (mDataManager.insertHistory(new HistoryModel(getBeatsPerMinute(), date, time))) {
             Toast.makeText(mContext, "Heart rate saved", Toast.LENGTH_SHORT).show();
             alertDialog.dismiss();
-            setBeatsPerMinute("000");
-            setProgress(0);
         } else {
             Toast.makeText(mContext, "Heart rate not saved", Toast.LENGTH_SHORT).show();
         }
-    }
-
-    private void initHeart() {
-        mHeartSupport.addOnResultListener(new PulseListener() {
-            @Override
-            public void OnPulseResult(String pulse) {
-                if (pulse.length() == 2) {
-                    setBeatsPerMinute("0" + pulse);
-                } else {
-                    setBeatsPerMinute(pulse);
-                }
-            }
-        }).addOnTimerListener(new TimerListener() {
-            @Override
-            public void OnTimerStarted() {
-                isStarted = true;
-                setBeatsPerMinute("000");
-                setProgress(0);
-            }
-
-            @Override
-            public void OnTimerRunning(long milliSecond) {
-                long n = timeLimit - milliSecond;
-                int progress = (int) (n * 100 / timeLimit);
-                setProgress(progress);
-            }
-
-            @Override
-            public void OnTimerStopped() {
-                setProgress(100);
-                new Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        isStarted = false;
-                        int value = Integer.parseInt(getBeatsPerMinute());
-                        if (value == 0 || value < 50) {
-                            showErrorDialog();
-                        } else {
-                            showSuccessDialog();
-                        }
-                    }
-                }, 800);
-            }
-        }).startPulseCheck(timeLimit);
     }
 }

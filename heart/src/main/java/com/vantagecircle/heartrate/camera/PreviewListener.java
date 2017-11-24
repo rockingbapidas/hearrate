@@ -1,10 +1,9 @@
 package com.vantagecircle.heartrate.camera;
 
 /**
- * Created by SiD on 10/14/2017.
+ * Created by bapidas on 22/11/17.
  */
 
 public interface PreviewListener {
-    void OnPreviewData(byte[] data);
-    void OnPreviewCount(int count);
+    void OnPreviewCallback(byte[] data, int mWidth, int mHeight);
 }

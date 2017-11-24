@@ -1,17 +1,13 @@
 package com.vantagecircle.heartrate.module;
 
 import android.app.Activity;
-import android.content.Context;
-import android.os.Build;
 import android.support.v4.app.Fragment;
 
-import com.vantagecircle.heartrate.camera.CameraNew;
-import com.vantagecircle.heartrate.camera.CameraOld;
-import com.vantagecircle.heartrate.camera.CameraSupport;
-import com.vantagecircle.heartrate.core.HeartRate;
-import com.vantagecircle.heartrate.processing.Processing;
-import com.vantagecircle.heartrate.processing.ProcessingSupport;
 import com.vantagecircle.heartrate.annotation.ActivityContext;
+import com.vantagecircle.heartrate.camera.CameraManager;
+import com.vantagecircle.heartrate.camera.CameraSupport;
+import com.vantagecircle.heartrate.core.PulseManager;
+import com.vantagecircle.heartrate.core.PulseSupport;
 
 import dagger.Module;
 import dagger.Provides;
@@ -39,22 +35,12 @@ public class FragmentModule {
     }
 
     @Provides
-    ProcessingSupport provideProcessingSupport() {
-        return new Processing();
+    CameraSupport provideCameraSupport(@ActivityContext Activity mActivity) {
+        return new CameraManager(mActivity);
     }
 
     @Provides
-    CameraSupport provideCameraSupport(@ActivityContext Activity mActivity, ProcessingSupport processingSupport) {
-        /*if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            return new CameraNew(mContext, processingSupport);
-        } else {
-            return new CameraOld(mContext, processingSupport);
-        }*/
-        return new CameraOld(mActivity, processingSupport);
-    }
-
-    @Provides
-    HeartRate provideHeartRate(CameraSupport cameraSupport) {
-        return new HeartRate(cameraSupport);
+    PulseSupport providePulseSupport(CameraSupport cameraSupport) {
+        return new PulseManager(cameraSupport);
     }
 }

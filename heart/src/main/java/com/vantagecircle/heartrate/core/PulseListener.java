@@ -1,9 +1,12 @@
 package com.vantagecircle.heartrate.core;
 
 /**
- * Created by bapidas on 03/11/17.
+ * Created by bapidas on 23/11/17.
  */
 
 public interface PulseListener {
-    void OnPulseResult(String pulse);
+    void OnPulseCheckStarted();
+    void OnPulseCheckStopped();
+    void OnPulseCheckFinished(String mPulseRate, boolean isComplete);
+    void OnPulseCheckRate(String mPulseRate);
 }
