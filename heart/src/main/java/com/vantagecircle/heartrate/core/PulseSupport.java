@@ -8,6 +8,7 @@ import android.view.SurfaceHolder;
 
 public interface PulseSupport {
     PulseSupport startMeasure();
+    void resumeMeasure();
     void stopMeasure();
     PulseSupport setSurfaceHolder(SurfaceHolder mSurfaceHolder);
     PulseSupport setMeasurementTime(int time);

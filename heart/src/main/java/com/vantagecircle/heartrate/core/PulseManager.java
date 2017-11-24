@@ -84,6 +84,11 @@ public class PulseManager implements PulseSupport {
     }
 
     @Override
+    public void resumeMeasure() {
+        this.isStarted = true;
+    }
+
+    @Override
     public void stopMeasure() {
         this.clear();
         this.mCameraSupport.releaseCamera();
