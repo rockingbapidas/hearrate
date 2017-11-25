@@ -54,7 +54,7 @@ public class HeartActivityPresenter {
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                mPagerAdapter.getItem(tab.getPosition()).onStop();
+
             }
 
             @Override

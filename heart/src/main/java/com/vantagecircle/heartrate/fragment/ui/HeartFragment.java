@@ -97,7 +97,7 @@ public class HeartFragment extends BaseFragment {
                 requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.BODY_SENSORS,
                         Manifest.permission.WAKE_LOCK, Manifest.permission.VIBRATE},Constant.REQUEST_ALL_PERMISSION);
             } else {
-                //mHeartFragmentPresenter.start(mHeartRateLayoutBinding.surfaceView.getHolder());
+                mHeartFragmentPresenter.start(mHeartRateLayoutBinding.surfaceView.getHolder());
             }
         }
     }
@@ -113,19 +113,8 @@ public class HeartFragment extends BaseFragment {
             if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
                 Toast.makeText(this.getActivity(), "Camera need permission", Toast.LENGTH_SHORT).show();
             } else {
-                //mHeartFragmentPresenter.start(mHeartRateLayoutBinding.surfaceView.getHolder());
+                mHeartFragmentPresenter.start(mHeartRateLayoutBinding.surfaceView.getHolder());
             }
         }
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                mHeartFragmentPresenter.stop();
-            }
-        }, 500);
     }
 }

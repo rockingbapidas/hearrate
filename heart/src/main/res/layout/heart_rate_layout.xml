@@ -109,7 +109,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/button_shape"
-                android:onClick="@{(view) -> heartPresenter.onHelpClick(surfaceView)}"
+                android:onClick="@{(view) -> heartPresenter.onHelpClick(view)}"
                 android:text="@string/how_it_works"
                 android:textColor="@color/white" />
 

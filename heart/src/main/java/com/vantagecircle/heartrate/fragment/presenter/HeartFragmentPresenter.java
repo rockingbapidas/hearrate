@@ -39,7 +39,6 @@ public class HeartFragmentPresenter extends BaseObservable {
     private AlertDialog mAlertDialog;
     private int mMeasurementTime = 15;
     private Vibrator mVibrate;
-
     private static ProgressBar mProgressBar;
     private static ObjectAnimator mObjectAnimator;
 
@@ -138,9 +137,8 @@ public class HeartFragmentPresenter extends BaseObservable {
     }
 
 
-    public void onHelpClick(SurfaceView view) {
-        start(view.getHolder());
-        //showHintDialog();
+    public void onHelpClick(View view) {
+        showHintDialog();
     }
 
     private void showHintDialog() {
