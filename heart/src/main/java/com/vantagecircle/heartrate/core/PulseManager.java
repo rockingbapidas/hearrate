@@ -306,19 +306,15 @@ public class PulseManager implements PulseSupport {
         Arrays.fill(this.beatsArray, 0.0d);
         this.mStartTime = System.currentTimeMillis();
         this.currentTimeStamp = 0.0d;
-
         this.beatsAverageArray.clear();
         this.timeStampDiffArray.clear();
-
         this.isPixelFound = true;
-
         this.aK = 1000.0d;
         this.beepCount = 1;
         this.aH = 0.0d;
         this.aV = 25;
         this.aW = this.aV;
         this.aX = this.aV + 25;
-
         ArrayTransform.result = null;
     }
 

@@ -13,4 +13,6 @@
     <color name="grey">#CCffffff</color>
     <color name="white80">#80FFFFFF</color>
     <color name="light_color">#9f9f9f</color>
+    <color name="red">#ff0000</color>
+    <color name="green">#4fc240</color>
 </resources>

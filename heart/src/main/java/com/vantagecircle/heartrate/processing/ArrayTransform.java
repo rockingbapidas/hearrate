@@ -37,7 +37,7 @@ public class ArrayTransform {
         for (i = 0; i < size; i++) {
             dArr2[i] = arrayList2.get(i) - arrayList2.get(0);
         }
-        result = m15896a(dArr, dArr2, a);
+        result = combine(dArr, dArr2, a);
         ArrayTransform.copy();
     }
 
@@ -73,7 +73,7 @@ public class ArrayTransform {
     }
 
     public static double[] m15895a(double[] dArr) {
-        double b = m15897b(m15899c(dArr));
+        double b = getLength(m15899c(dArr));
         if (b > 0.0d) {
             for (int i = 0; i < dArr.length; i++) {
                 dArr[i] = dArr[i] / b;
@@ -113,7 +113,7 @@ public class ArrayTransform {
         return dArr3;
     }
 
-    private static double[] m15896a(double[] dArr, double[] dArr2, double[] dArr3) {
+    private static double[] combine(double[] dArr, double[] dArr2, double[] dArr3) {
         if (dArr.length != dArr2.length) {
             throw new IllegalArgumentException("X and Y must be the same length");
         } else if (dArr.length == 1) {
@@ -160,7 +160,7 @@ public class ArrayTransform {
         }
     }
 
-    private static double m15897b(double[] dArr) {
+    private static double getLength(double[] dArr) {
         int length = dArr.length - 150;
         double d = dArr[length];
         for (length++; length < dArr.length; length++) {

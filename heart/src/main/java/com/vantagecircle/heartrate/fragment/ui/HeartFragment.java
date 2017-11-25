@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
@@ -26,6 +27,7 @@ import com.vantagecircle.heartrate.fragment.BaseFragment;
 import com.vantagecircle.heartrate.component.FragmentComponent;
 import com.vantagecircle.heartrate.module.FragmentModule;
 import com.vantagecircle.heartrate.fragment.presenter.HeartFragmentPresenter;
+import com.vantagecircle.heartrate.utils.Constant;
 import com.vantagecircle.heartrate.utils.ToolsUtils;
 
 import javax.inject.Inject;
@@ -48,7 +50,9 @@ public class HeartFragment extends BaseFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        askPermission();
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            this.getActivity().getWindow().addFlags(Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
+        }
     }
 
     @Override
@@ -62,42 +66,9 @@ public class HeartFragment extends BaseFragment {
         mFragmentComponent.inject(this);
     }
 
-    private void askPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!ToolsUtils.getInstance().isHasPermissions(this.getActivity(),
-                    Manifest.permission.CAMERA,
-                    Manifest.permission.BODY_SENSORS,
-                    Manifest.permission.WAKE_LOCK,
-                    Manifest.permission.VIBRATE)) {
-                requestPermissions(new String[]{Manifest.permission.CAMERA,
-                        Manifest.permission.BODY_SENSORS,
-                        Manifest.permission.WAKE_LOCK,
-                        Manifest.permission.VIBRATE}, 2);
-            }
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        checkPermission(requestCode, grantResults);
-    }
-
-    private void checkPermission(int requestCode, int[] grantResults) {
-        if (requestCode == 2) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
-                Toast.makeText(this.getActivity(), "You have to give permission to access this window", Toast.LENGTH_SHORT).show();
-            }
-        }
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         mHeartRateLayoutBinding = DataBindingUtil.inflate(inflater, R.layout.heart_rate_layout, container, false);
-        mPulseSupport.setSurfaceHolder(mHeartRateLayoutBinding.surfaceView.getHolder());
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            this.getActivity().getWindow().addFlags(Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
-        }
         return mHeartRateLayoutBinding.getRoot();
     }
 
@@ -116,12 +87,45 @@ public class HeartFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        mHeartFragmentPresenter.start();
+        askPermission();
+    }
+
+    private void askPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!ToolsUtils.getInstance().isHasPermissions(this.getActivity(), Manifest.permission.CAMERA,
+                    Manifest.permission.BODY_SENSORS, Manifest.permission.WAKE_LOCK, Manifest.permission.VIBRATE)) {
+                requestPermissions(new String[]{Manifest.permission.CAMERA, Manifest.permission.BODY_SENSORS,
+                        Manifest.permission.WAKE_LOCK, Manifest.permission.VIBRATE},Constant.REQUEST_ALL_PERMISSION);
+            } else {
+                //mHeartFragmentPresenter.start(mHeartRateLayoutBinding.surfaceView.getHolder());
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        checkPermission(requestCode, grantResults);
+    }
+
+    private void checkPermission(int requestCode, int[] grantResults) {
+        if (requestCode == Constant.REQUEST_ALL_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                Toast.makeText(this.getActivity(), "Camera need permission", Toast.LENGTH_SHORT).show();
+            } else {
+                //mHeartFragmentPresenter.start(mHeartRateLayoutBinding.surfaceView.getHolder());
+            }
+        }
     }
 
     @Override
     public void onStop() {
         super.onStop();
-        mHeartFragmentPresenter.stop();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                mHeartFragmentPresenter.stop();
+            }
+        }, 500);
     }
 }

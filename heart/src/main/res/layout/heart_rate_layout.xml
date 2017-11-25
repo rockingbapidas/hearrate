@@ -82,9 +82,9 @@
                             android:layout_height="30dp"
                             android:layout_centerInParent="true"
                             android:contentDescription="@string/image"
+                            android:tint="@{heartPresenter.heartColor == 0 ? @color/orange : heartPresenter.heartColor}"
                             android:src="@drawable/hearts" />
                     </RelativeLayout>
-
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -109,7 +109,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/button_shape"
-                android:onClick="@{(view) -> heartPresenter.onHelpClick(view)}"
+                android:onClick="@{(view) -> heartPresenter.onHelpClick(surfaceView)}"
                 android:text="@string/how_it_works"
                 android:textColor="@color/white" />
 

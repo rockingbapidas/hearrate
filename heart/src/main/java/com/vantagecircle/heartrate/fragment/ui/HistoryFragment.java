@@ -1,8 +1,10 @@
 package com.vantagecircle.heartrate.fragment.ui;
 
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -67,17 +69,21 @@ public class HistoryFragment extends BaseFragment {
 
     @Override
     protected void init() {
-        mHistoryFragmentPresenter = new HistoryFragmentPresenter(
-                this.getActivity(), mDataManager, mRecyclerView);
+        mHistoryFragmentPresenter = new HistoryFragmentPresenter(this.getActivity(), mDataManager, mRecyclerView);
         mHistoryFragmentPresenter.initialize();
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        if (mHistoryFragmentPresenter != null) {
-            mHistoryFragmentPresenter.initialize();
-        }
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (mHistoryFragmentPresenter != null) {
+                    mHistoryFragmentPresenter.initialize();
+                }
+            }
+        }, 500);
     }
 
     @Override
