@@ -55,6 +55,11 @@ public class CameraManager implements CameraSupport {
     }
 
     @Override
+    public Camera getCamera() {
+        return this.mCamera;
+    }
+
+    @Override
     public void prepareCamera() {
         if (this.mCamera == null) {
             return;
@@ -68,16 +73,12 @@ public class CameraManager implements CameraSupport {
 
         if (parameters.getFlashMode() != null) {
             List supportedFlashModes = parameters.getSupportedFlashModes();
-            this.isFlashSupported = !(supportedFlashModes == null || supportedFlashModes.isEmpty() || (supportedFlashModes.size() == 1 && supportedFlashModes.get(0).equals(Camera.Parameters.FLASH_MODE_OFF)));
+            this.isFlashSupported = !(supportedFlashModes == null || supportedFlashModes.isEmpty() ||
+                    (supportedFlashModes.size() == 1 && supportedFlashModes.get(0).equals(Camera.Parameters.FLASH_MODE_OFF)));
         }
 
         this.isAutoExposureLockSupported = parameters.isAutoExposureLockSupported();
         this.isFlashEnabled = false;
-    }
-
-    @Override
-    public Camera getCamera() {
-        return this.mCamera;
     }
 
     @Override
@@ -107,7 +108,7 @@ public class CameraManager implements CameraSupport {
         this.setRotation();
         this.mWidth = parameters.getPreviewSize().width;
         this.mHeight = parameters.getPreviewSize().height;
-        this.mCamera.startPreview();
+        //this.startPreview();
     }
 
     @Override
@@ -131,6 +132,14 @@ public class CameraManager implements CameraSupport {
         this.mCamera.setDisplayOrientation(cameraInfo.facing == 1 ?
                 (360 - ((rotation + cameraInfo.orientation) % 360)) % 360 :
                 ((cameraInfo.orientation - rotation) + 360) % 360);
+    }
+
+    @Override
+    public void startPreview() {
+        if (this.mCamera == null) {
+            return;
+        }
+        this.mCamera.startPreview();
     }
 
     @Override
@@ -281,15 +290,6 @@ public class CameraManager implements CameraSupport {
         return list.get(i);
     }
 
-    private Camera.PreviewCallback mPreviewCallback = new Camera.PreviewCallback() {
-        @Override
-        public void onPreviewFrame(byte[] bytes, Camera camera) {
-            if (mPreviewListener != null) {
-                mPreviewListener.OnPreviewCallback(bytes, mWidth, mHeight);
-            }
-        }
-    };
-
     private SensorEventListener mSensorEventListener = new SensorEventListener() {
         @Override
         public void onSensorChanged(SensorEvent mSensorEvent) {
@@ -308,6 +308,15 @@ public class CameraManager implements CameraSupport {
         @Override
         public void onAccuracyChanged(Sensor sensor, int i) {
 
+        }
+    };
+
+    private Camera.PreviewCallback mPreviewCallback = new Camera.PreviewCallback() {
+        @Override
+        public void onPreviewFrame(byte[] bytes, Camera camera) {
+            if (mPreviewListener != null) {
+                mPreviewListener.OnPreviewCallback(bytes, mWidth, mHeight);
+            }
         }
     };
 }

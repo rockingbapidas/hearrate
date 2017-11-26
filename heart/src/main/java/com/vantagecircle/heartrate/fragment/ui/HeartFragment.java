@@ -70,16 +70,7 @@ public class HeartFragment extends BaseFragment {
     @Override
     protected void init() {
         mHeartFragmentPresenter = new HeartFragmentPresenter(this.getActivity(), mPulseSupport, mDataManager);
-        mHeartFragmentPresenter.set(mHeartRateLayoutBinding.surfaceView.getHolder());
         mHeartRateLayoutBinding.setHeartPresenter(mHeartFragmentPresenter);
-    }
-
-    @Override
-    public void onResume() {
-        Log.e(TAG, "onResume");
-        super.onResume();
-        if (mHeartFragmentPresenter != null)
-            mHeartFragmentPresenter.start();
     }
 
     @Override
@@ -88,15 +79,5 @@ public class HeartFragment extends BaseFragment {
         super.onPause();
         if (mHeartFragmentPresenter != null)
             mHeartFragmentPresenter.stop();
-    }
-
-    @Override
-    public void onStart() {
-        super.onStart();
-    }
-
-    @Override
-    public void onStop() {
-        super.onStop();
     }
 }

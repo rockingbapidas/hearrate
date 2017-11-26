@@ -12,6 +12,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
+import android.view.SurfaceView;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
@@ -33,21 +34,23 @@ import com.vantagecircle.heartrate.utils.ToolsUtils;
 
 public class HeartFragmentPresenter extends BaseObservable {
     private static final String TAG = HeartFragmentPresenter.class.getSimpleName();
-    private PulseSupport mPulseSupport;
+    private static PulseSupport mPulseSupport;
     private DataManager mDataManager;
     private Context mContext;
     private AlertDialog mAlertDialog;
     private int mMeasurementTime = 15;
     private Vibrator mVibrate;
+
     private static ProgressBar mProgressBar;
     private static ObjectAnimator mObjectAnimator;
 
     //android data binding fields
     private String beatsPerMinute;
     private int heartColor;
+    private boolean isStarted;
 
     public HeartFragmentPresenter(Context mContext, PulseSupport mPulseSupport, DataManager mDataManager) {
-        this.mPulseSupport = mPulseSupport;
+        HeartFragmentPresenter.mPulseSupport = mPulseSupport;
         this.mDataManager = mDataManager;
         this.mContext = mContext;
         this.mVibrate = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
@@ -73,6 +76,16 @@ public class HeartFragmentPresenter extends BaseObservable {
         notifyPropertyChanged(BR.heartColor);
     }
 
+    @Bindable
+    public boolean isStarted() {
+        return isStarted;
+    }
+
+    private void setStarted(boolean started) {
+        isStarted = started;
+        notifyPropertyChanged(BR.started);
+    }
+
     @BindingAdapter("setProgressAnimation")
     public static void setProgressAnimation(ProgressBar mProgressBar, boolean aBoolean) {
         HeartFragmentPresenter.mProgressBar = mProgressBar;
@@ -80,16 +93,17 @@ public class HeartFragmentPresenter extends BaseObservable {
         mObjectAnimator.setInterpolator(new LinearInterpolator());
     }
 
-    public void set(SurfaceHolder mSurfaceHolder){
-        mPulseSupport.setSurface(mSurfaceHolder);
+    @BindingAdapter("setSurfaceHolder")
+    public static void setSurfaceHolder(SurfaceView mSurfaceView, boolean aBoolean) {
+        mPulseSupport.setSurface(mSurfaceView.getHolder());
     }
 
-    public void start() {
+    private void start() {
         mPulseSupport.setMeasurementTime(mMeasurementTime).startMeasure().addOnPulseListener(new PulseListener() {
             @Override
             public void OnPulseCheckStarted() {
                 setBeatsPerMinute("000");
-                setHeartColor(ContextCompat.getColor(mContext, R.color.orange));
+                setHeartColor(ContextCompat.getColor(mContext, R.color.white));
                 mVibrate.vibrate(50);
                 mObjectAnimator.setValues(PropertyValuesHolder.ofInt("progress", 0, 200));
                 mObjectAnimator.setDuration((long) mMeasurementTime * 1000);
@@ -119,6 +133,7 @@ public class HeartFragmentPresenter extends BaseObservable {
                 } else {
                     showSuccessDialog();
                 }
+                stop();
             }
 
             @Override
@@ -135,26 +150,15 @@ public class HeartFragmentPresenter extends BaseObservable {
 
     public void stop() {
         mPulseSupport.stopMeasure();
+        setStarted(false);
     }
 
-    public void onHelpClick(View view) {
-        showHintDialog();
-    }
-
-    private void showHintDialog() {
-        if (mAlertDialog == null || !mAlertDialog.isShowing()) {
-            AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
-            View mView = LayoutInflater.from(mContext).inflate(R.layout.hint_diaog, null);
-            Button btnOk = mView.findViewById(R.id.btnOk);
-            btnOk.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    mAlertDialog.dismiss();
-                }
-            });
-            dialog.setView(mView);
-            mAlertDialog = dialog.create();
-            mAlertDialog.show();
+    public void onStartClick(View view) {
+        if (isStarted) {
+            stop();
+        } else {
+            start();
+            setStarted(true);
         }
     }
 
@@ -180,6 +184,7 @@ public class HeartFragmentPresenter extends BaseObservable {
                     saveHeartRate();
                 }
             });
+            dialog.setCancelable(false);
             dialog.setView(mView);
             mAlertDialog = dialog.create();
             mAlertDialog.show();
@@ -206,6 +211,7 @@ public class HeartFragmentPresenter extends BaseObservable {
                     resume();
                 }
             });
+            dialog.setCancelable(false);
             dialog.setView(mView);
             mAlertDialog = dialog.create();
             mAlertDialog.show();
@@ -227,7 +233,7 @@ public class HeartFragmentPresenter extends BaseObservable {
 
     private void resume() {
         setBeatsPerMinute("000");
-        setHeartColor(ContextCompat.getColor(mContext, R.color.orange));
+        setHeartColor(ContextCompat.getColor(mContext, R.color.white));
         mProgressBar.setProgress(0);
         mPulseSupport.resumeMeasure();
     }

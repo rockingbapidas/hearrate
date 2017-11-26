@@ -1,10 +1,9 @@
 package com.vantagecircle.heartrate.fragment.ui;
 
+import android.databinding.DataBindingUtil;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,27 +11,22 @@ import android.view.ViewGroup;
 import com.vantagecircle.heartrate.HeartApplication;
 import com.vantagecircle.heartrate.R;
 import com.vantagecircle.heartrate.component.DaggerFragmentComponent;
-import com.vantagecircle.heartrate.data.DataManager;
-import com.vantagecircle.heartrate.fragment.BaseFragment;
 import com.vantagecircle.heartrate.component.FragmentComponent;
-import com.vantagecircle.heartrate.module.FragmentModule;
+import com.vantagecircle.heartrate.data.DataManager;
+import com.vantagecircle.heartrate.databinding.HistoryLayoutBinding;
+import com.vantagecircle.heartrate.fragment.BaseFragment;
 import com.vantagecircle.heartrate.fragment.presenter.HistoryFragmentPresenter;
+import com.vantagecircle.heartrate.module.FragmentModule;
 
 import javax.inject.Inject;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
-
 public class HistoryFragment extends BaseFragment {
     private static final String TAG = HistoryFragment.class.getSimpleName();
-    private Unbinder mUnBinder;
-    private FragmentComponent mFragmentComponent;
-    private HistoryFragmentPresenter mHistoryFragmentPresenter;
     @Inject
     DataManager mDataManager;
-    @BindView(R.id.recycler_view)
-    public RecyclerView mRecyclerView;
+    private FragmentComponent mFragmentComponent;
+    private HistoryFragmentPresenter mHistoryFragmentPresenter;
+    private HistoryLayoutBinding mHistoryLayoutBinding;
 
     public static HistoryFragment newInstance() {
         return new HistoryFragment();
@@ -56,39 +50,25 @@ public class HistoryFragment extends BaseFragment {
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        View mView = inflater.inflate(R.layout.history_layout, container, false);
-        mUnBinder = ButterKnife.bind(this, mView);
-        return mView;
+        mHistoryLayoutBinding = DataBindingUtil.inflate(inflater, R.layout.history_layout, container, false);
+        return mHistoryLayoutBinding.getRoot();
     }
 
     @Override
-    public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
         init();
     }
 
     @Override
     protected void init() {
-        mHistoryFragmentPresenter = new HistoryFragmentPresenter(this.getActivity(), mDataManager, mRecyclerView);
-        mHistoryFragmentPresenter.initialize();
+        mHistoryFragmentPresenter = new HistoryFragmentPresenter(this.getActivity(), mDataManager);
+        mHistoryLayoutBinding.setHistoryPresenter(mHistoryFragmentPresenter);
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        new Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                if (mHistoryFragmentPresenter != null) {
-                    mHistoryFragmentPresenter.initialize();
-                }
-            }
-        }, 500);
-    }
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        mUnBinder.unbind();
+        HistoryFragmentPresenter.initialize();
     }
 }

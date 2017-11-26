@@ -25,4 +25,5 @@
     <string name="try_again">Try Again</string>
     <string name="fail">Your pulse is not detected properly please attach your finger gently don\'t press too hard, try again.</string>
     <string name="failed">Failed</string>
+    <string name="action_help">Help</string>
 </resources>

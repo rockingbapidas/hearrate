@@ -41,6 +41,8 @@ public class PulseManager implements PulseSupport {
     private int mMeasurementTime;
     private int mHeartBeat;
     private int beepCount;
+    private int sWidth;
+    private int sHeight;
 
     private int aV;
     private int aW;
@@ -71,21 +73,32 @@ public class PulseManager implements PulseSupport {
     }
 
     @Override
+    public void setSurface(SurfaceHolder mSurfaceHolder) {
+        this.mSurfaceHolder = mSurfaceHolder;
+        this.mSurfaceHolder.addCallback(mSurfaceCallback);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            this.mActivity.getWindow().addFlags(Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
+        }
+    }
+
+    @Override
     public PulseSupport startMeasure() {
         this.startThread();
+
         this.mCameraSupport.openCamera();
+        this.mCameraSupport.prepareCamera();
+        this.mCameraSupport.changedSurface(sWidth, sHeight);
+        this.mCameraSupport.createSurface(mSurfaceHolder);
+        this.mCameraSupport.addOnPreviewListener(mPreviewListener);
+        this.mCameraSupport.startPreview();
 
         this.isPixelFound = false;
         this.zeroIndexPixelArray.clear();
         this.firstIndexPixelArray.clear();
         this.secondIndexPixelArray.clear();
-
-        this.mCameraSupport.prepareCamera();
-
         this.thirdIndexPixelArray.clear();
 
         this.mCameraSupport.disableAutoExposureLock();
-
         this.mCameraSupport.setLightIntensity(50);
         this.mCameraSupport.addSensorListener();
 
@@ -93,11 +106,6 @@ public class PulseManager implements PulseSupport {
         this.isRunning = true;
 
         return this;
-    }
-
-    @Override
-    public void resumeMeasure() {
-        this.isStarted = true;
     }
 
     @Override
@@ -110,13 +118,8 @@ public class PulseManager implements PulseSupport {
     }
 
     @Override
-    public PulseSupport setSurface(SurfaceHolder mSurfaceHolder) {
-        this.mSurfaceHolder = mSurfaceHolder;
-        this.mSurfaceHolder.addCallback(mSurfaceCallback);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            this.mActivity.getWindow().addFlags(Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
-        }
-        return this;
+    public void resumeMeasure() {
+        this.isStarted = true;
     }
 
     @Override
@@ -168,12 +171,10 @@ public class PulseManager implements PulseSupport {
     }
 
     private void manageFlash() {
-        Log.e(TAG, "qqqqqqqqqqqqqqqqqqqqqqqqq " + this.mCameraSupport.getLightIntensity());
         if (this.mCameraSupport.getLightIntensity() == 30 & !isRunning) {
             this.isStarted = false;
             this.isRunning = true;
             //
-            Log.e(TAG, "qqqqqqqqqqqqqqqqqqqqqqqqq");
         }
         if (!this.mCameraSupport.isFlashEnabled() & this.mCameraSupport.isFlashSupported() & this.isStarted) {
             int intensity = this.mCameraSupport.getLightIntensity();
@@ -223,19 +224,21 @@ public class PulseManager implements PulseSupport {
     private SurfaceHolder.Callback mSurfaceCallback = new SurfaceHolder.Callback() {
         @Override
         public void surfaceCreated(SurfaceHolder surfaceHolder) {
-            mCameraSupport.createSurface(mSurfaceHolder);
-            mCameraSupport.addOnPreviewListener(mPreviewListener);
+            /*mCameraSupport.createSurface(mSurfaceHolder);
+            mCameraSupport.addOnPreviewListener(mPreviewListener);*/
         }
 
         @Override
         public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-            mCameraSupport.changedSurface(i1, i2);
+            sWidth = i1;
+            sHeight = i2;
+            /*mCameraSupport.changedSurface(sWidth, sHeight);*/
         }
 
         @Override
         public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-            mSurfaceHolder.removeCallback(this);
-            mSurfaceHolder.getSurface().release();
+           /* mSurfaceHolder.removeCallback(this);
+            mSurfaceHolder.getSurface().release();*/
         }
     };
 
@@ -327,7 +330,6 @@ public class PulseManager implements PulseSupport {
                         }
                         this.isRunning = false;
                         this.isStarted = true;
-                        Log.e(TAG, "wwwwwwwwwwwwwwwwwwwww");
                     }
                 }
             } else if (this.currentTimeStamp > ((double) this.mMeasurementTime)) {
@@ -338,7 +340,6 @@ public class PulseManager implements PulseSupport {
                     this.clear();
                     this.isRunning = false;
                     this.isStarted = true;
-                    Log.e(TAG, "xxxxxxxxxxxxxxxxxxxxxxx");
                 }
             }
         }

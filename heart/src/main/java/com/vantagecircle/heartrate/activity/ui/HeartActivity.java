@@ -12,6 +12,8 @@ import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -41,6 +43,7 @@ public class HeartActivity extends BaseActivity {
     public ActionBar mActionBar;
     private Unbinder mUnBinder;
     private ActivityComponent mActivityComponent;
+    private HeartActivityPresenter mHeartActivityPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,14 +66,22 @@ public class HeartActivity extends BaseActivity {
 
     @Override
     protected void init() {
-        HeartActivityPresenter mHeartActivityPresenter = new HeartActivityPresenter(this);
+        mHeartActivityPresenter = new HeartActivityPresenter(this);
         mHeartActivityPresenter.setup();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
             finish();
+        } else if(item.getItemId() == R.id.action_help){
+            mHeartActivityPresenter.showHintDialog();
         }
         return super.onOptionsItemSelected(item);
     }

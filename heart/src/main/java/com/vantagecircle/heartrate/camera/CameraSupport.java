@@ -22,6 +22,8 @@ public interface CameraSupport {
 
     void setRotation();
 
+    void startPreview();
+
     void stopPreview();
 
     void releaseCamera();

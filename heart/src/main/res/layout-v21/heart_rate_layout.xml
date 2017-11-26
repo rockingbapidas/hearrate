@@ -75,7 +75,8 @@
                             android:id="@+id/surfaceView"
                             android:layout_width="15dp"
                             android:layout_height="15dp"
-                            android:layout_centerInParent="true" />
+                            android:layout_centerInParent="true"
+                            app:setSurfaceHolder="@{true}"/>
 
                         <ImageView
                             android:id="@+id/heartStatus"
@@ -106,12 +107,12 @@
             android:layout_marginTop="20dp">
 
             <Button
-                android:id="@+id/btnHint"
+                android:id="@+id/btnStart"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:background="@drawable/button_shape"
-                android:onClick="@{(view) -> heartPresenter.onHelpClick(view)}"
-                android:text="@string/how_it_works"
+                android:onClick="@{(view) -> heartPresenter.onStartClick(view)}"
+                android:text="@{heartPresenter.started ? @string/stop : @string/start}"
                 android:textColor="@color/white" />
 
         </com.balysv.materialripple.MaterialRippleLayout>
