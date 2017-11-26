@@ -12,7 +12,9 @@ public interface CameraSupport {
     void setPreviewHolder(SurfaceHolder mSurfaceHolder);
     void preparePreview(int mWidth, int mHeight);
     void startPreview();
+    void stopPreview();
     void releaseCamera();
+    void releaseCallbacks();
     boolean isAutoExposureLockSupported();
     boolean isAutoExposureLockEnabled();
     void enableAutoExposureLock();

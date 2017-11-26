@@ -137,6 +137,14 @@ public class CameraManager implements CameraSupport {
         this.mCamera.startPreview();
     }
 
+    @Override
+    public void stopPreview() {
+        if (this.mCamera == null) {
+            return;
+        }
+        this.mCamera.stopPreview();
+    }
+
     private Camera.Size getSmallestPreviewSize(int width, int height, Camera.Parameters parameters) {
         Camera.Size size = null;
         if (height <= width) {
@@ -173,6 +181,14 @@ public class CameraManager implements CameraSupport {
             this.mCamera.release();
             this.mCamera = null;
             this.mSensorManager.unregisterListener(this.mSensorEventListener);
+        }
+    }
+
+    @Override
+    public void releaseCallbacks() {
+        if (this.mCamera != null) {
+            this.mCamera.release();
+            this.mCamera = null;
         }
     }
 
