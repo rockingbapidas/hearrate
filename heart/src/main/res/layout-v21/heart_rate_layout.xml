@@ -83,7 +83,7 @@
                             android:layout_height="30dp"
                             android:layout_centerInParent="true"
                             android:contentDescription="@string/image"
-                            android:tint="@{heartPresenter.heartColor == 0 ? @color/orange : heartPresenter.heartColor}"
+                            android:tint="@{heartPresenter.heartColor == 0 ? @color/white : heartPresenter.heartColor}"
                             android:src="@drawable/hearts" />
                     </RelativeLayout>
 

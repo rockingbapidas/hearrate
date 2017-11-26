@@ -8,10 +8,16 @@ import android.view.SurfaceHolder;
 
 public interface PulseSupport {
     PulseSupport startMeasure();
+
     void resumeMeasure();
+
     void stopMeasure();
-    PulseSupport setSurfaceHolder(SurfaceHolder mSurfaceHolder);
+
+    PulseSupport setSurface(SurfaceHolder mSurfaceHolder);
+
     PulseSupport setMeasurementTime(int time);
+
     PulseSupport setBeep(boolean beepEnable);
+
     void addOnPulseListener(PulseListener mPulseListener);
 }

@@ -1,5 +1,9 @@
 package com.vantagecircle.heartrate.core;
 
+import android.app.Activity;
+import android.content.Intent;
+import android.os.Build;
+import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.vantagecircle.heartrate.camera.PreviewListener;
@@ -26,6 +30,7 @@ public class PulseManager implements PulseSupport {
     private SurfaceHolder mSurfaceHolder;
     private PulseListener mPulseListener;
     private DecimalFormat mDecimalFormat;
+    private Activity mActivity;
     private Thread mThread;
 
     private boolean isPixelFound = false;
@@ -51,7 +56,6 @@ public class PulseManager implements PulseSupport {
     private double[] beatsArray = new double[300];
     private double[] graphArray = new double[150];
     private double currentTimeStamp;
-    private double thirdIndexPixel;
 
     private double aK;
     private double aH;
@@ -60,7 +64,8 @@ public class PulseManager implements PulseSupport {
     private long beepStartTime = 0;
     private long mStartTime;
 
-    public PulseManager(CameraSupport mCameraSupport) {
+    public PulseManager(Activity mActivity, CameraSupport mCameraSupport) {
+        this.mActivity = mActivity;
         this.mCameraSupport = mCameraSupport;
         this.mDecimalFormat = (DecimalFormat) NumberFormat.getInstance(Locale.getDefault());
     }
@@ -69,17 +74,24 @@ public class PulseManager implements PulseSupport {
     public PulseSupport startMeasure() {
         this.startThread();
         this.mCameraSupport.openCamera();
+
         this.isPixelFound = false;
         this.zeroIndexPixelArray.clear();
         this.firstIndexPixelArray.clear();
         this.secondIndexPixelArray.clear();
+
         this.mCameraSupport.prepareCamera();
+
         this.thirdIndexPixelArray.clear();
+
+        this.mCameraSupport.disableAutoExposureLock();
+
+        this.mCameraSupport.setLightIntensity(50);
+        this.mCameraSupport.addSensorListener();
+
         this.isStarted = true;
         this.isRunning = true;
 
-        this.mCameraSupport.addOnPreviewListener(mPreviewListener);
-        this.mCameraSupport.startPreview();
         return this;
     }
 
@@ -91,14 +103,19 @@ public class PulseManager implements PulseSupport {
     @Override
     public void stopMeasure() {
         this.clear();
+        this.mCameraSupport.stopPreview();
         this.mCameraSupport.releaseCamera();
         this.stopThread();
+        this.mCameraSupport.removeSensorListener();
     }
 
     @Override
-    public PulseSupport setSurfaceHolder(SurfaceHolder mSurfaceHolder) {
+    public PulseSupport setSurface(SurfaceHolder mSurfaceHolder) {
         this.mSurfaceHolder = mSurfaceHolder;
         this.mSurfaceHolder.addCallback(mSurfaceCallback);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+            this.mActivity.getWindow().addFlags(Intent.FLAG_GRANT_PREFIX_URI_PERMISSION);
+        }
         return this;
     }
 
@@ -123,7 +140,6 @@ public class PulseManager implements PulseSupport {
         this.mPulseListener = mPulseListener;
     }
 
-
     private void startThread() {
         if (this.mThread == null) {
             this.mThread = new Thread(mBackgroundThread);
@@ -139,40 +155,6 @@ public class PulseManager implements PulseSupport {
         }
     }
 
-    private void backgroundProcess() {
-        while (this.mThread != null) {
-            if (this.isPixelFound && this.beatsAverageArray.size() > this.aX) {
-                ArrayTransform.compare(this.timeStampDiffArray, this.beatsAverageArray);
-                int length = ArrayTransform.result.length - ArrayTransform.samples.length;
-                for (int i = 0; i < FastMath.min(300, length - this.aX); i++) {
-                    this.beatsArray[299 - i] = -ArrayTransform.result[(length - 1) - i];
-                }
-                double[] a = ArrayTransform.sort(this.beatsArray);
-                this.mHeartBeat = (int) (a[0] * 60.0d);
-                this.aH = a[1];
-
-                if (System.currentTimeMillis() - this.graphStartTime > 30) {
-                    this.graphStartTime = System.currentTimeMillis();
-                    System.arraycopy(this.beatsArray, 150, this.graphArray, 0, 150);
-                    this.graphArray = ArrayTransform.m15895a(this.graphArray);
-                    //can render measure graph here
-                }
-
-                if (((ArrayTransform.result != null) & this.isBeepEnable)) {
-                    while (this.beepCount < ArrayTransform.result.length - (ArrayTransform.samples.length / 2)) {
-                        if (this.aH > 0.01d) {
-                            if ((ArrayTransform.result[this.beepCount + 1] > 0.0d & ArrayTransform.result[this.beepCount + -1] < 0.0d) && ((double) (System.currentTimeMillis() - this.beepStartTime)) > (1.0d / a[0]) * 750.0d) {
-                                //can play beep sound here
-                                this.beepStartTime = System.currentTimeMillis();
-                            }
-                        }
-                        this.beepCount++;
-                    }
-                }
-            }
-        }
-    }
-
     private boolean isValidPixel() {
         if (this.firstIndexPixelArray.size() <= 5) {
             return false;
@@ -185,93 +167,13 @@ public class PulseManager implements PulseSupport {
         return doubles[0] > 0.95d & doubles[2] + doubles[1] > 1.15d & !this.isPixelFound;
     }
 
-    private void calculatePulse(double[] doubles) {
-        //store third number index value
-        this.thirdIndexPixel = doubles[3];
-        //store timestamp subtracts from current and start
-        this.currentTimeStamp = (double) (System.currentTimeMillis() - this.mStartTime);
-        //add new third index data from red pixel array
-        this.thirdIndexPixelArray.add((int) this.thirdIndexPixel);
-        //turn on Flash
-        this.manageFlash();
-        //off manageFlash if pixel not correct and third index is greater than 25
-        if (!this.isPixelFound & this.thirdIndexPixelArray.size() > 25) {
-            this.mCameraSupport.disableFlash();
-            this.thirdIndexPixelArray.clear();
-        }
-        //check array if pixel not found yet and it already started
-        if (!this.isPixelFound & this.isStarted) {
-            this.zeroIndexPixelArray.add(doubles[0]);
-            this.firstIndexPixelArray.add(doubles[1]);
-            this.secondIndexPixelArray.add(doubles[2]);
-            if (this.isValidPixel()) {
-                if (this.mPulseListener != null) {
-                    this.mPulseListener.OnPulseCheckStarted();
-                }
-                this.initVariables();
-            }
-        }
-        //check i pixel found and post heart rate
-        if (this.isPixelFound) {
-            if (doubles[0] < 0.95d & doubles[2] + doubles[1] <= 1.15d) {
-                if (this.beatsAverageArray.size() > this.aW) {
-                    if (this.mPulseListener != null) {
-                        this.mPulseListener.OnPulseCheckStopped();
-                    }
-                    this.clear();
-                }
-                //check if current timestamp getter than 9 second
-                if (this.currentTimeStamp > 9000.0d) {
-                    if (this.aH > 0.01d & this.mHeartBeat < 210 & this.mHeartBeat > 35) {
-                        if (this.mPulseListener != null) {
-                            this.mPulseListener.OnPulseCheckFinished(this.mDecimalFormat.format((long) this.mHeartBeat), false);
-                        }
-                        this.isRunning = false;
-                        this.isStarted = true;
-                    }
-                }
-            } else if (this.currentTimeStamp > ((double) this.mMeasurementTime)) {
-                //check if heart rate id getter than 35 and less than 210 and post
-                if (this.aH > 0.01d & this.mHeartBeat < 210 & this.mHeartBeat > 35) {
-                    if (this.mPulseListener != null) {
-                        this.mPulseListener.OnPulseCheckFinished(this.mDecimalFormat.format((long) this.mHeartBeat), true);
-                    }
-                    this.clear();
-                    this.isRunning = false;
-                    this.isStarted = true;
-                }
-            }
-        }
-        //check if pixel found and post heart rate
-        if (this.isPixelFound) {
-            if (!this.mCameraSupport.isAutoExposureLockEnabled() & this.beatsAverageArray.size() > this.aV) {
-                this.mCameraSupport.enableAutoExposureLock();
-                this.aW = this.beatsAverageArray.size();
-                this.aX = this.beatsAverageArray.size() + 25;
-            }
-
-            int size = this.timeStampDiffArray.size();
-            if (size <= 1) {
-                this.beatsAverageArray.add(this.thirdIndexPixel);
-                this.timeStampDiffArray.add(this.currentTimeStamp);
-            } else if (this.currentTimeStamp > this.timeStampDiffArray.get(size - 1)) {
-                this.beatsAverageArray.add(this.thirdIndexPixel);
-                this.timeStampDiffArray.add(this.currentTimeStamp);
-            }
-            if (this.aH > 0.01d & this.mHeartBeat > 35 & this.currentTimeStamp > this.aK & this.mHeartBeat < 210) {
-                if (this.mPulseListener != null) {
-                    this.mPulseListener.OnPulseCheckRate(this.mDecimalFormat.format((long) this.mHeartBeat));
-                }
-                this.aK = this.currentTimeStamp + 500.0d;
-            }
-        }
-    }
-
     private void manageFlash() {
+        Log.e(TAG, "qqqqqqqqqqqqqqqqqqqqqqqqq " + this.mCameraSupport.getLightIntensity());
         if (this.mCameraSupport.getLightIntensity() == 30 & !isRunning) {
             this.isStarted = false;
             this.isRunning = true;
             //
+            Log.e(TAG, "qqqqqqqqqqqqqqqqqqqqqqqqq");
         }
         if (!this.mCameraSupport.isFlashEnabled() & this.mCameraSupport.isFlashSupported() & this.isStarted) {
             int intensity = this.mCameraSupport.getLightIntensity();
@@ -318,21 +220,22 @@ public class PulseManager implements PulseSupport {
         ArrayTransform.result = null;
     }
 
-
     private SurfaceHolder.Callback mSurfaceCallback = new SurfaceHolder.Callback() {
         @Override
         public void surfaceCreated(SurfaceHolder surfaceHolder) {
-            mCameraSupport.setPreviewHolder(surfaceHolder);
+            mCameraSupport.createSurface(mSurfaceHolder);
+            mCameraSupport.addOnPreviewListener(mPreviewListener);
         }
 
         @Override
         public void surfaceChanged(SurfaceHolder surfaceHolder, int i, int i1, int i2) {
-            mCameraSupport.preparePreview(i1, i2);
+            mCameraSupport.changedSurface(i1, i2);
         }
 
         @Override
         public void surfaceDestroyed(SurfaceHolder surfaceHolder) {
-            mCameraSupport.releaseCamera();
+            mSurfaceHolder.removeCallback(this);
+            mSurfaceHolder.getSurface().release();
         }
     };
 
@@ -343,6 +246,40 @@ public class PulseManager implements PulseSupport {
         }
     };
 
+    private void backgroundProcess() {
+        while (this.mThread != null) {
+            if (this.isPixelFound && this.beatsAverageArray.size() > this.aX) {
+                ArrayTransform.compare(this.timeStampDiffArray, this.beatsAverageArray);
+                int length = ArrayTransform.result.length - ArrayTransform.samples.length;
+                for (int i = 0; i < FastMath.min(300, length - this.aX); i++) {
+                    this.beatsArray[299 - i] = -ArrayTransform.result[(length - 1) - i];
+                }
+                double[] a = ArrayTransform.sort(this.beatsArray);
+                this.mHeartBeat = (int) (a[0] * 60.0d);
+                this.aH = a[1];
+
+                if (System.currentTimeMillis() - this.graphStartTime > 30) {
+                    this.graphStartTime = System.currentTimeMillis();
+                    System.arraycopy(this.beatsArray, 150, this.graphArray, 0, 150);
+                    this.graphArray = ArrayTransform.m15895a(this.graphArray);
+                    //
+                }
+
+                if (((ArrayTransform.result != null) & this.isBeepEnable)) {
+                    while (this.beepCount < ArrayTransform.result.length - (ArrayTransform.samples.length / 2)) {
+                        if (this.aH > 0.01d) {
+                            if ((ArrayTransform.result[this.beepCount + 1] > 0.0d & ArrayTransform.result[this.beepCount + -1] < 0.0d) && ((double) (System.currentTimeMillis() - this.beepStartTime)) > (1.0d / a[0]) * 750.0d) {
+                                //
+                                this.beepStartTime = System.currentTimeMillis();
+                            }
+                        }
+                        this.beepCount++;
+                    }
+                }
+            }
+        }
+    }
+
     private PreviewListener mPreviewListener = new PreviewListener() {
         @Override
         public void OnPreviewCallback(byte[] data, int mWidth, int mHeight) {
@@ -350,4 +287,83 @@ public class PulseManager implements PulseSupport {
             calculatePulse(doubles);
         }
     };
+
+    private void calculatePulse(double[] doubles) {
+        double thirdIndexPixel = doubles[3];
+        this.currentTimeStamp = (double) (System.currentTimeMillis() - this.mStartTime);
+        this.thirdIndexPixelArray.add((int) thirdIndexPixel);
+        this.manageFlash();
+
+        if (!this.isPixelFound & this.thirdIndexPixelArray.size() > 25) {
+            this.mCameraSupport.disableFlash();
+            this.thirdIndexPixelArray.clear();
+        }
+
+        if (!this.isPixelFound & this.isStarted) {
+            this.zeroIndexPixelArray.add(doubles[0]);
+            this.firstIndexPixelArray.add(doubles[1]);
+            this.secondIndexPixelArray.add(doubles[2]);
+            if (this.isValidPixel()) {
+                if (this.mPulseListener != null) {
+                    this.mPulseListener.OnPulseCheckStarted();
+                }
+                this.initVariables();
+            }
+        }
+
+        if (this.isPixelFound) {
+            if (doubles[0] < 0.95d & doubles[2] + doubles[1] <= 1.15d) {
+                if (this.beatsAverageArray.size() > this.aW) {
+                    if (this.mPulseListener != null) {
+                        this.mPulseListener.OnPulseCheckStopped();
+                    }
+                    this.clear();
+                }
+
+                if (this.currentTimeStamp > 9000.0d) {
+                    if (this.aH > 0.01d & this.mHeartBeat < 210 & this.mHeartBeat > 35) {
+                        if (this.mPulseListener != null) {
+                            this.mPulseListener.OnPulseCheckFinished(this.mDecimalFormat.format((long) this.mHeartBeat), false);
+                        }
+                        this.isRunning = false;
+                        this.isStarted = true;
+                        Log.e(TAG, "wwwwwwwwwwwwwwwwwwwww");
+                    }
+                }
+            } else if (this.currentTimeStamp > ((double) this.mMeasurementTime)) {
+                if (this.aH > 0.01d & this.mHeartBeat < 210 & this.mHeartBeat > 35) {
+                    if (this.mPulseListener != null) {
+                        this.mPulseListener.OnPulseCheckFinished(this.mDecimalFormat.format((long) this.mHeartBeat), true);
+                    }
+                    this.clear();
+                    this.isRunning = false;
+                    this.isStarted = true;
+                    Log.e(TAG, "xxxxxxxxxxxxxxxxxxxxxxx");
+                }
+            }
+        }
+
+        if (this.isPixelFound) {
+            if (!this.mCameraSupport.isAutoExposureLockEnabled() & this.beatsAverageArray.size() > this.aV) {
+                this.mCameraSupport.enableAutoExposureLock();
+                this.aW = this.beatsAverageArray.size();
+                this.aX = this.beatsAverageArray.size() + 25;
+            }
+
+            int size = this.timeStampDiffArray.size();
+            if (size <= 1) {
+                this.beatsAverageArray.add(thirdIndexPixel);
+                this.timeStampDiffArray.add(this.currentTimeStamp);
+            } else if (this.currentTimeStamp > this.timeStampDiffArray.get(size - 1)) {
+                this.beatsAverageArray.add(thirdIndexPixel);
+                this.timeStampDiffArray.add(this.currentTimeStamp);
+            }
+            if (this.aH > 0.01d & this.mHeartBeat > 35 & this.currentTimeStamp > this.aK & this.mHeartBeat < 210) {
+                if (this.mPulseListener != null) {
+                    this.mPulseListener.OnPulseCheckRate(this.mDecimalFormat.format((long) this.mHeartBeat));
+                }
+                this.aK = this.currentTimeStamp + 500.0d;
+            }
+        }
+    }
 }

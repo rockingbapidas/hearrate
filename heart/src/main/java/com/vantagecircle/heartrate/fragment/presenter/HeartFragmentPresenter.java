@@ -6,12 +6,12 @@ import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
 import android.databinding.BindingAdapter;
+import android.hardware.Camera;
 import android.os.Vibrator;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.SurfaceHolder;
-import android.view.SurfaceView;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
 import android.widget.Button;
@@ -74,68 +74,68 @@ public class HeartFragmentPresenter extends BaseObservable {
     }
 
     @BindingAdapter("setProgressAnimation")
-    public static void setProgressAnimation(ProgressBar mProgressBar, boolean bind) {
+    public static void setProgressAnimation(ProgressBar mProgressBar, boolean aBoolean) {
         HeartFragmentPresenter.mProgressBar = mProgressBar;
         mObjectAnimator = ObjectAnimator.ofInt(mProgressBar, "progress", 1, 200);
         mObjectAnimator.setInterpolator(new LinearInterpolator());
     }
 
-    public void start(SurfaceHolder mSurfaceHolder) {
-        mPulseSupport.setSurfaceHolder(mSurfaceHolder)
-                .setMeasurementTime(mMeasurementTime)
-                .startMeasure()
-                .addOnPulseListener(new PulseListener() {
-                    @Override
-                    public void OnPulseCheckStarted() {
-                        setBeatsPerMinute("000");
-                        setHeartColor(ContextCompat.getColor(mContext, R.color.orange));
-                        mVibrate.vibrate(50);
-                        mObjectAnimator.setValues(PropertyValuesHolder.ofInt("progress", 0, 200));
-                        mObjectAnimator.setDuration((long) mMeasurementTime * 1000);
-                        mObjectAnimator.start();
-                    }
+    public void set(SurfaceHolder mSurfaceHolder){
+        mPulseSupport.setSurface(mSurfaceHolder);
+    }
 
-                    @Override
-                    public void OnPulseCheckStopped() {
-                        if (mProgressBar.getProgress() < 200) {
-                            int progress = mProgressBar.getProgress();
-                            mObjectAnimator.setValues(PropertyValuesHolder.ofInt("progress", progress, 0));
-                            mObjectAnimator.setDuration(500);
-                            mObjectAnimator.start();
-                        }
-                    }
+    public void start() {
+        mPulseSupport.setMeasurementTime(mMeasurementTime).startMeasure().addOnPulseListener(new PulseListener() {
+            @Override
+            public void OnPulseCheckStarted() {
+                setBeatsPerMinute("000");
+                setHeartColor(ContextCompat.getColor(mContext, R.color.orange));
+                mVibrate.vibrate(50);
+                mObjectAnimator.setValues(PropertyValuesHolder.ofInt("progress", 0, 200));
+                mObjectAnimator.setDuration((long) mMeasurementTime * 1000);
+                mObjectAnimator.start();
+            }
 
-                    @Override
-                    public void OnPulseCheckFinished(String mPulseRate, boolean isComplete) {
-                        if (mPulseRate.length() > 2) {
-                            setBeatsPerMinute(mPulseRate);
-                        } else {
-                            setBeatsPerMinute("0" + mPulseRate);
-                        }
-                        mVibrate.vibrate(50);
-                        if (Integer.parseInt(mPulseRate) == 0) {
-                            showErrorDialog();
-                        } else {
-                            showSuccessDialog();
-                        }
-                    }
+            @Override
+            public void OnPulseCheckStopped() {
+                if (mProgressBar.getProgress() < 200) {
+                    int progress = mProgressBar.getProgress();
+                    mObjectAnimator.setValues(PropertyValuesHolder.ofInt("progress", progress, 0));
+                    mObjectAnimator.setDuration(500);
+                    mObjectAnimator.start();
+                }
+            }
 
-                    @Override
-                    public void OnPulseCheckRate(String mPulseRate) {
-                        if (mPulseRate.length() > 2) {
-                            setBeatsPerMinute(mPulseRate);
-                        } else {
-                            setBeatsPerMinute("0" + mPulseRate);
-                        }
-                        setHeartColor(ContextCompat.getColor(mContext, R.color.red));
-                    }
-                });
+            @Override
+            public void OnPulseCheckFinished(String mPulseRate, boolean isComplete) {
+                if (mPulseRate.length() > 2) {
+                    setBeatsPerMinute(mPulseRate);
+                } else {
+                    setBeatsPerMinute("0" + mPulseRate);
+                }
+                mVibrate.vibrate(50);
+                if (Integer.parseInt(mPulseRate) == 0) {
+                    showErrorDialog();
+                } else {
+                    showSuccessDialog();
+                }
+            }
+
+            @Override
+            public void OnPulseCheckRate(String mPulseRate) {
+                if (mPulseRate.length() > 2) {
+                    setBeatsPerMinute(mPulseRate);
+                } else {
+                    setBeatsPerMinute("0" + mPulseRate);
+                }
+                setHeartColor(ContextCompat.getColor(mContext, R.color.red));
+            }
+        });
     }
 
     public void stop() {
         mPulseSupport.stopMeasure();
     }
-
 
     public void onHelpClick(View view) {
         showHintDialog();

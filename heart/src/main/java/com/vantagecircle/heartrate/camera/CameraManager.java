@@ -23,7 +23,6 @@ public class CameraManager implements CameraSupport {
     private Camera mCamera;
     private Sensor mSensor;
     private SensorManager mSensorManager;
-    private SurfaceHolder mSurfaceHolder;
 
     private int mCameraId = 0;
     private int mWidth;
@@ -48,6 +47,7 @@ public class CameraManager implements CameraSupport {
     @Override
     public void openCamera() {
         try {
+            releaseCamera();
             this.mCamera = Camera.open(this.mCameraId);
         } catch (Exception e) {
             e.printStackTrace();
@@ -70,23 +70,23 @@ public class CameraManager implements CameraSupport {
             List supportedFlashModes = parameters.getSupportedFlashModes();
             this.isFlashSupported = !(supportedFlashModes == null || supportedFlashModes.isEmpty() || (supportedFlashModes.size() == 1 && supportedFlashModes.get(0).equals(Camera.Parameters.FLASH_MODE_OFF)));
         }
+
         this.isAutoExposureLockSupported = parameters.isAutoExposureLockSupported();
         this.isFlashEnabled = false;
-        this.disableAutoExposureLock();
-        this.mLightIntensity = 50;
-        if (this.mSensor != null && this.mSensorEventListener != null) {
-            this.mSensorManager.registerListener(this.mSensorEventListener, this.mSensor, SensorManager.SENSOR_DELAY_NORMAL);
-        }
     }
 
     @Override
-    public void setPreviewHolder(SurfaceHolder mSurfaceHolder) {
+    public Camera getCamera() {
+        return this.mCamera;
+    }
+
+    @Override
+    public void createSurface(SurfaceHolder mSurfaceHolder) {
         if (this.mCamera == null) {
             return;
         }
-        this.mSurfaceHolder = mSurfaceHolder;
         try {
-            this.mCamera.setPreviewDisplay(this.mSurfaceHolder);
+            this.mCamera.setPreviewDisplay(mSurfaceHolder);
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -94,7 +94,7 @@ public class CameraManager implements CameraSupport {
     }
 
     @Override
-    public void preparePreview(int mWidth, int mHeight) {
+    public void changedSurface(int mWidth, int mHeight) {
         if (this.mCamera == null) {
             return;
         }
@@ -104,7 +104,14 @@ public class CameraManager implements CameraSupport {
             parameters.setPreviewSize(a.width, a.height);
         }
         this.mCamera.setParameters(parameters);
+        this.setRotation();
+        this.mWidth = parameters.getPreviewSize().width;
+        this.mHeight = parameters.getPreviewSize().height;
+        this.mCamera.startPreview();
+    }
 
+    @Override
+    public void setRotation() {
         int rotation = 0;
         Camera.CameraInfo cameraInfo = new Camera.CameraInfo();
         Camera.getCameraInfo(this.mCameraId, cameraInfo);
@@ -124,17 +131,6 @@ public class CameraManager implements CameraSupport {
         this.mCamera.setDisplayOrientation(cameraInfo.facing == 1 ?
                 (360 - ((rotation + cameraInfo.orientation) % 360)) % 360 :
                 ((cameraInfo.orientation - rotation) + 360) % 360);
-
-        this.mWidth = parameters.getPreviewSize().width;
-        this.mHeight = parameters.getPreviewSize().height;
-    }
-
-    @Override
-    public void startPreview() {
-        if (this.mCamera == null) {
-            return;
-        }
-        this.mCamera.startPreview();
     }
 
     @Override
@@ -142,50 +138,12 @@ public class CameraManager implements CameraSupport {
         if (this.mCamera == null) {
             return;
         }
+        this.mCamera.setPreviewCallback(null);
         this.mCamera.stopPreview();
-    }
-
-    private Camera.Size getSmallestPreviewSize(int width, int height, Camera.Parameters parameters) {
-        Camera.Size size = null;
-        if (height <= width) {
-            int i3 = height;
-            height = width;
-            width = i3;
-        }
-        for (Camera.Size result : parameters.getSupportedPreviewSizes()) {
-            if (result.width > height || result.height > width || (size != null && result.width * result.height >= size.width * size.height)) {
-                result = size;
-            }
-            size = result;
-        }
-        return size;
-    }
-
-    private int[] getAccurateFps(List<int[]> list) {
-        int i = 0;
-        int i2 = 0;
-        for (int i3 = 0; i3 < list.size(); i3++) {
-            if (list.get(i3)[1] * list.get(i3)[0] > i2) {
-                i2 = list.get(i3)[0] * list.get(i3)[1];
-                i = i3;
-            }
-        }
-        return list.get(i);
     }
 
     @Override
     public void releaseCamera() {
-        if (this.mCamera != null) {
-            this.mCamera.setPreviewCallback(null);
-            this.mCamera.stopPreview();
-            this.mCamera.release();
-            this.mCamera = null;
-            this.mSensorManager.unregisterListener(this.mSensorEventListener);
-        }
-    }
-
-    @Override
-    public void releaseCallbacks() {
         if (this.mCamera != null) {
             this.mCamera.release();
             this.mCamera = null;
@@ -270,8 +228,57 @@ public class CameraManager implements CameraSupport {
     }
 
     @Override
+    public void setLightIntensity(int intensity) {
+        this.mLightIntensity = intensity;
+    }
+
+    @Override
+    public void addSensorListener() {
+        if (this.mSensor != null && this.mSensorEventListener != null) {
+            this.mSensorManager.registerListener(this.mSensorEventListener, this.mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        }
+    }
+
+    @Override
+    public void removeSensorListener() {
+        if (mSensorManager != null && this.mSensorEventListener != null) {
+            this.mSensorManager.unregisterListener(this.mSensorEventListener);
+        }
+    }
+
+    @Override
     public void addOnPreviewListener(PreviewListener mPreviewListener) {
         this.mPreviewListener = mPreviewListener;
+    }
+
+    @Override
+    public Camera.Size getSmallestPreviewSize(int width, int height, Camera.Parameters parameters) {
+        Camera.Size size = null;
+        if (height <= width) {
+            int i3 = height;
+            height = width;
+            width = i3;
+        }
+        for (Camera.Size result : parameters.getSupportedPreviewSizes()) {
+            if (result.width > height || result.height > width || (size != null && result.width * result.height >= size.width * size.height)) {
+                result = size;
+            }
+            size = result;
+        }
+        return size;
+    }
+
+    @Override
+    public int[] getAccurateFps(List<int[]> list) {
+        int i = 0;
+        int i2 = 0;
+        for (int i3 = 0; i3 < list.size(); i3++) {
+            if (list.get(i3)[1] * list.get(i3)[0] > i2) {
+                i2 = list.get(i3)[0] * list.get(i3)[1];
+                i = i3;
+            }
+        }
+        return list.get(i);
     }
 
     private Camera.PreviewCallback mPreviewCallback = new Camera.PreviewCallback() {

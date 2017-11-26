@@ -1,6 +1,7 @@
 package com.vantagecircle.heartrate.activity.ui;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -16,11 +17,11 @@ import android.widget.Toast;
 
 import com.vantagecircle.heartrate.HeartApplication;
 import com.vantagecircle.heartrate.R;
+import com.vantagecircle.heartrate.activity.BaseActivity;
+import com.vantagecircle.heartrate.activity.presenter.HeartActivityPresenter;
 import com.vantagecircle.heartrate.component.ActivityComponent;
 import com.vantagecircle.heartrate.component.DaggerActivityComponent;
 import com.vantagecircle.heartrate.module.ActivityModule;
-import com.vantagecircle.heartrate.activity.BaseActivity;
-import com.vantagecircle.heartrate.activity.presenter.HeartActivityPresenter;
 import com.vantagecircle.heartrate.utils.Constant;
 import com.vantagecircle.heartrate.utils.ToolsUtils;
 
@@ -46,7 +47,7 @@ public class HeartActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main_activity);
         mUnBinder = ButterKnife.bind(this);
-        init();
+        askPermission();
     }
 
     @Override
@@ -72,6 +73,35 @@ public class HeartActivity extends BaseActivity {
             finish();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private void askPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (!ToolsUtils.getInstance().isHasPermissions(this, Manifest.permission.CAMERA, Manifest.permission.BODY_SENSORS,
+                    Manifest.permission.WAKE_LOCK, Manifest.permission.VIBRATE)) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.BODY_SENSORS,
+                        Manifest.permission.WAKE_LOCK, Manifest.permission.VIBRATE}, Constant.REQUEST_ALL_PERMISSION);
+            } else {
+                init();
+            }
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        checkPermission(requestCode, grantResults);
+    }
+
+    private void checkPermission(int requestCode, int[] grantResults) {
+        if (requestCode == Constant.REQUEST_ALL_PERMISSION) {
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_DENIED) {
+                Toast.makeText(this, "This window need camera and sensor permission", Toast.LENGTH_SHORT).show();
+                finish();
+            } else {
+                init();
+            }
+        }
     }
 
     @Override

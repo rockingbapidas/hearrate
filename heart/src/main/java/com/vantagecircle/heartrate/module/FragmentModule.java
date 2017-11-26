@@ -40,7 +40,7 @@ public class FragmentModule {
     }
 
     @Provides
-    PulseSupport providePulseSupport(CameraSupport cameraSupport) {
-        return new PulseManager(cameraSupport);
+    PulseSupport providePulseSupport(@ActivityContext Activity mActivity, CameraSupport cameraSupport) {
+        return new PulseManager(mActivity, cameraSupport);
     }
 }

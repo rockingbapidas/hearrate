@@ -49,7 +49,7 @@ public class HeartActivityPresenter {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
                 heartActivity.mViewPager.setCurrentItem(tab.getPosition());
-                mPagerAdapter.getItem(tab.getPosition()).onResume();
+                //mPagerAdapter.getItem(tab.getPosition()).onResume();
             }
 
             @Override
