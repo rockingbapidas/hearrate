@@ -37,6 +37,7 @@
             android:orientation="horizontal">
 
             <ImageView
+                android:id="@+id/heartStatus"
                 android:layout_width="30dp"
                 android:layout_height="30dp"
                 android:contentDescription="@string/image"

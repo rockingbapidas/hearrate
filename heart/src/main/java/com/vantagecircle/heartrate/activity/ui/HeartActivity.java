@@ -1,7 +1,6 @@
 package com.vantagecircle.heartrate.activity.ui;
 
 import android.Manifest;
-import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -11,9 +10,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
-import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.Toast;
 
@@ -58,7 +55,7 @@ public class HeartActivity extends BaseActivity {
         if (mActivityComponent == null) {
             mActivityComponent = DaggerActivityComponent.builder()
                     .activityModule(new ActivityModule(this))
-                    .appComponent(HeartApplication.get(this).getAppComponent())
+                    .heartComponent(HeartApplication.get(this).getHeartComponent())
                     .build();
         }
         mActivityComponent.inject(this);

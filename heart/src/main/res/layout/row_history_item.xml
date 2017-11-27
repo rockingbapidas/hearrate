@@ -5,11 +5,11 @@
 
     <data>
 
-        <import type="com.vantagecircle.heartrate.model.HistoryModel" />
+        <import type="com.vantagecircle.heartrate.model.History" />
 
         <variable
             name="history"
-            type="com.vantagecircle.heartrate.model.HistoryModel" />
+            type="com.vantagecircle.heartrate.model.History" />
     </data>
 
     <android.support.v7.widget.CardView

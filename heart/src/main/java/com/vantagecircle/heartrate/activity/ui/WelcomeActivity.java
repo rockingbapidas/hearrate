@@ -34,7 +34,7 @@ public class WelcomeActivity extends BaseActivity {
         if (mActivityComponent == null) {
             mActivityComponent = DaggerActivityComponent.builder()
                     .activityModule(new ActivityModule(this))
-                    .appComponent(HeartApplication.get(this).getAppComponent())
+                    .heartComponent(HeartApplication.get(this).getHeartComponent())
                     .build();
         }
         mActivityComponent.inject(this);

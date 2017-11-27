@@ -2,7 +2,7 @@ package com.vantagecircle.heartrate.data;
 
 import android.content.Context;
 
-import com.vantagecircle.heartrate.model.HistoryModel;
+import com.vantagecircle.heartrate.model.History;
 import com.vantagecircle.heartrate.annotation.ApplicationContext;
 
 import java.util.ArrayList;
@@ -24,15 +24,15 @@ public class DataManager {
         this.mDatabaseHelper = mDatabaseHelper;
     }
 
-    public boolean insertHistory(HistoryModel historyModel) {
-        return mDatabaseHelper.insertHistory(historyModel);
+    public boolean insertHistory(History history) {
+        return mDatabaseHelper.insertHistory(history);
     }
 
-    public ArrayList<HistoryModel> getHistory() {
+    public ArrayList<History> getHistory() {
         return mDatabaseHelper.getHistory();
     }
 
-    public ArrayList<HistoryModel> getHistory(int limit) {
+    public ArrayList<History> getHistory(int limit) {
         return mDatabaseHelper.getHistory(limit);
     }
 }

@@ -9,4 +9,5 @@ public interface PulseListener {
     void OnPulseCheckStopped();
     void OnPulseCheckFinished(String mPulseRate, boolean isComplete);
     void OnPulseCheckRate(String mPulseRate);
+    void OnPulseCheckError();
 }

@@ -11,12 +11,12 @@ import com.vantagecircle.heartrate.BR;
  * Created by SiD on 11/11/2017.
  */
 
-public class HistoryModel extends BaseObservable {
+public class History extends BaseObservable {
     private String heartRate;
     private String dateString;
     private String timeString;
 
-    public HistoryModel(String heartRate, String dateString, String timeString) {
+    public History(String heartRate, String dateString, String timeString) {
         this.heartRate = heartRate;
         this.dateString = dateString;
         this.timeString = timeString;

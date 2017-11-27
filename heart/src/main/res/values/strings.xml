@@ -1,16 +1,11 @@
 <resources>
     <string name="app_name">HeartRate</string>
-    <string name="check_your_heart_rate">Check your Heart rate</string>
     <string name="start">Start</string>
     <string name="stop">Stop</string>
-    <string name="blank">-----</string>
-    <string name="finger_status">Please attach your finger first</string>
-
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="calculate">CALCULATE</string>
     <string name="history">HISTORY</string>
     <string name="place_finger">Place finger on your camera</string>
+    <string name="press_start">Press start to check your heart rate</string>
     <string name="bpm">bpm</string>
     <string name="how_it_works">How it works</string>
     <string name="default_bpm">000</string>
@@ -26,4 +21,5 @@
     <string name="fail">Your pulse is not detected properly please attach your finger gently don\'t press too hard, try again.</string>
     <string name="failed">Failed</string>
     <string name="action_help">Help</string>
+    <string name="check_your_heart_rate">Check your heart rate</string>
 </resources>

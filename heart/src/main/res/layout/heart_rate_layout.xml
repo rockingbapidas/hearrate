@@ -44,7 +44,7 @@
                     android:layout_height="wrap_content"
                     android:ems="8"
                     android:gravity="center"
-                    android:text="@string/place_finger"
+                    android:text="@{heartPresenter.started ? @string/place_finger : @string/press_start}"
                     android:textAlignment="gravity"
                     android:textColor="@color/grey"
                     android:textSize="16sp" />

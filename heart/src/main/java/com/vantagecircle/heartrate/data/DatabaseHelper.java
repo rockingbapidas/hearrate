@@ -6,7 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
-import com.vantagecircle.heartrate.model.HistoryModel;
+import com.vantagecircle.heartrate.model.History;
 import com.vantagecircle.heartrate.annotation.ApplicationContext;
 import com.vantagecircle.heartrate.annotation.DatabaseInfo;
 
@@ -37,8 +37,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    ArrayList<HistoryModel> getHistory() {
-        ArrayList<HistoryModel> arrayList = new ArrayList<>();
+    ArrayList<History> getHistory() {
+        ArrayList<History> arrayList = new ArrayList<>();
         Cursor cursor = null;
         String query = DataModel.GET_HISTORY_QUERY + " ORDER BY " + DataModel.COLUMN_ID + " DESC";
         try {
@@ -49,8 +49,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     String heartRate = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_HEART_RATE));
                     String date = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_DATE_STRING));
                     String time = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_TIME_STRING));
-                    HistoryModel historyModel = new HistoryModel(heartRate, date, time);
-                    arrayList.add(historyModel);
+                    History history = new History(heartRate, date, time);
+                    arrayList.add(history);
                     cursor.moveToNext();
                 }
             }
@@ -63,8 +63,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return arrayList;
     }
 
-    ArrayList<HistoryModel> getHistory(int limit) {
-        ArrayList<HistoryModel> arrayList = new ArrayList<>();
+    ArrayList<History> getHistory(int limit) {
+        ArrayList<History> arrayList = new ArrayList<>();
         Cursor cursor = null;
         String query = DataModel.GET_HISTORY_QUERY + " ORDER BY " + DataModel.COLUMN_ID + " DESC " + "LIMIT " + limit;
         try {
@@ -75,8 +75,8 @@ public class DatabaseHelper extends SQLiteOpenHelper {
                     String heartRate = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_HEART_RATE));
                     String date = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_DATE_STRING));
                     String time = cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_TIME_STRING));
-                    HistoryModel historyModel = new HistoryModel(heartRate, date, time);
-                    arrayList.add(historyModel);
+                    History history = new History(heartRate, date, time);
+                    arrayList.add(history);
                     cursor.moveToNext();
                 }
             }
@@ -89,12 +89,12 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         return arrayList;
     }
 
-    boolean insertHistory(HistoryModel historyModel) {
+    boolean insertHistory(History history) {
         try {
             ContentValues cValues = new ContentValues();
-            cValues.put(DataModel.COLUMN_HEART_RATE, historyModel.getHeartRate());
-            cValues.put(DataModel.COLUMN_DATE_STRING, historyModel.getDateString());
-            cValues.put(DataModel.COLUMN_TIME_STRING, historyModel.getTimeString());
+            cValues.put(DataModel.COLUMN_HEART_RATE, history.getHeartRate());
+            cValues.put(DataModel.COLUMN_DATE_STRING, history.getDateString());
+            cValues.put(DataModel.COLUMN_TIME_STRING, history.getTimeString());
             return getReadableDatabase().insert(DataModel.HISTORY_TABLE, null, cValues) > 0;
         } catch (Exception e) {
             e.printStackTrace();

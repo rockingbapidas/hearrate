@@ -17,6 +17,7 @@ import com.vantagecircle.heartrate.data.DataManager;
 import com.vantagecircle.heartrate.databinding.HeartRateLayoutBinding;
 import com.vantagecircle.heartrate.fragment.BaseFragment;
 import com.vantagecircle.heartrate.fragment.presenter.HeartFragmentPresenter;
+import com.vantagecircle.heartrate.model.Heart;
 import com.vantagecircle.heartrate.module.FragmentModule;
 
 import javax.inject.Inject;
@@ -27,6 +28,8 @@ public class HeartFragment extends BaseFragment {
     PulseSupport mPulseSupport;
     @Inject
     DataManager mDataManager;
+    @Inject
+    Heart mHeart;
 
     private FragmentComponent mFragmentComponent;
     private HeartRateLayoutBinding mHeartRateLayoutBinding;
@@ -47,7 +50,7 @@ public class HeartFragment extends BaseFragment {
         if (mFragmentComponent == null) {
             mFragmentComponent = DaggerFragmentComponent.builder()
                     .fragmentModule(new FragmentModule(this))
-                    .appComponent(HeartApplication.get(this.getContext()).getAppComponent())
+                    .heartComponent(HeartApplication.get(this.getContext()).getHeartComponent())
                     .build();
         }
         mFragmentComponent.inject(this);
@@ -70,6 +73,7 @@ public class HeartFragment extends BaseFragment {
     @Override
     protected void init() {
         mHeartFragmentPresenter = new HeartFragmentPresenter(this.getActivity(), mPulseSupport, mDataManager);
+        mHeartFragmentPresenter.initialize(mHeart);
         mHeartRateLayoutBinding.setHeartPresenter(mHeartFragmentPresenter);
     }
 

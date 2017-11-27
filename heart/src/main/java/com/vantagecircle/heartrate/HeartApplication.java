@@ -4,9 +4,9 @@ import android.app.Application;
 import android.content.Context;
 
 import com.crashlytics.android.Crashlytics;
-import com.vantagecircle.heartrate.component.AppComponent;
-import com.vantagecircle.heartrate.component.DaggerAppComponent;
-import com.vantagecircle.heartrate.module.AppModule;
+import com.vantagecircle.heartrate.component.DaggerHeartComponent;
+import com.vantagecircle.heartrate.component.HeartComponent;
+import com.vantagecircle.heartrate.module.HeartModule;
 
 import io.fabric.sdk.android.Fabric;
 
@@ -15,7 +15,7 @@ import io.fabric.sdk.android.Fabric;
  */
 
 public class HeartApplication extends Application {
-    private AppComponent appComponent;
+    private HeartComponent heartComponent;
 
     public static HeartApplication get(Context context) {
         return (HeartApplication) context.getApplicationContext();
@@ -25,17 +25,28 @@ public class HeartApplication extends Application {
     public void onCreate() {
         super.onCreate();
         Fabric.with(this, new Crashlytics());
-        initAppComponent();
+        initHeartComponent();
     }
 
-    private void initAppComponent(){
-        appComponent = DaggerAppComponent.builder()
-                .appModule(new AppModule(this))
-                .build();
-        appComponent.inject(this);
+    private void initHeartComponent() {
+        if (heartComponent == null) {
+            heartComponent = DaggerHeartComponent.builder()
+                    .heartModule(new HeartModule(this))
+                    .build();
+        }
+        heartComponent.inject(this);
     }
 
-    public AppComponent getAppComponent() {
-        return appComponent;
+    private void initHeartComponent(String gender, int year) {
+        if (heartComponent == null) {
+            heartComponent = DaggerHeartComponent.builder()
+                    .heartModule(new HeartModule(this, gender, year))
+                    .build();
+        }
+        heartComponent.inject(this);
+    }
+
+    public HeartComponent getHeartComponent() {
+        return heartComponent;
     }
 }

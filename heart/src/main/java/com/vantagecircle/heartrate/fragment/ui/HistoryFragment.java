@@ -42,7 +42,7 @@ public class HistoryFragment extends BaseFragment {
         if (mFragmentComponent == null) {
             mFragmentComponent = DaggerFragmentComponent.builder()
                     .fragmentModule(new FragmentModule(this))
-                    .appComponent(HeartApplication.get(this.getContext()).getAppComponent())
+                    .heartComponent(HeartApplication.get(this.getContext()).getHeartComponent())
                     .build();
         }
         mFragmentComponent.inject(this);
@@ -69,6 +69,11 @@ public class HistoryFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        HistoryFragmentPresenter.initialize();
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                HistoryFragmentPresenter.initialize();
+            }
+        }, 500);
     }
 }

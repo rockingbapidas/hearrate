@@ -307,9 +307,12 @@ public class PulseManager implements PulseSupport {
             this.firstIndexPixelArray.add(doubles[1]);
             this.secondIndexPixelArray.add(doubles[2]);
             if (this.isValidPixel()) {
+
+                //new code
                 if (this.mPulseListener != null) {
                     this.mPulseListener.OnPulseCheckStarted();
                 }
+
                 this.initVariables();
             }
         }
@@ -317,29 +320,46 @@ public class PulseManager implements PulseSupport {
         if (this.isPixelFound) {
             if (doubles[0] < 0.95d & doubles[2] + doubles[1] <= 1.15d) {
                 if (this.beatsAverageArray.size() > this.aW) {
+
+                    //new code
                     if (this.mPulseListener != null) {
                         this.mPulseListener.OnPulseCheckStopped();
                     }
+
                     this.clear();
                 }
 
                 if (this.currentTimeStamp > 9000.0d) {
                     if (this.aH > 0.01d & this.mHeartBeat < 210 & this.mHeartBeat > 35) {
+
+                        //new code
                         if (this.mPulseListener != null) {
                             this.mPulseListener.OnPulseCheckFinished(this.mDecimalFormat.format((long) this.mHeartBeat), false);
                         }
+
                         this.isRunning = false;
                         this.isStarted = true;
+                    } else { //new code
+                        if (this.mPulseListener != null) {
+                            this.mPulseListener.OnPulseCheckError();
+                        }
                     }
                 }
             } else if (this.currentTimeStamp > ((double) this.mMeasurementTime)) {
                 if (this.aH > 0.01d & this.mHeartBeat < 210 & this.mHeartBeat > 35) {
+
+                    //new code
                     if (this.mPulseListener != null) {
                         this.mPulseListener.OnPulseCheckFinished(this.mDecimalFormat.format((long) this.mHeartBeat), true);
                     }
+
                     this.clear();
                     this.isRunning = false;
                     this.isStarted = true;
+                } else { //new code
+                    if (this.mPulseListener != null) {
+                        this.mPulseListener.OnPulseCheckError();
+                    }
                 }
             }
         }
@@ -360,9 +380,12 @@ public class PulseManager implements PulseSupport {
                 this.timeStampDiffArray.add(this.currentTimeStamp);
             }
             if (this.aH > 0.01d & this.mHeartBeat > 35 & this.currentTimeStamp > this.aK & this.mHeartBeat < 210) {
+
+                //new code
                 if (this.mPulseListener != null) {
                     this.mPulseListener.OnPulseCheckRate(this.mDecimalFormat.format((long) this.mHeartBeat));
                 }
+
                 this.aK = this.currentTimeStamp + 500.0d;
             }
         }

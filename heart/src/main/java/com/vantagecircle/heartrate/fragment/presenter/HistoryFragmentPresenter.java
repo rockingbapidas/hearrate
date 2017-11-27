@@ -1,5 +1,6 @@
 package com.vantagecircle.heartrate.fragment.presenter;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.databinding.BindingAdapter;
 import android.support.v7.widget.LinearLayoutManager;
@@ -7,16 +8,17 @@ import android.support.v7.widget.RecyclerView;
 
 import com.vantagecircle.heartrate.adapter.HistoryAdapter;
 import com.vantagecircle.heartrate.data.DataManager;
-import com.vantagecircle.heartrate.model.HistoryModel;
+import com.vantagecircle.heartrate.model.History;
 
 import java.util.ArrayList;
 
 /**
  * Created by bapidas on 08/11/17.
  */
-
+@SuppressLint("StaticFieldLeak")
 public class HistoryFragmentPresenter {
     private static final String TAG = HistoryFragmentPresenter.class.getSimpleName();
+
     private static DataManager mDataManger;
     private static Context mContext;
     private static RecyclerView mRecyclerView;
@@ -29,7 +31,8 @@ public class HistoryFragmentPresenter {
     @BindingAdapter("setAdapter")
     public static void setAdapter(RecyclerView recyclerView, boolean aBoolean) {
         mRecyclerView = recyclerView;
-        initialize();
+        if (aBoolean)
+            initialize();
     }
 
     public static void initialize() {
@@ -38,7 +41,8 @@ public class HistoryFragmentPresenter {
             mLinearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             mRecyclerView.setLayoutManager(mLinearLayoutManager);
             mRecyclerView.scrollToPosition(0);
-            ArrayList<HistoryModel> mArrayList = mDataManger.getHistory();
+
+            ArrayList<History> mArrayList = mDataManger.getHistory();
             if (mArrayList != null && mArrayList.size() > 0) {
                 HistoryAdapter mHistoryAdapter = new HistoryAdapter(mArrayList);
                 mRecyclerView.setAdapter(mHistoryAdapter);
