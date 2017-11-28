@@ -24,7 +24,6 @@ public class HeartApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        Fabric.with(this, new Crashlytics());
         initHeartComponent();
     }
 

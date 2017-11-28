@@ -1,44 +1,20 @@
-apply plugin: 'com.android.application'
+apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
-apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.vantagecircle.heartrate"
-
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
 
-        versionCode 1
-        versionName "1.0"
-
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
-    signingConfigs {
-        release {
-            keyAlias "heart"
-            keyPassword "heartrate"
-            storePassword "heartrate"
-            //storeFile file('I:/Android_Projects/HeartRate/heart_rate_key.jks')
-            storeFile file('/Users/bapidas/AndroidStudioProjects/HeartRate/heart_rate_key.jks')
-            //storeFile file('/Users/somirsaikia/Documents/AndroidApp/HeartRate/heart_rate_key.jks')
-        }
-    }
+
     buildTypes {
-        debug {
-            minifyEnabled false
-            shrinkResources false
-            useProguard false
-            debuggable true
-        }
         release {
-            minifyEnabled true
-            shrinkResources true
-            useProguard true
+            minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-            signingConfig signingConfigs.release
         }
     }
     dataBinding {
