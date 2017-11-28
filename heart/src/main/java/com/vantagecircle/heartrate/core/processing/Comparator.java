@@ -1,4 +1,4 @@
-package com.vantagecircle.heartrate.processing;
+package com.vantagecircle.heartrate.core.processing;
 
 import org.apache.commons.math3.complex.Complex;
 import org.apache.commons.math3.transform.DftNormalization;
@@ -9,7 +9,7 @@ import org.apache.commons.math3.util.MathArrays;
 import java.util.ArrayList;
 import java.util.Arrays;
 
-public class ArrayTransform {
+public class Comparator {
     public static final double[] samples = new double[]{
             -0.05900213d, -0.05847387d,
             -0.05707053d, -0.05134577d,
@@ -32,18 +32,18 @@ public class ArrayTransform {
         for (i = 0; i < size; i++) {
             dArr[i] = (arrayList.get(i) - arrayList.get(0)) / 1000.0d;
         }
-        double[] a = m15894a(dArr[0], dArr[size - 1], 0.03333333333333333d);
+        double[] a = compare(dArr[0], dArr[size - 1], 0.03333333333333333d);
         double[] dArr2 = new double[size];
         for (i = 0; i < size; i++) {
             dArr2[i] = arrayList2.get(i) - arrayList2.get(0);
         }
         result = combine(dArr, dArr2, a);
-        ArrayTransform.copy();
+        Comparator.copy();
     }
 
     public static double[] sort(double[] dArr) {
         int i;
-        double[] b = ArrayTransform.normalize(dArr);
+        double[] b = Comparator.normalize(dArr);
         int length = b.length;
         int i2 = (int) ((1.0d * ((double) length)) / 30.0d);
         int i3 = (int) ((7.0d * ((double) length)) / 30.0d);
@@ -62,7 +62,7 @@ public class ArrayTransform {
         return new double[]{(((double) i4) / ((double) length)) * 15.0d, d / d2};
     }
 
-    public static int m15893a(int[] iArr) {
+    public static int getIndex(int[] iArr) {
         int i = iArr[0];
         for (int i2 = 1; i2 < iArr.length; i2++) {
             if (iArr[i2] > i) {
@@ -72,8 +72,8 @@ public class ArrayTransform {
         return i;
     }
 
-    public static double[] m15895a(double[] dArr) {
-        double b = getLength(m15899c(dArr));
+    public static double[] getArray(double[] dArr) {
+        double b = getLength(getDouble(dArr));
         if (b > 0.0d) {
             for (int i = 0; i < dArr.length; i++) {
                 dArr[i] = dArr[i] / b;
@@ -82,7 +82,7 @@ public class ArrayTransform {
         return dArr;
     }
 
-    public static int m15898b(int[] iArr) {
+    public static int getPosition(int[] iArr) {
         int i = 210;
         for (int i2 = 1; i2 < iArr.length; i2++) {
             if (((iArr[i2] != 0 ? 1 : 0) & (iArr[i2] < i ? 1 : 0)) != 0) {
@@ -91,7 +91,6 @@ public class ArrayTransform {
         }
         return i;
     }
-
 
     private static void copy() {
         for (int i = 0; i < result.length; i++) {
@@ -171,7 +170,7 @@ public class ArrayTransform {
         return d;
     }
 
-    private static double[] m15899c(double[] dArr) {
+    private static double[] getDouble(double[] dArr) {
         double[] dArr2 = new double[dArr.length];
         for (int i = 0; i < dArr.length; i++) {
             if (dArr[i] > 0.0d) {
@@ -183,7 +182,7 @@ public class ArrayTransform {
         return dArr2;
     }
 
-    private static double[] m15894a(double d, double d2, double d3) {
+    private static double[] compare(double d, double d2, double d3) {
         int i = 0;
         int i2 = (int) ((d2 - d) / d3);
         if (i2 > 1) {

@@ -1,4 +1,4 @@
-package com.vantagecircle.heartrate.processing;
+package com.vantagecircle.heartrate.core.processing;
 
 import android.graphics.Color;
 
@@ -6,7 +6,7 @@ import android.graphics.Color;
  * Created by bapidas on 18/11/17.
  */
 
-public class RGBCalculation {
+public class Calculation {
     public static double[] calculate(byte[] data, int width, int height) {
         if (data == null) {
             return new double[3];

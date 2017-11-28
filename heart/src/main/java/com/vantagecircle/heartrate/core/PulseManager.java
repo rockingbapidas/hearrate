@@ -3,12 +3,11 @@ package com.vantagecircle.heartrate.core;
 import android.app.Activity;
 import android.content.Intent;
 import android.os.Build;
-import android.util.Log;
 import android.view.SurfaceHolder;
 
 import com.vantagecircle.heartrate.camera.PreviewListener;
-import com.vantagecircle.heartrate.processing.ArrayTransform;
-import com.vantagecircle.heartrate.processing.RGBCalculation;
+import com.vantagecircle.heartrate.core.processing.Comparator;
+import com.vantagecircle.heartrate.core.processing.Calculation;
 import com.vantagecircle.heartrate.camera.CameraSupport;
 
 import org.apache.commons.math3.util.FastMath;
@@ -218,7 +217,7 @@ public class PulseManager implements PulseSupport {
         this.aV = 25;
         this.aW = this.aV;
         this.aX = this.aV + 25;
-        ArrayTransform.result = null;
+        Comparator.result = null;
     }
 
     private SurfaceHolder.Callback mSurfaceCallback = new SurfaceHolder.Callback() {
@@ -252,26 +251,26 @@ public class PulseManager implements PulseSupport {
     private void backgroundProcess() {
         while (this.mThread != null) {
             if (this.isPixelFound && this.beatsAverageArray.size() > this.aX) {
-                ArrayTransform.compare(this.timeStampDiffArray, this.beatsAverageArray);
-                int length = ArrayTransform.result.length - ArrayTransform.samples.length;
+                Comparator.compare(this.timeStampDiffArray, this.beatsAverageArray);
+                int length = Comparator.result.length - Comparator.samples.length;
                 for (int i = 0; i < FastMath.min(300, length - this.aX); i++) {
-                    this.beatsArray[299 - i] = -ArrayTransform.result[(length - 1) - i];
+                    this.beatsArray[299 - i] = -Comparator.result[(length - 1) - i];
                 }
-                double[] a = ArrayTransform.sort(this.beatsArray);
+                double[] a = Comparator.sort(this.beatsArray);
                 this.mHeartBeat = (int) (a[0] * 60.0d);
                 this.aH = a[1];
 
                 if (System.currentTimeMillis() - this.graphStartTime > 30) {
                     this.graphStartTime = System.currentTimeMillis();
                     System.arraycopy(this.beatsArray, 150, this.graphArray, 0, 150);
-                    this.graphArray = ArrayTransform.m15895a(this.graphArray);
+                    this.graphArray = Comparator.getArray(this.graphArray);
                     //
                 }
 
-                if (((ArrayTransform.result != null) & this.isBeepEnable)) {
-                    while (this.beepCount < ArrayTransform.result.length - (ArrayTransform.samples.length / 2)) {
+                if (((Comparator.result != null) & this.isBeepEnable)) {
+                    while (this.beepCount < Comparator.result.length - (Comparator.samples.length / 2)) {
                         if (this.aH > 0.01d) {
-                            if ((ArrayTransform.result[this.beepCount + 1] > 0.0d & ArrayTransform.result[this.beepCount + -1] < 0.0d) && ((double) (System.currentTimeMillis() - this.beepStartTime)) > (1.0d / a[0]) * 750.0d) {
+                            if ((Comparator.result[this.beepCount + 1] > 0.0d & Comparator.result[this.beepCount + -1] < 0.0d) && ((double) (System.currentTimeMillis() - this.beepStartTime)) > (1.0d / a[0]) * 750.0d) {
                                 //
                                 this.beepStartTime = System.currentTimeMillis();
                             }
@@ -286,7 +285,7 @@ public class PulseManager implements PulseSupport {
     private PreviewListener mPreviewListener = new PreviewListener() {
         @Override
         public void OnPreviewCallback(byte[] data, int mWidth, int mHeight) {
-            double[] doubles = RGBCalculation.calculate(data.clone(), mWidth, mHeight);
+            double[] doubles = Calculation.calculate(data.clone(), mWidth, mHeight);
             calculatePulse(doubles);
         }
     };
