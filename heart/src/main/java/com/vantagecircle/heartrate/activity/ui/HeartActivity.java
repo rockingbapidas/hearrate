@@ -85,13 +85,13 @@ public class HeartActivity extends BaseActivity {
 
     private void askPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!ToolsUtils.getInstance().isHasPermissions(this, Manifest.permission.CAMERA, Manifest.permission.BODY_SENSORS,
-                    Manifest.permission.WAKE_LOCK, Manifest.permission.VIBRATE)) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.BODY_SENSORS,
-                        Manifest.permission.WAKE_LOCK, Manifest.permission.VIBRATE}, Constant.REQUEST_ALL_PERMISSION);
+            if (!ToolsUtils.getInstance().isHasPermissions(this, Manifest.permission.CAMERA, Manifest.permission.BODY_SENSORS, Manifest.permission.WAKE_LOCK, Manifest.permission.VIBRATE)) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.BODY_SENSORS, Manifest.permission.WAKE_LOCK, Manifest.permission.VIBRATE}, Constant.REQUEST_ALL_PERMISSION);
             } else {
                 init();
             }
+        } else {
+            init();
         }
     }
 
