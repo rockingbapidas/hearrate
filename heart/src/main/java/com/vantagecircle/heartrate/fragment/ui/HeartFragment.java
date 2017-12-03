@@ -82,6 +82,6 @@ public class HeartFragment extends BaseFragment {
         Log.e(TAG, "onPause");
         super.onPause();
         if (mHeartFragmentPresenter != null)
-            mHeartFragmentPresenter.stop();
+            mHeartFragmentPresenter.stopPulseCheck();
     }
 }

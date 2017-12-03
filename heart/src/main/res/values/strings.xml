@@ -22,4 +22,5 @@
     <string name="failed">Failed</string>
     <string name="action_help">Help</string>
     <string name="check_your_heart_rate">Check your heart rate</string>
+    <string name="no_saved_heart_rate_found_yet">No Saved heart rate found yet</string>
 </resources>

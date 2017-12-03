@@ -18,12 +18,12 @@ import com.vantagecircle.heartrate.fragment.ui.HistoryFragment;
 
 public class HeartActivityPresenter {
     private final String TAG = HeartActivityPresenter.class.getSimpleName();
-    private HeartActivity heartActivity;
+    private HeartActivity mHeartActivity;
     private PagerAdapter mPagerAdapter;
     private AlertDialog mAlertDialog;
 
-    public HeartActivityPresenter(HeartActivity heartActivity) {
-        this.heartActivity = heartActivity;
+    public HeartActivityPresenter(HeartActivity mHeartActivity) {
+        this.mHeartActivity = mHeartActivity;
     }
 
     public void setup() {
@@ -32,28 +32,25 @@ public class HeartActivityPresenter {
     }
 
     private void initToolBar() {
-        heartActivity.setSupportActionBar(heartActivity.mToolBar);
-        heartActivity.mActionBar = heartActivity.getSupportActionBar();
-        if (heartActivity.mActionBar != null) {
-            heartActivity.mActionBar.setTitle("Heart Rate");
-            heartActivity.mActionBar.setDisplayHomeAsUpEnabled(true);
+        mHeartActivity.setSupportActionBar(mHeartActivity.mToolBar);
+        mHeartActivity.mActionBar = mHeartActivity.getSupportActionBar();
+        if (mHeartActivity.mActionBar != null) {
+            mHeartActivity.mActionBar.setTitle("Heart Rate");
+            mHeartActivity.mActionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
     private void initTabPager() {
-        mPagerAdapter = new PagerAdapter(heartActivity.getSupportFragmentManager());
-        mPagerAdapter.addFragment(HeartFragment.newInstance(),
-                heartActivity.getResources().getString(R.string.calculate));
-        mPagerAdapter.addFragment(HistoryFragment.newInstance(),
-                heartActivity.getResources().getString(R.string.history));
-        heartActivity.mViewPager.setAdapter(mPagerAdapter);
-        heartActivity.mViewPager.addOnPageChangeListener(new TabLayout
-                .TabLayoutOnPageChangeListener(heartActivity.mTabLayout));
-        heartActivity.mTabLayout.setupWithViewPager(heartActivity.mViewPager);
-        heartActivity.mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+        mPagerAdapter = new PagerAdapter(mHeartActivity.getSupportFragmentManager());
+        mPagerAdapter.addFragment(HeartFragment.newInstance(), mHeartActivity.getResources().getString(R.string.calculate));
+        mPagerAdapter.addFragment(HistoryFragment.newInstance(), mHeartActivity.getResources().getString(R.string.history));
+        mHeartActivity.mViewPager.setAdapter(mPagerAdapter);
+        mHeartActivity.mViewPager.addOnPageChangeListener(new TabLayout.TabLayoutOnPageChangeListener(mHeartActivity.mTabLayout));
+        mHeartActivity.mTabLayout.setupWithViewPager(mHeartActivity.mViewPager);
+        mHeartActivity.mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                heartActivity.mViewPager.setCurrentItem(tab.getPosition());
+                mHeartActivity.mViewPager.setCurrentItem(tab.getPosition());
                 mPagerAdapter.getItem(tab.getPosition()).onResume();
             }
 
@@ -71,8 +68,8 @@ public class HeartActivityPresenter {
 
     public void showHintDialog() {
         if (mAlertDialog == null || !mAlertDialog.isShowing()) {
-            AlertDialog.Builder dialog = new AlertDialog.Builder(heartActivity);
-            View mView = LayoutInflater.from(heartActivity).inflate(R.layout.hint_diaog, null);
+            AlertDialog.Builder dialog = new AlertDialog.Builder(mHeartActivity);
+            View mView = LayoutInflater.from(mHeartActivity).inflate(R.layout.hint_diaog, null);
             Button btnOk = mView.findViewById(R.id.btnOk);
             btnOk.setOnClickListener(new View.OnClickListener() {
                 @Override

@@ -2,7 +2,6 @@ package com.vantagecircle.heartrate.fragment.presenter;
 
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.databinding.BaseObservable;
 import android.databinding.Bindable;
@@ -36,30 +35,39 @@ import java.util.Calendar;
  * Created by bapidas on 08/11/17.
  */
 
-public class HeartFragmentPresenter extends BaseObservable {
+public class HeartFragmentPresenter extends BaseObservable implements HeartViewListener {
     private static final String TAG = HeartFragmentPresenter.class.getSimpleName();
-    private static PulseSupport mPulseSupport;
+    private PulseSupport mPulseSupport;
     private DataManager mDataManager;
     private Context mContext;
     private AlertDialog mAlertDialog;
     private int mMeasurementTime = 15;
     private Vibrator mVibrate;
     private int healthyValue;
-
-    @SuppressLint("StaticFieldLeak")
-    private static ProgressBar mProgressBar;
-    private static ObjectAnimator mObjectAnimator;
+    private ProgressBar mProgressBar;
+    private ObjectAnimator mObjectAnimator;
 
     //android data binding fields
     private String beatsPerMinute;
     private int heartColor;
     private boolean isStarted;
+    private HeartViewListener heartViewListener;
 
     public HeartFragmentPresenter(Context mContext, PulseSupport mPulseSupport, DataManager mDataManager) {
-        HeartFragmentPresenter.mPulseSupport = mPulseSupport;
+        this.mPulseSupport = mPulseSupport;
         this.mDataManager = mDataManager;
         this.mContext = mContext;
         this.mVibrate = (Vibrator) mContext.getSystemService(Context.VIBRATOR_SERVICE);
+        setHeartViewListener(this);
+    }
+
+    public void initialize(Heart mHeart) {
+        double year = (double) mHeart.getBirthYear();
+        if (mHeart.getGender().equals("female")) {
+            this.healthyValue = (int) (207.2d - ((Calendar.YEAR - year) * 0.65d));
+        } else {
+            this.healthyValue = (int) (209.6d - ((Calendar.YEAR - year) * 0.72d));
+        }
     }
 
     @Bindable
@@ -92,33 +100,56 @@ public class HeartFragmentPresenter extends BaseObservable {
         notifyPropertyChanged(BR.started);
     }
 
+    @Bindable
+    public HeartViewListener getHeartViewListener() {
+        return heartViewListener;
+    }
+
+    private void setHeartViewListener(HeartViewListener heartViewListener) {
+        this.heartViewListener = heartViewListener;
+        notifyPropertyChanged(BR.heartViewListener);
+    }
+
     @BindingAdapter("setProgressAnimation")
-    public static void setProgressAnimation(ProgressBar mProgressBar, boolean aBoolean) {
-        HeartFragmentPresenter.mProgressBar = mProgressBar;
-        mObjectAnimator = ObjectAnimator.ofInt(mProgressBar, "progress", 1, 200);
-        mObjectAnimator.setInterpolator(new LinearInterpolator());
+    public static void setProgressAnimation(ProgressBar mProgressBar, HeartViewListener heartViewListener) {
+        if (mProgressBar != null) {
+            heartViewListener.getProgressView(mProgressBar);
+        }
     }
 
     @BindingAdapter("setSurfaceHolder")
-    public static void setSurfaceHolder(SurfaceView mSurfaceView, boolean aBoolean) {
-        mPulseSupport.setSurface(mSurfaceView.getHolder());
+    public static void setSurfaceHolder(SurfaceView mSurfaceView, HeartViewListener heartViewListener) {
+        if (mSurfaceView != null) {
+            heartViewListener.getSurfaceView(mSurfaceView);
+        }
+    }
+
+    @Override
+    public void getProgressView(ProgressBar mProgressBar) {
+        this.mProgressBar = mProgressBar;
+        this.mObjectAnimator = ObjectAnimator.ofInt(mProgressBar, "progress", 1, 200);
+        this.mObjectAnimator.setInterpolator(new LinearInterpolator());
+    }
+
+    @Override
+    public void getSurfaceView(SurfaceView mSurfaceView) {
+        this.mPulseSupport.setSurface(mSurfaceView.getHolder());
     }
 
     public void onStartClick(View view) {
         if (isStarted) {
-            stop();
+            stopPulseCheck();
         } else {
-            start();
-            setStarted(true);
+            startPulseCheck();
         }
     }
 
-    private void start() {
+    private void startPulseCheck() {
+        resetAllValues();
         setStarted(true);
         mPulseSupport.setMeasurementTime(mMeasurementTime).startMeasure().addOnPulseListener(new PulseListener() {
             @Override
             public void OnPulseCheckStarted() {
-                clear();
                 mVibrate.vibrate(50);
                 mObjectAnimator.setValues(PropertyValuesHolder.ofInt("progress", 0, 200));
                 mObjectAnimator.setDuration((long) mMeasurementTime * 1000);
@@ -144,7 +175,7 @@ public class HeartFragmentPresenter extends BaseObservable {
                     setBeatsPerMinute("0" + mPulseRate);
                 }
                 showSuccessDialog();
-                stop();
+                stopPulseCheck();
             }
 
             @Override
@@ -161,26 +192,17 @@ public class HeartFragmentPresenter extends BaseObservable {
             public void OnPulseCheckError() {
                 mVibrate.vibrate(50);
                 showErrorDialog();
-                stop();
+                stopPulseCheck();
             }
         });
     }
 
-    public void stop() {
+    public void stopPulseCheck() {
         setStarted(false);
         mPulseSupport.stopMeasure();
     }
 
-    public void initialize(Heart mHeart) {
-        double year = (double) mHeart.getBirthYear();
-        if (mHeart.getGender().equals("female")) {
-            this.healthyValue = (int) (207.2d - ((Calendar.YEAR - year) * 0.65d));
-        } else {
-            this.healthyValue = (int) (209.6d - ((Calendar.YEAR - year) * 0.72d));
-        }
-    }
-
-    private void heartStatus(int mPulseRate){
+    private void heartStatus(int mPulseRate) {
         int i = 1;
         if (((double) mPulseRate) <= ((double) healthyValue) * 0.55d) {
             setHeartColor(Color.rgb(40, 180, 40));
@@ -197,19 +219,7 @@ public class HeartFragmentPresenter extends BaseObservable {
         }
     }
 
-    private void saveHeartRate() {
-        long timeStamp = System.currentTimeMillis();
-        String date = ToolsUtils.getInstance().getDate(timeStamp);
-        String time = ToolsUtils.getInstance().getTime(timeStamp);
-        if (mDataManager.insertHistory(new History(getBeatsPerMinute(), date, time))) {
-            clear();
-            mAlertDialog.dismiss();
-        } else {
-            Toast.makeText(mContext, "Heart rate not saved", Toast.LENGTH_SHORT).show();
-        }
-    }
-
-    private void clear() {
+    private void resetAllValues() {
         setBeatsPerMinute("000");
         setHeartColor(ContextCompat.getColor(mContext, R.color.white));
         mProgressBar.setProgress(0);
@@ -227,7 +237,6 @@ public class HeartFragmentPresenter extends BaseObservable {
             btnCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    clear();
                     mAlertDialog.dismiss();
                 }
             });
@@ -246,6 +255,17 @@ public class HeartFragmentPresenter extends BaseObservable {
         }
     }
 
+    private void saveHeartRate() {
+        long timeStamp = System.currentTimeMillis();
+        String date = ToolsUtils.getInstance().getDate(timeStamp);
+        String time = ToolsUtils.getInstance().getTime(timeStamp);
+        if (mDataManager.insertHistory(new History(getBeatsPerMinute(), date, time))) {
+            mAlertDialog.dismiss();
+        } else {
+            Toast.makeText(mContext, "Heart rate not saved", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void showErrorDialog() {
         if (mAlertDialog == null || !mAlertDialog.isShowing()) {
             AlertDialog.Builder dialog = new AlertDialog.Builder(mContext);
@@ -254,7 +274,6 @@ public class HeartFragmentPresenter extends BaseObservable {
             btnCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    clear();
                     mAlertDialog.dismiss();
                 }
             });
@@ -262,9 +281,8 @@ public class HeartFragmentPresenter extends BaseObservable {
             btn_try.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    clear();
-                    start();
                     mAlertDialog.dismiss();
+                    startPulseCheck();
                 }
             });
             dialog.setCancelable(false);

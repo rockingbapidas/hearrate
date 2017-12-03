@@ -18,8 +18,9 @@ import java.util.ArrayList;
 public class HistoryAdapter extends RecyclerView.Adapter<HistoryViewHolder> {
     private ArrayList<History> arrayList;
 
-    public HistoryAdapter(ArrayList<History> arrayList) {
+    public void bindData(ArrayList<History> arrayList){
         this.arrayList = arrayList;
+        notifyDataSetChanged();
     }
 
     @Override
