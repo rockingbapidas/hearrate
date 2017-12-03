@@ -3,20 +3,19 @@ package com.vantagecircle.heartrate;
 import android.app.Application;
 import android.content.Context;
 
-import com.vantagecircle.heartrate.component.AppComponent;
-import com.vantagecircle.heartrate.component.DaggerAppComponent;
-import com.vantagecircle.heartrate.component.UserComponent;
-import com.vantagecircle.heartrate.data.UserM;
-import com.vantagecircle.heartrate.module.AppModule;
-import com.vantagecircle.heartrate.module.UserModule;
+import com.crashlytics.android.Crashlytics;
+import com.vantagecircle.heartrate.component.DaggerHeartComponent;
+import com.vantagecircle.heartrate.component.HeartComponent;
+import com.vantagecircle.heartrate.module.HeartModule;
+
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by bapidas on 09/10/17.
  */
 
 public class HeartApplication extends Application {
-    private AppComponent appComponent;
-    private UserComponent userComponent;
+    private HeartComponent heartComponent;
 
     public static HeartApplication get(Context context) {
         return (HeartApplication) context.getApplicationContext();
@@ -25,29 +24,28 @@ public class HeartApplication extends Application {
     @Override
     public void onCreate() {
         super.onCreate();
-        initAppComponent();
+        initHeartComponent();
     }
 
-    private void initAppComponent(){
-        appComponent = DaggerAppComponent.builder()
-                .appModule(new AppModule(this))
-                .build();
+    private void initHeartComponent() {
+        if (heartComponent == null) {
+            heartComponent = DaggerHeartComponent.builder()
+                    .heartModule(new HeartModule(this))
+                    .build();
+        }
+        heartComponent.inject(this);
     }
 
-    public AppComponent getAppComponent() {
-        return appComponent;
+    private void initHeartComponent(String gender, int year) {
+        if (heartComponent == null) {
+            heartComponent = DaggerHeartComponent.builder()
+                    .heartModule(new HeartModule(this, gender, year))
+                    .build();
+        }
+        heartComponent.inject(this);
     }
 
-    public UserComponent createUserComponent(UserM userM) {
-        userComponent = appComponent.plus(new UserModule(userM));
-        return userComponent;
-    }
-
-    public void releaseUserComponent() {
-        userComponent = null;
-    }
-
-    public UserComponent getUserComponent() {
-        return userComponent;
+    public HeartComponent getHeartComponent() {
+        return heartComponent;
     }
 }

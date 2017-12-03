@@ -3,10 +3,11 @@
 buildscript {
     ext.kotlin_version = '1.1.51'
     repositories {
+        google()
         jcenter()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.0.0'
+        classpath 'com.android.tools.build:gradle:3.0.1'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'com.jfrog.bintray.gradle:gradle-bintray-plugin:1.4'
         classpath 'com.github.dcendents:android-maven-gradle-plugin:1.4.1'
@@ -17,8 +18,8 @@ buildscript {
 
 allprojects {
     repositories {
-        jcenter()
         google()
+        jcenter()
     }
 }
 
@@ -26,25 +27,16 @@ task clean(type: Delete) {
     delete rootProject.buildDir
 }
 
-ext{
-    applicationId = "com.vantagecircle.heartrate"
-    keyAlias = "heart"
-    keyPassword = "heartrate"
-    storePassword = "heartrate"
-
+ext {
     compileSdkVersion = 26
-    buildToolsVersion = "26.0.2"
 
-    minSdkVersion = 15
+    minSdkVersion = 16
     targetSdkVersion = 26
-
-    versionCode = 1
-    versionName = "1.0"
 
     supportLibVersion = "26.1.0"
     constraintLayoutVersion = "1.0.2"
 
-    googleVersion = "11.4.2"
+    googleVersion = "11.6.0"
     daggerVersion = "2.8"
     gsonVersion = "2.8.1"
 

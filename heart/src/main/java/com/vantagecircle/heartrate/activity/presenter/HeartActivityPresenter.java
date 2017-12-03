@@ -1,37 +1,16 @@
 package com.vantagecircle.heartrate.activity.presenter;
 
-import android.Manifest;
-import android.content.pm.PackageManager;
-import android.graphics.Typeface;
-import android.os.Build;
-import android.os.CountDownTimer;
-import android.support.annotation.NonNull;
-import android.support.v4.app.ActivityCompat;
-import android.util.Log;
-import android.widget.Toast;
+import android.support.design.widget.TabLayout;
+import android.support.v7.app.AlertDialog;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 
-import com.github.mikephil.charting.charts.LineChart;
-import com.github.mikephil.charting.components.Legend;
-import com.github.mikephil.charting.components.XAxis;
-import com.github.mikephil.charting.components.YAxis;
-import com.github.mikephil.charting.data.LineData;
-import com.github.mikephil.charting.data.LineDataSet;
-import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
-import com.github.mikephil.charting.utils.ColorTemplate;
-import com.github.mikephil.charting.utils.FileUtils;
 import com.vantagecircle.heartrate.R;
 import com.vantagecircle.heartrate.activity.ui.HeartActivity;
-import com.vantagecircle.heartrate.camera.CameraCallBack;
-import com.vantagecircle.heartrate.camera.CameraSupport;
-import com.vantagecircle.heartrate.core.HeartSupport;
-import com.vantagecircle.heartrate.core.PulseListener;
-import com.vantagecircle.heartrate.data.HeartM;
-import com.vantagecircle.heartrate.utils.Constant;
-import com.vantagecircle.heartrate.utils.TYPE;
-import com.vantagecircle.heartrate.utils.ToolsUtils;
-
-import java.util.ArrayList;
-import java.util.concurrent.atomic.AtomicBoolean;
+import com.vantagecircle.heartrate.adapter.PagerAdapter;
+import com.vantagecircle.heartrate.fragment.ui.HeartFragment;
+import com.vantagecircle.heartrate.fragment.ui.HistoryFragment;
 
 /**
  * Created by bapidas on 10/10/17.
@@ -40,93 +19,70 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class HeartActivityPresenter {
     private final String TAG = HeartActivityPresenter.class.getSimpleName();
     private HeartActivity heartActivity;
-    private HeartSupport heartSupport;
-    private HeartM heartM;
+    private PagerAdapter mPagerAdapter;
+    private AlertDialog mAlertDialog;
 
-    public HeartActivityPresenter(HeartActivity heartActivity, HeartSupport heartSupport) {
+    public HeartActivityPresenter(HeartActivity heartActivity) {
         this.heartActivity = heartActivity;
-        this.heartSupport = heartSupport;
     }
 
-    public void askPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (ToolsUtils.getInstance().isHasPermissions(heartActivity,
-                    Manifest.permission.CAMERA)) {
-                Log.d(TAG, "Permission already accepted");
-            } else {
-                ActivityCompat.requestPermissions(heartActivity,
-                        new String[]{Manifest.permission.CAMERA},
-                        Constant.REQUEST_CAMERA_PERMISSION);
-            }
-        } else {
-            Log.d(TAG, "No need permission");
+    public void setup() {
+        initToolBar();
+        initTabPager();
+    }
+
+    private void initToolBar() {
+        heartActivity.setSupportActionBar(heartActivity.mToolBar);
+        heartActivity.mActionBar = heartActivity.getSupportActionBar();
+        if (heartActivity.mActionBar != null) {
+            heartActivity.mActionBar.setTitle("Heart Rate");
+            heartActivity.mActionBar.setDisplayHomeAsUpEnabled(true);
         }
     }
 
-    public void checkPermission(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == Constant.REQUEST_CAMERA_PERMISSION) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                Log.d(TAG, "Permission granted");
-            } else {
-                Log.d(TAG, "Permission not granted");
-                Toast.makeText(heartActivity, "You have to give permission " +
-                        "to access this window", Toast.LENGTH_SHORT).show();
-                heartActivity.finish();
+    private void initTabPager() {
+        mPagerAdapter = new PagerAdapter(heartActivity.getSupportFragmentManager());
+        mPagerAdapter.addFragment(HeartFragment.newInstance(),
+                heartActivity.getResources().getString(R.string.calculate));
+        mPagerAdapter.addFragment(HistoryFragment.newInstance(),
+                heartActivity.getResources().getString(R.string.history));
+        heartActivity.mViewPager.setAdapter(mPagerAdapter);
+        heartActivity.mViewPager.addOnPageChangeListener(new TabLayout
+                .TabLayoutOnPageChangeListener(heartActivity.mTabLayout));
+        heartActivity.mTabLayout.setupWithViewPager(heartActivity.mViewPager);
+        heartActivity.mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                heartActivity.mViewPager.setCurrentItem(tab.getPosition());
+                mPagerAdapter.getItem(tab.getPosition()).onResume();
             }
-        }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                mPagerAdapter.getItem(tab.getPosition()).onPause();
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 
-    public void handleClick() {
-        if (heartM != null && heartM.isStarted()) {
-            heartSupport.stopPulseCheck();
-
-            heartM.setStarted(false);
-            heartActivity.bindHeartRate(heartM);
-        } else {
-            if (heartM != null) {
-                heartM.setStarted(true);
-                heartM.setBeatsPerMinuteValue("-----");
-            } else {
-                heartM = new HeartM();
-                heartM.setStarted(true);
-                heartM.setBeatsPerMinuteValue("-----");
-            }
-            heartActivity.bindHeartRate(heartM);
-
-            start();
+    public void showHintDialog() {
+        if (mAlertDialog == null || !mAlertDialog.isShowing()) {
+            AlertDialog.Builder dialog = new AlertDialog.Builder(heartActivity);
+            View mView = LayoutInflater.from(heartActivity).inflate(R.layout.hint_diaog, null);
+            Button btnOk = mView.findViewById(R.id.btnOk);
+            btnOk.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    mAlertDialog.dismiss();
+                }
+            });
+            dialog.setView(mView);
+            mAlertDialog = dialog.create();
+            mAlertDialog.show();
         }
-    }
-
-    private void start() {
-        heartSupport.setPulseTimeLimit(20000, 1000)
-                .startPulseCheck(new PulseListener() {
-                    @Override
-                    public void OnPulseDetected(int success) {
-                        Log.e(TAG, "OnPulseDetected == " + success);
-                        heartM.setDetectHeartRate(true);
-                        heartActivity.bindHeartRate(heartM);
-                    }
-
-                    @Override
-                    public void OnPulseDetectFailed(int failed) {
-                        Log.e(TAG, "OnPulseDetectFailed == " + failed);
-                        heartM.setDetectHeartRate(false);
-                        heartActivity.bindHeartRate(heartM);
-                    }
-
-                    @Override
-                    public void OnPulseResult(String pulse) {
-                        Log.e(TAG, "OnPulseResult == " + pulse);
-                        heartM.setBeatsPerMinuteValue(pulse);
-                        heartActivity.bindHeartRate(heartM);
-                    }
-
-                    @Override
-                    public void OnPulseCheckStop() {
-                        Log.e(TAG, "OnPulseCheckStop == ");
-                        heartM.setStarted(false);
-                        heartActivity.bindHeartRate(heartM);
-                    }
-                });
     }
 }
