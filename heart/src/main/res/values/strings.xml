@@ -12,7 +12,7 @@
     <string name="BPM">BPM</string>
     <string name="ok_">OKay</string>
     <string name="measure_title">Measure your Heart Rate</string>
-    <string name="measure_hint">Lightly place your index finger over the camera lens on back of your phone. Make sure the lens and flash are fully covered.</string>
+    <string name="measure_hint">Lightly place your index finger over the camera lens on back of your phone. Make sure the camera lens are fully covered.</string>
     <string name="image">image</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
@@ -22,4 +22,5 @@
     <string name="failed">Failed</string>
     <string name="action_help">Help</string>
     <string name="check_your_heart_rate">Check your heart rate</string>
+    <string name="no_saved_heart_rate_found_yet">No Saved heart rate found yet</string>
 </resources>

@@ -30,7 +30,7 @@
                 android:layout_height="280dp"
                 android:layout_centerInParent="true"
                 android:max="200"
-                app:setProgressAnimation="@{true}" />
+                app:setProgressAnimation="@{heartPresenter.heartViewListener}" />
 
             <LinearLayout
                 android:layout_width="wrap_content"
@@ -63,8 +63,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:gravity="center"
-                    android:orientation="horizontal"
-                    tools:ignore="UseCompoundDrawables">
+                    android:orientation="horizontal">
 
                     <RelativeLayout
                         android:layout_width="wrap_content"
@@ -75,7 +74,7 @@
                             android:layout_width="15dp"
                             android:layout_height="15dp"
                             android:layout_centerInParent="true"
-                            app:setSurfaceHolder="@{true}"/>
+                            app:setSurfaceHolder="@{heartPresenter.heartViewListener}"/>
 
                         <ImageView
                             android:id="@+id/heartStatus"
@@ -91,6 +90,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginLeft="10dp"
+                        android:layout_marginStart="10dp"
                         android:text="@string/bpm"
                         android:textColor="@color/grey"
                         android:textSize="18sp" />
