@@ -25,17 +25,12 @@ task clean(type: Delete) {
 
 ext {
     compileSdkVersion = 26
-
     minSdkVersion = 16
     targetSdkVersion = 26
-
     supportLibVersion = "26.1.0"
     constraintLayoutVersion = "1.0.2"
-
     googleVersion = "11.6.2"
     daggerVersion = "2.8"
     gsonVersion = "2.8.1"
-
-    butterKnifeVersion = "8.8.1"
     mockitoVersion = "2.7.22"
 }

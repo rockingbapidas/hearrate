@@ -33,7 +33,7 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <activity
-            android:name=".activity.ui.HeartActivity"
+            android:name=".activity.ui.MainActivity"
             android:screenOrientation="portrait" />
     </application>
 
