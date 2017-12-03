@@ -11,7 +11,6 @@ import android.graphics.Color;
 import android.os.Vibrator;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.SurfaceView;
 import android.view.View;
@@ -32,8 +31,6 @@ import com.vantagecircle.heartrate.model.History;
 import com.vantagecircle.heartrate.utils.ToolsUtils;
 
 import java.util.Calendar;
-
-import javax.inject.Inject;
 
 /**
  * Created by bapidas on 08/11/17.
@@ -117,10 +114,11 @@ public class HeartFragmentPresenter extends BaseObservable {
     }
 
     private void start() {
+        setStarted(true);
         mPulseSupport.setMeasurementTime(mMeasurementTime).startMeasure().addOnPulseListener(new PulseListener() {
             @Override
             public void OnPulseCheckStarted() {
-                resume();
+                clear();
                 mVibrate.vibrate(50);
                 mObjectAnimator.setValues(PropertyValuesHolder.ofInt("progress", 0, 200));
                 mObjectAnimator.setDuration((long) mMeasurementTime * 1000);
@@ -169,8 +167,8 @@ public class HeartFragmentPresenter extends BaseObservable {
     }
 
     public void stop() {
-        mPulseSupport.stopMeasure();
         setStarted(false);
+        mPulseSupport.stopMeasure();
     }
 
     public void initialize(Heart mHeart) {
@@ -204,14 +202,14 @@ public class HeartFragmentPresenter extends BaseObservable {
         String date = ToolsUtils.getInstance().getDate(timeStamp);
         String time = ToolsUtils.getInstance().getTime(timeStamp);
         if (mDataManager.insertHistory(new History(getBeatsPerMinute(), date, time))) {
-            resume();
+            clear();
             mAlertDialog.dismiss();
         } else {
             Toast.makeText(mContext, "Heart rate not saved", Toast.LENGTH_SHORT).show();
         }
     }
 
-    private void resume() {
+    private void clear() {
         setBeatsPerMinute("000");
         setHeartColor(ContextCompat.getColor(mContext, R.color.white));
         mProgressBar.setProgress(0);
@@ -229,7 +227,7 @@ public class HeartFragmentPresenter extends BaseObservable {
             btnCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    resume();
+                    clear();
                     mAlertDialog.dismiss();
                 }
             });
@@ -256,7 +254,7 @@ public class HeartFragmentPresenter extends BaseObservable {
             btnCancel.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    resume();
+                    clear();
                     mAlertDialog.dismiss();
                 }
             });
@@ -264,7 +262,7 @@ public class HeartFragmentPresenter extends BaseObservable {
             btn_try.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    resume();
+                    clear();
                     start();
                     mAlertDialog.dismiss();
                 }
