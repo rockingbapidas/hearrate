@@ -1,7 +1,7 @@
 package com.vantagecircle.heartrate.component;
 
+import com.vantagecircle.heartrate.activity.ui.MainActivity;
 import com.vantagecircle.heartrate.module.ActivityModule;
-import com.vantagecircle.heartrate.activity.ui.HeartActivity;
 import com.vantagecircle.heartrate.activity.ui.WelcomeActivity;
 import com.vantagecircle.heartrate.annotation.PerActivity;
 
@@ -14,5 +14,5 @@ import dagger.Component;
 @Component(dependencies = HeartComponent.class, modules = ActivityModule.class)
 public interface ActivityComponent {
     void inject(WelcomeActivity welcomeActivity);
-    void inject(HeartActivity heartActivity);
+    void inject(MainActivity mainActivity);
 }

@@ -2,14 +2,11 @@ package com.vantagecircle.heartrate.activity.ui;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.databinding.DataBindingUtil;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
-import android.support.design.widget.TabLayout;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
@@ -17,36 +14,24 @@ import android.widget.Toast;
 import com.vantagecircle.heartrate.HeartApplication;
 import com.vantagecircle.heartrate.R;
 import com.vantagecircle.heartrate.activity.BaseActivity;
-import com.vantagecircle.heartrate.activity.presenter.HeartActivityPresenter;
+import com.vantagecircle.heartrate.activity.presenter.MainActivityPresenter;
 import com.vantagecircle.heartrate.component.ActivityComponent;
 import com.vantagecircle.heartrate.component.DaggerActivityComponent;
+import com.vantagecircle.heartrate.databinding.MainActivityBinding;
 import com.vantagecircle.heartrate.module.ActivityModule;
 import com.vantagecircle.heartrate.utils.Constant;
 import com.vantagecircle.heartrate.utils.ToolsUtils;
 
-import butterknife.BindView;
-import butterknife.ButterKnife;
-import butterknife.Unbinder;
-
-public class HeartActivity extends BaseActivity {
-    private final String TAG = HeartActivity.class.getSimpleName();
-    @BindView(R.id.tabLayout)
-    public TabLayout mTabLayout;
-    @BindView(R.id.viewpager)
-    public ViewPager mViewPager;
-    @BindView(R.id.toolbar)
-    public Toolbar mToolBar;
-
-    public ActionBar mActionBar;
-    private Unbinder mUnBinder;
+public class MainActivity extends BaseActivity {
+    private final String TAG = MainActivity.class.getSimpleName();
     private ActivityComponent mActivityComponent;
-    private HeartActivityPresenter mHeartActivityPresenter;
+    private MainActivityBinding mMainActivityBinding;
+    private MainActivityPresenter mMainActivityPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.main_activity);
-        mUnBinder = ButterKnife.bind(this);
+        mMainActivityBinding = DataBindingUtil.setContentView(this, R.layout.main_activity);
         askPermission();
     }
 
@@ -63,8 +48,9 @@ public class HeartActivity extends BaseActivity {
 
     @Override
     protected void init() {
-        mHeartActivityPresenter = new HeartActivityPresenter(this);
-        mHeartActivityPresenter.setup();
+        mMainActivityPresenter = new MainActivityPresenter(this);
+        mMainActivityBinding.setMainActivityPresenter(mMainActivityPresenter);
+        mMainActivityPresenter.init();
     }
 
     @Override
@@ -78,15 +64,18 @@ public class HeartActivity extends BaseActivity {
         if (item.getItemId() == android.R.id.home) {
             finish();
         } else if(item.getItemId() == R.id.action_help){
-            mHeartActivityPresenter.showHintDialog();
+            mMainActivityPresenter.showHintDialog();
         }
         return super.onOptionsItemSelected(item);
     }
 
     private void askPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            if (!ToolsUtils.getInstance().isHasPermissions(this, Manifest.permission.CAMERA, Manifest.permission.BODY_SENSORS, Manifest.permission.WAKE_LOCK, Manifest.permission.VIBRATE)) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.BODY_SENSORS, Manifest.permission.WAKE_LOCK, Manifest.permission.VIBRATE}, Constant.REQUEST_ALL_PERMISSION);
+            if (!ToolsUtils.getInstance().isHasPermissions(this, Manifest.permission.CAMERA,
+                    Manifest.permission.BODY_SENSORS, Manifest.permission.WAKE_LOCK, Manifest.permission.VIBRATE)) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA,
+                        Manifest.permission.BODY_SENSORS, Manifest.permission.WAKE_LOCK, Manifest.permission.VIBRATE},
+                        Constant.REQUEST_ALL_PERMISSION);
             } else {
                 init();
             }
@@ -110,11 +99,5 @@ public class HeartActivity extends BaseActivity {
                 init();
             }
         }
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        mUnBinder.unbind();
     }
 }

@@ -1,7 +1,6 @@
 // Top-level build file where you can add configuration options common to all sub-projects/modules.
 
 buildscript {
-    ext.kotlin_version = '1.1.51'
     repositories {
         google()
         jcenter()
@@ -9,7 +8,6 @@ buildscript {
     }
     dependencies {
         classpath 'com.android.tools.build:gradle:3.0.1'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
         classpath 'io.fabric.tools:gradle:1.22.2'
         // NOTE: Do not place your application dependencies here; they belong
         // in the individual module build.gradle files
@@ -29,17 +27,12 @@ task clean(type: Delete) {
 
 ext {
     compileSdkVersion = 26
-
     minSdkVersion = 16
     targetSdkVersion = 26
-
     supportLibVersion = "26.1.0"
     constraintLayoutVersion = "1.0.2"
-
-    googleVersion = "11.6.0"
+    googleVersion = "11.6.2"
     daggerVersion = "2.8"
     gsonVersion = "2.8.1"
-
-    butterKnifeVersion = "8.8.1"
     mockitoVersion = "2.7.22"
 }

@@ -43,7 +43,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activity.ui.HeartActivity"
+            android:name=".activity.ui.MainActivity"
             android:screenOrientation="portrait" />
 
         <meta-data
