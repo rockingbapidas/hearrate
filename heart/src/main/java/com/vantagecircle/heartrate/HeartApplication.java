@@ -14,38 +14,44 @@ import io.fabric.sdk.android.Fabric;
  * Created by bapidas on 09/10/17.
  */
 
-public class HeartApplication extends Application {
-    private HeartComponent heartComponent;
+public class HeartApplication {
+    private static HeartApplication mInstance;
+    private HeartComponent mHeartComponent;
+
+    public static HeartApplication getInstance() {
+        if (mInstance == null) {
+            synchronized (HeartApplication.class) {
+                if (mInstance == null) {
+                    mInstance = new HeartApplication();
+                }
+            }
+        }
+        return mInstance;
+    }
 
     public static HeartApplication get(Context context) {
-        return (HeartApplication) context.getApplicationContext();
+        return mInstance;
     }
 
-    @Override
-    public void onCreate() {
-        super.onCreate();
-        initHeartComponent();
-    }
-
-    private void initHeartComponent() {
-        if (heartComponent == null) {
-            heartComponent = DaggerHeartComponent.builder()
-                    .heartModule(new HeartModule(this))
+    public void initHeartComponent(Application mApplication) {
+        if (mHeartComponent == null) {
+            mHeartComponent = DaggerHeartComponent.builder()
+                    .heartModule(new HeartModule(mApplication))
                     .build();
         }
-        heartComponent.inject(this);
+        mHeartComponent.inject(this);
     }
 
-    private void initHeartComponent(String gender, int year) {
-        if (heartComponent == null) {
-            heartComponent = DaggerHeartComponent.builder()
-                    .heartModule(new HeartModule(this, gender, year))
+    public void initHeartComponent(Application mApplication, String gender, int year) {
+        if (mHeartComponent == null) {
+            mHeartComponent = DaggerHeartComponent.builder()
+                    .heartModule(new HeartModule(mApplication, gender, year))
                     .build();
         }
-        heartComponent.inject(this);
+        mHeartComponent.inject(this);
     }
 
     public HeartComponent getHeartComponent() {
-        return heartComponent;
+        return mHeartComponent;
     }
 }
