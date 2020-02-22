@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HeartRate.iml" filepath="$PROJECT_DIR$/HeartRate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/hearrate.iml" filepath="$PROJECT_DIR$/hearrate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/heart/hearrate-heart.iml" filepath="$PROJECT_DIR$/heart/hearrate-heart.iml" />
       <module fileurl="file://$PROJECT_DIR$/heart/heart.iml" filepath="$PROJECT_DIR$/heart/heart.iml" />
     </modules>
   </component>

@@ -1,13 +1,9 @@
 package com.vantagecircle.heartrate.fragment.presenter;
 
 import android.animation.ObjectAnimator;
+import android.app.AlertDialog;
 import android.content.Context;
-import android.databinding.BaseObservable;
-import android.databinding.Bindable;
-import android.databinding.BindingAdapter;
 import android.os.Handler;
-import android.support.v7.app.AlertDialog;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.animation.LinearInterpolator;
@@ -16,6 +12,10 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.databinding.BaseObservable;
+import androidx.databinding.Bindable;
+import androidx.databinding.BindingAdapter;
+
 import com.vantagecircle.heartrate.BR;
 import com.vantagecircle.heartrate.R;
 import com.vantagecircle.heartrate.core.HeartSupport;
@@ -23,7 +23,6 @@ import com.vantagecircle.heartrate.core.PulseListener;
 import com.vantagecircle.heartrate.core.TimerListener;
 import com.vantagecircle.heartrate.data.DataManager;
 import com.vantagecircle.heartrate.model.HistoryModel;
-import com.vantagecircle.heartrate.utils.ProgressAnimation;
 import com.vantagecircle.heartrate.utils.ToolsUtils;
 
 /**

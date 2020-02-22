@@ -6,5 +6,6 @@ package com.vantagecircle.heartrate.core;
 
 public interface FingerListener {
     void OnFingerDetected(int success);
+
     void OnFingerDetectFailed(int failed);
 }

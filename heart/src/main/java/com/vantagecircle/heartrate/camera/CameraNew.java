@@ -17,11 +17,12 @@ import android.os.Build;
 import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.PowerManager;
-import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
 import android.util.Log;
 import android.view.Surface;
+
+import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
+import androidx.core.app.ActivityCompat;
 
 import com.vantagecircle.heartrate.processing.ProcessingSupport;
 
@@ -58,7 +59,7 @@ public class CameraNew implements CameraSupport {
         this.processingSupport = processingSupport;
         PowerManager powerManager = (PowerManager) mActivity.getSystemService(Context.POWER_SERVICE);
         if (powerManager != null) {
-            this.mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
+            this.mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen " + System.currentTimeMillis());
         }
     }
 

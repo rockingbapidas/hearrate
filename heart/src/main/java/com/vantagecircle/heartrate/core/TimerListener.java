@@ -6,6 +6,8 @@ package com.vantagecircle.heartrate.core;
 
 public interface TimerListener {
     void OnTimerStarted();
+
     void OnTimerRunning(long milliSecond);
+
     void OnTimerStopped();
 }

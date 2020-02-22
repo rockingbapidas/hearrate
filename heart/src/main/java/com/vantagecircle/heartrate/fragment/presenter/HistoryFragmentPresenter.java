@@ -1,9 +1,9 @@
 package com.vantagecircle.heartrate.fragment.presenter;
 
 import android.content.Context;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
+
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.vantagecircle.heartrate.adapter.HistoryAdapter;
 import com.vantagecircle.heartrate.data.DataManager;

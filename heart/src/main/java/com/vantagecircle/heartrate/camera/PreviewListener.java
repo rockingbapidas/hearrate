@@ -6,5 +6,6 @@ package com.vantagecircle.heartrate.camera;
 
 public interface PreviewListener {
     void OnPreviewData(byte[] data);
+
     void OnPreviewCount(int count);
 }

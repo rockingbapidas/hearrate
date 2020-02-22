@@ -2,7 +2,9 @@ package com.vantagecircle.heartrate.processing;
 
 import android.media.Image;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
+
+import androidx.annotation.RequiresApi;
+
 import java.nio.ByteBuffer;
 
 public class Processing implements ProcessingSupport {

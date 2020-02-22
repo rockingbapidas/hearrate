@@ -6,7 +6,10 @@ package com.vantagecircle.heartrate.camera;
 
 public interface CameraSupport {
     CameraSupport open();
+
     void close();
+
     boolean isCameraInUse();
+
     void addOnPreviewListener(PreviewListener callBack);
 }

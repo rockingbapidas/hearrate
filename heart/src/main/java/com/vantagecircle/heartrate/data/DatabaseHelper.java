@@ -5,6 +5,9 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.os.Build;
+
+import androidx.annotation.RequiresApi;
 
 import com.vantagecircle.heartrate.model.HistoryModel;
 import com.vantagecircle.heartrate.annotation.ApplicationContext;
@@ -37,12 +40,11 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         onCreate(db);
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     ArrayList<HistoryModel> getHistory() {
         ArrayList<HistoryModel> arrayList = new ArrayList<>();
-        Cursor cursor = null;
         String query = DataModel.GET_HISTORY_QUERY + " ORDER BY " + DataModel.COLUMN_ID + " DESC";
-        try {
-            cursor = getReadableDatabase().rawQuery(query, null);
+        try (Cursor cursor = getReadableDatabase().rawQuery(query, null)) {
             if (cursor != null) {
                 cursor.moveToFirst();
                 while (!cursor.isAfterLast()) {
@@ -56,19 +58,15 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (cursor != null)
-                cursor.close();
         }
         return arrayList;
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     ArrayList<HistoryModel> getHistory(int limit) {
         ArrayList<HistoryModel> arrayList = new ArrayList<>();
-        Cursor cursor = null;
         String query = DataModel.GET_HISTORY_QUERY + " ORDER BY " + DataModel.COLUMN_ID + " DESC " + "LIMIT " + limit;
-        try {
-            cursor = getReadableDatabase().rawQuery(query, null);
+        try (Cursor cursor = getReadableDatabase().rawQuery(query, null)) {
             if (cursor != null) {
                 cursor.moveToFirst();
                 while (!cursor.isAfterLast()) {
@@ -82,9 +80,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
             }
         } catch (Exception e) {
             e.printStackTrace();
-        } finally {
-            if (cursor != null)
-                cursor.close();
         }
         return arrayList;
     }

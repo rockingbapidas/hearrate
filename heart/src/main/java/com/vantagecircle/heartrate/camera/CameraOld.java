@@ -33,7 +33,7 @@ public class CameraOld implements CameraSupport {
         this.mActivity = mActivity;
         PowerManager powerManager = (PowerManager) mActivity.getSystemService(Context.POWER_SERVICE);
         if (powerManager != null) {
-            this.mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen");
+            this.mWakeLock = powerManager.newWakeLock(PowerManager.FULL_WAKE_LOCK, "DoNotDimScreen " + System.currentTimeMillis());
         }
         this.mProcessingSupport = mProcessingSupport;
     }
@@ -174,9 +174,7 @@ public class CameraOld implements CameraSupport {
             if (this.mSurfaceTexture != null) {
                 try {
                     Method method = this.mSurfaceTexture.getClass().getMethod("release");
-                    if (method != null) {
-                        method.invoke(this.mSurfaceTexture);
-                    }
+                    method.invoke(this.mSurfaceTexture);
                 } catch (Throwable th) {
                     throw new RuntimeException("Interrupted while trying " +
                             "to get surface method.", th.getCause());
