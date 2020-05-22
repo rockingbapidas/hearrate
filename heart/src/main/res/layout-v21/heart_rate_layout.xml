@@ -9,7 +9,7 @@
 
         <variable
             name="heartPresenter"
-            type="com.vantagecircle.heartrate.fragment.presenter.HeartFragmentPresenter" />
+            type="com.bapidas.heartrate.ui.fragment.presenter.HeartFragmentPresenter" />
     </data>
 
     <LinearLayout

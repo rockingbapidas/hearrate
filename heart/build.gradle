@@ -2,30 +2,31 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'io.fabric'
 
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
     defaultConfig {
-        applicationId "com.vantagecircle.heartrate"
-
+        applicationId "com.bapidas.heartrate"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-
         versionCode 1
         versionName "1.0"
-
         multiDexEnabled true
-
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     signingConfigs {
+        debug {
+            keyAlias "heart"
+            keyPassword "123456789"
+            storePassword "123456789"
+            storeFile file('heart_rate_debug_key.jks')
+        }
         release {
             keyAlias "heart"
             keyPassword "heartrate"
             storePassword "heartrate"
-            storeFile file('/Users/bapidas/AndroidStudioProjects/HeartRate/heart_rate_key.jks')
+            storeFile file('heart_rate_key.jks')
         }
     }
     buildTypes {
@@ -33,6 +34,7 @@ android {
             minifyEnabled false
             shrinkResources false
             debuggable true
+            signingConfig signingConfigs.release
         }
         release {
             minifyEnabled true
@@ -46,49 +48,30 @@ android {
     }
 }
 
-repositories {
-    maven { url "https://jitpack.io" }
-}
-
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8:$kotlin_version"
     implementation "org.jetbrains.kotlin:kotlin-reflect:$kotlin_version"
-    implementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.0'
 
     implementation 'androidx.core:core-ktx:1.2.0'
     implementation 'androidx.appcompat:appcompat:1.1.0'
     implementation 'androidx.multidex:multidex:2.0.1'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
-    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
-
     implementation 'com.google.android.material:material:1.1.0'
 
     implementation "com.google.code.gson:gson:${rootProject.ext.gsonVersion}"
 
-    implementation 'com.google.code.gson:gson:2.8.6'
     implementation 'com.google.dagger:dagger:2.26'
-    implementation 'com.google.dagger:dagger-android:2.26'
-    implementation 'com.google.dagger:dagger-android-support:2.26'
     kapt 'com.google.dagger:dagger-compiler:2.26'
-    kapt 'com.google.dagger:dagger-android-processor:2.26'
-    kapt 'com.squareup.inject:assisted-inject-processor-dagger2:0.5.2'
-    compileOnly 'javax.annotation:jsr250-api:1.0'
-    compileOnly 'com.squareup.inject:assisted-inject-annotations-dagger2:0.5.2'
-
-    implementation "com.google.android.gms:play-services-auth:${rootProject.ext.googleVersion}"
-    implementation('com.crashlytics.sdk.android:crashlytics:2.10.1@aar') { transitive = true }
 
     implementation 'com.balysv:material-ripple:1.0.2'
 
-
     //all test compile dependency
     testImplementation "junit:junit:4.13"
-    testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoVersion}"
+    testImplementation "org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version"
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
 
+    testImplementation "org.mockito:mockito-core:${rootProject.ext.mockitoVersion}"
     androidTestImplementation "org.mockito:mockito-android:${rootProject.ext.mockitoVersion}"
-    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
 }

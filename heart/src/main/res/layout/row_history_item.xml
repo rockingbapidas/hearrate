@@ -5,11 +5,11 @@
 
     <data>
 
-        <import type="com.vantagecircle.heartrate.model.HistoryModel" />
+        <import type="com.bapidas.heartrate.data.model.HistoryModel" />
 
         <variable
             name="history"
-            type="com.vantagecircle.heartrate.model.HistoryModel" />
+            type="com.bapidas.heartrate.data.model.HistoryModel" />
     </data>
 
     <androidx.cardview.widget.CardView
@@ -30,7 +30,6 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginLeft="5dp"
                 android:layout_marginStart="5dp"
                 android:layout_weight="1"
                 android:gravity="start|center"
@@ -45,7 +44,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
                     android:layout_marginStart="10dp"
                     android:text="@{history.heartRate}"
                     android:textColor="@android:color/black"
@@ -55,7 +53,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
                     android:layout_marginStart="10dp"
                     android:text="@string/BPM"
                     android:textColor="@android:color/black"
@@ -67,7 +64,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="8dp"
-                android:layout_marginRight="8dp"
                 android:layout_weight="1"
                 android:gravity="end|center"
                 android:orientation="vertical">
@@ -75,7 +71,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
                     android:layout_marginStart="10dp"
                     android:text="@{history.dateString}"
                     android:textColor="@android:color/black"
@@ -85,7 +80,6 @@
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
                     android:layout_marginStart="10dp"
                     android:text="@{history.timeString}"
                     android:textColor="@android:color/black"

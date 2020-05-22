@@ -48,7 +48,6 @@
                 android:textColor="@color/black"
                 android:textSize="18sp"
                 android:layout_marginStart="10dp"
-                android:layout_marginLeft="10dp"
                 android:textStyle="normal" />
 
         </LinearLayout>
