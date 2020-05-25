@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/your_heart_rate"
+            android:textColor="@android:color/black"
+            android:textSize="22sp"
+            android:textStyle="normal"
+            android:layout_marginTop="20dp"/>
+
+        <TextView
+            android:id="@+id/txtheart"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/default_bpm"
+            android:textColor="@color/black"
+            android:textSize="38sp"
+            android:textStyle="bold" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <ImageView
+                android:layout_width="30dp"
+                android:layout_height="30dp"
+                android:contentDescription="@string/image"
+                android:src="@drawable/hearts" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/bpm"
+                android:textColor="@color/black"
+                android:textSize="18sp"
+                android:layout_marginStart="10dp"
+                android:textStyle="normal" />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="54dp"
+        android:layout_marginTop="25dp"
+        android:orientation="horizontal"
+        android:baselineAligned="false">
+
+        <com.balysv.materialripple.MaterialRippleLayout
+            style="@style/RippleStyle.White"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5">
+
+            <Button
+                android:id="@+id/btn_cancel"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5"
+                android:background="@color/white90"
+                android:text="@string/cancel"
+                android:textColor="@color/black"
+                android:textSize="18sp" />
+        </com.balysv.materialripple.MaterialRippleLayout>
+
+        <com.balysv.materialripple.MaterialRippleLayout
+            style="@style/RippleStyle.White"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="0.5">
+
+            <Button
+                android:id="@+id/btn_save"
+                style="?android:attr/buttonBarButtonStyle"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:layout_weight="0.5"
+                android:background="@color/orange"
+                android:text="@string/save"
+                android:textColor="@color/white"
+                android:textSize="18sp" />
+
+        </com.balysv.materialripple.MaterialRippleLayout>
+
+    </LinearLayout>
+
+</LinearLayout>

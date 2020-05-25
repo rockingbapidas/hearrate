@@ -3,9 +3,9 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/HeartRate.iml" filepath="$PROJECT_DIR$/HeartRate.iml" />
+      <module fileurl="file://$PROJECT_DIR$/app/app.iml" filepath="$PROJECT_DIR$/app/app.iml" group="hearrate/app" />
       <module fileurl="file://$PROJECT_DIR$/hearrate.iml" filepath="$PROJECT_DIR$/hearrate.iml" group="hearrate" />
-      <module fileurl="file://$PROJECT_DIR$/heart/hearrate-heart.iml" filepath="$PROJECT_DIR$/heart/hearrate-heart.iml" />
-      <module fileurl="file://$PROJECT_DIR$/heart/heart.iml" filepath="$PROJECT_DIR$/heart/heart.iml" group="hearrate/heart" />
+      <module fileurl="file://$PROJECT_DIR$/app/hearrate-heart.iml" filepath="$PROJECT_DIR$/app/hearrate-heart.iml" />
     </modules>
   </component>
 </project>
