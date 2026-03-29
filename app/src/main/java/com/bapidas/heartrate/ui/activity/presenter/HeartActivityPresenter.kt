@@ -21,7 +21,7 @@ class HeartActivityPresenter(private val heartActivity: HeartActivity) {
     }
 
     private fun initToolBar() {
-        heartActivity.setSupportActionBar(heartActivity.mBinding.toolbar)
+        heartActivity.mBinding?.toolbar?.let { heartActivity.setSupportActionBar(it) }
         heartActivity.mActionBar = heartActivity.supportActionBar
         if (heartActivity.mActionBar != null) {
             heartActivity.mActionBar?.title = "Heart Rate"
@@ -40,16 +40,18 @@ class HeartActivityPresenter(private val heartActivity: HeartActivity) {
             HistoryFragment.newInstance(),
             heartActivity.resources.getString(R.string.history)
         )
-        heartActivity.mBinding.viewpager.adapter = mPagerAdapter
-        heartActivity.mBinding.viewpager.addOnPageChangeListener(
-            TabLayoutOnPageChangeListener(
-                heartActivity.mBinding.tabLayout
+        heartActivity.mBinding?.viewpager?.adapter = mPagerAdapter
+        heartActivity.mBinding?.viewpager?.let {
+            it.addOnPageChangeListener(
+                TabLayoutOnPageChangeListener(
+                    heartActivity.mBinding?.tabLayout
+                )
             )
-        )
-        heartActivity.mBinding.tabLayout.setupWithViewPager(heartActivity.mBinding.viewpager)
-        heartActivity.mBinding.tabLayout.addOnTabSelectedListener(object : OnTabSelectedListener {
+        }
+        heartActivity.mBinding?.tabLayout?.setupWithViewPager(heartActivity.mBinding?.viewpager)
+        heartActivity.mBinding?.tabLayout?.addOnTabSelectedListener(object : OnTabSelectedListener {
             override fun onTabSelected(tab: TabLayout.Tab) {
-                heartActivity.mBinding.viewpager.currentItem = tab.position
+                heartActivity.mBinding?.viewpager?.currentItem = tab.position
                 mPagerAdapter?.getItem(tab.position)?.onResume()
             }
 

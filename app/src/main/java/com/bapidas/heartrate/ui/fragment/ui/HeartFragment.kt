@@ -38,7 +38,7 @@ class HeartFragment : BaseFragment() {
             inflater, R.layout.heart_rate_layout,
             container, false
         )
-        return mHeartRateLayoutBinding.root
+        return mHeartRateLayoutBinding?.root
     }
 
     override fun onViewCreated(
@@ -64,7 +64,7 @@ class HeartFragment : BaseFragment() {
             activity,
             heartRate.heartSupport, mDataManager
         )
-        mHeartRateLayoutBinding.heartPresenter = mHeartFragmentPresenter
+        mHeartRateLayoutBinding?.heartPresenter = mHeartFragmentPresenter
     }
 
     companion object {

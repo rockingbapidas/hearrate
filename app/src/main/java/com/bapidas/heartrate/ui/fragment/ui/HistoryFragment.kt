@@ -44,7 +44,7 @@ class HistoryFragment : BaseFragment() {
             inflater, R.layout.history_layout,
             container, false
         )
-        return mUnBinder.root
+        return mUnBinder?.root
     }
 
     override fun onViewCreated(
@@ -57,7 +57,7 @@ class HistoryFragment : BaseFragment() {
 
     override fun init() {
         mHistoryFragmentPresenter = HistoryFragmentPresenter(
-            activity, mDataManager, mUnBinder.recyclerView
+            activity, mDataManager, mUnBinder?.recyclerView
         )
         mHistoryFragmentPresenter?.initialize()
     }
