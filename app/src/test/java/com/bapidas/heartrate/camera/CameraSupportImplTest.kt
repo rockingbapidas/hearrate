@@ -8,6 +8,8 @@ import org.junit.Test
 import org.mockito.Mock
 import org.mockito.Mockito.`when`
 import org.mockito.MockitoAnnotations
+import org.mockito.ArgumentMatchers.anyInt
+import org.mockito.ArgumentMatchers.anyString
 
 class CameraSupportImplTest {
 
@@ -27,9 +29,6 @@ class CameraSupportImplTest {
         `when`(powerManager.newWakeLock(anyInt(), anyString())).thenReturn(wakeLock)
         cameraSupportImpl = CameraSupportImpl(context)
     }
-
-    private fun anyInt() = org.mockito.ArgumentMatchers.anyInt()
-    private fun anyString() = org.mockito.ArgumentMatchers.anyString()
 
     @Test
     fun `isCameraInUse returns false initially`() {

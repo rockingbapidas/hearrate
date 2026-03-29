@@ -1,6 +1,5 @@
 package com.bapidas.heartrate.ui.fragment.viewmodel
 
-import app.cash.turbine.test
 import com.bapidas.heartrate.core.HeartSupport
 import com.bapidas.heartrate.core.PulseListener
 import com.bapidas.heartrate.core.TimerListener
@@ -22,7 +21,6 @@ import org.mockito.Mockito.verify
 import org.mockito.MockitoAnnotations
 import org.mockito.kotlin.any
 import org.mockito.kotlin.argumentCaptor
-import org.mockito.kotlin.times
 
 @ExperimentalCoroutinesApi
 class HeartViewModelTest {
@@ -58,15 +56,23 @@ class HeartViewModelTest {
 
     @Test
     fun `startMeasurement calls heartSupport startPulseCheck when not started`() = runTest {
+        val timerCaptor = argumentCaptor<TimerListener>()
         viewModel.startMeasurement()
+        verify(heartSupport).addOnTimerListener(timerCaptor.capture())
+        
+        timerCaptor.firstValue.onTimerStarted()
+        
         verify(heartSupport).startPulseCheck(anyLong())
         assertEquals(true, viewModel.isStarted.value)
     }
 
     @Test
     fun `startMeasurement stops pulse check when already started`() = runTest {
+        val timerCaptor = argumentCaptor<TimerListener>()
         // First start
         viewModel.startMeasurement()
+        verify(heartSupport).addOnTimerListener(timerCaptor.capture())
+        timerCaptor.firstValue.onTimerStarted()
         assertEquals(true, viewModel.isStarted.value)
         
         // Then toggle off

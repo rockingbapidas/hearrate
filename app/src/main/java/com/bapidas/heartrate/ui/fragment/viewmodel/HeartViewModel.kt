@@ -65,11 +65,12 @@ class HeartViewModel @Inject constructor(
             override fun onTimerStopped() {
                 _progress.value = 100
                 _isStarted.value = false
-                val value = _beatsPerMinute.value.toIntOrNull() ?: 0
+                val bpmString = _beatsPerMinute.value
+                val value = bpmString.toIntOrNull() ?: 0
                 if (value == 0 || value < 50) {
                     _measurementResult.value = MeasurementResult.Error
                 } else {
-                    _measurementResult.value = MeasurementResult.Success(value.toString())
+                    _measurementResult.value = MeasurementResult.Success(bpmString)
                 }
             }
         }).startPulseCheck(timeLimit)

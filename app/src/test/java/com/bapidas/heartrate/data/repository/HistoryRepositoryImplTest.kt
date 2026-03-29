@@ -3,7 +3,7 @@ package com.bapidas.heartrate.data.repository
 import com.bapidas.heartrate.data.local.HistoryDao
 import com.bapidas.heartrate.data.model.HistoryModel
 import kotlinx.coroutines.flow.flowOf
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
 import org.junit.Test
@@ -26,32 +26,38 @@ class HistoryRepositoryImplTest {
     }
 
     @Test
-    fun `getAllHistory calls dao and returns flow`() = runBlocking {
-        val historyList = listOf(HistoryModel(1, "75", "01/01/2021", "12:00 PM"))
-        `when`(historyDao.getAllHistory()).thenReturn(flowOf(historyList))
+    fun getAllHistory_calls_dao_and_returns_flow() {
+        runTest {
+            val historyList = listOf(HistoryModel(1, "75", "01/01/2021", "12:00 PM"))
+            `when`(historyDao.getAllHistory()).thenReturn(flowOf(historyList))
 
-        repository.getAllHistory().collect {
-            assertEquals(historyList, it)
+            repository.getAllHistory().collect {
+                assertEquals(historyList, it)
+            }
+            verify(historyDao).getAllHistory()
         }
-        verify(historyDao).getAllHistory()
     }
 
     @Test
-    fun `getHistoryWithLimit calls dao and returns flow`() = runBlocking {
-        val limit = 5
-        val historyList = listOf(HistoryModel(1, "75", "01/01/2021", "12:00 PM"))
-        `when`(historyDao.getHistoryWithLimit(limit)).thenReturn(flowOf(historyList))
+    fun getHistoryWithLimit_calls_dao_and_returns_flow() {
+        runTest {
+            val limit = 5
+            val historyList = listOf(HistoryModel(1, "75", "01/01/2021", "12:00 PM"))
+            `when`(historyDao.getHistoryWithLimit(limit)).thenReturn(flowOf(historyList))
 
-        repository.getHistoryWithLimit(limit).collect {
-            assertEquals(historyList, it)
+            repository.getHistoryWithLimit(limit).collect {
+                assertEquals(historyList, it)
+            }
+            verify(historyDao).getHistoryWithLimit(limit)
         }
-        verify(historyDao).getHistoryWithLimit(limit)
     }
 
     @Test
-    fun `insertHistory calls dao`() = runBlocking {
-        val history = HistoryModel(1, "75", "01/01/2021", "12:00 PM")
-        repository.insertHistory(history)
-        verify(historyDao).insertHistory(history)
+    fun insertHistory_calls_dao() {
+        runTest {
+            val history = HistoryModel(1, "75", "01/01/2021", "12:00 PM")
+            repository.insertHistory(history)
+            verify(historyDao).insertHistory(history)
+        }
     }
 }

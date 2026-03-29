@@ -5,7 +5,7 @@ import com.bapidas.heartrate.data.model.HistoryModel
 import com.bapidas.heartrate.data.repository.HistoryRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.resetMain
 import kotlinx.coroutines.test.runTest
@@ -33,7 +33,7 @@ class HistoryViewModelTest {
         Dispatchers.setMain(testDispatcher)
         
         val historyList = listOf(HistoryModel(1, "75", "01/01/2021", "12:00 PM"))
-        `when`(repository.getAllHistory()).thenReturn(flowOf(historyList))
+        `when`(repository.getAllHistory()).thenReturn(MutableStateFlow(historyList))
         
         viewModel = HistoryViewModel(repository)
     }
@@ -46,7 +46,11 @@ class HistoryViewModelTest {
     @Test
     fun `history state flow emits values from repository`() = runTest {
         viewModel.history.test {
-            val item = awaitItem()
+            // StateIn with WhileSubscribed might emit initial value first
+            var item = awaitItem()
+            if (item.isEmpty()) {
+                item = awaitItem()
+            }
             assertEquals(1, item.size)
             assertEquals("75", item[0].heartRate)
         }
