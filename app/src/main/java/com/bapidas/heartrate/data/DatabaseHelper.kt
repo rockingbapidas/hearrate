@@ -41,14 +41,17 @@ class DatabaseHelper constructor(
                     if (cursor != null) {
                         cursor.moveToFirst()
                         while (!cursor.isAfterLast) {
-                            val heartRate =
-                                cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_HEART_RATE))
-                            val date =
-                                cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_DATE_STRING))
-                            val time =
-                                cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_TIME_STRING))
-                            val historyModel = HistoryModel(heartRate, date, time)
-                            arrayList.add(historyModel)
+                            val heartRateIndex = cursor.getColumnIndex(DataModel.COLUMN_HEART_RATE)
+                            val dateIndex = cursor.getColumnIndex(DataModel.COLUMN_DATE_STRING)
+                            val timeIndex = cursor.getColumnIndex(DataModel.COLUMN_TIME_STRING)
+
+                            if (heartRateIndex != -1 && dateIndex != -1 && timeIndex != -1) {
+                                val heartRate = cursor.getString(heartRateIndex)
+                                val date = cursor.getString(dateIndex)
+                                val time = cursor.getString(timeIndex)
+                                val historyModel = HistoryModel(heartRate, date, time)
+                                arrayList.add(historyModel)
+                            }
                             cursor.moveToNext()
                         }
                     }
@@ -69,14 +72,17 @@ class DatabaseHelper constructor(
                 if (cursor != null) {
                     cursor.moveToFirst()
                     while (!cursor.isAfterLast) {
-                        val heartRate =
-                            cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_HEART_RATE))
-                        val date =
-                            cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_DATE_STRING))
-                        val time =
-                            cursor.getString(cursor.getColumnIndex(DataModel.COLUMN_TIME_STRING))
-                        val historyModel = HistoryModel(heartRate, date, time)
-                        arrayList.add(historyModel)
+                        val heartRateIndex = cursor.getColumnIndex(DataModel.COLUMN_HEART_RATE)
+                        val dateIndex = cursor.getColumnIndex(DataModel.COLUMN_DATE_STRING)
+                        val timeIndex = cursor.getColumnIndex(DataModel.COLUMN_TIME_STRING)
+
+                        if (heartRateIndex != -1 && dateIndex != -1 && timeIndex != -1) {
+                            val heartRate = cursor.getString(heartRateIndex)
+                            val date = cursor.getString(dateIndex)
+                            val time = cursor.getString(timeIndex)
+                            val historyModel = HistoryModel(heartRate, date, time)
+                            arrayList.add(historyModel)
+                        }
                         cursor.moveToNext()
                     }
                 }
