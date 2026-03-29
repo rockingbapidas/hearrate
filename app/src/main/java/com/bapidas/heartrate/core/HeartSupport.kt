@@ -7,7 +7,6 @@ interface HeartSupport {
     fun startPulseCheck(timeLimit: Long): HeartSupport
     fun startPulseCheck(): HeartSupport
     fun addOnResultListener(pulseListener: PulseListener): HeartSupport
-    fun addOnFingerListener(fingerListener: FingerListener): HeartSupport
     fun addOnTimerListener(timerListener: TimerListener): HeartSupport
     fun stopPulseCheck()
 }
