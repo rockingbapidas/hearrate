@@ -1,74 +1,60 @@
 package com.bapidas.heartrate.core
 
-import android.os.CountDownTimer
 import android.util.Log
 import com.bapidas.heartrate.camera.CameraSupport
 import com.bapidas.heartrate.camera.PreviewListener
 import com.bapidas.heartrate.utils.TYPE
+import kotlinx.coroutines.*
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
- * Created by bapidas on 03/11/17.
+ * Refactored to use modern Kotlin Coroutines for timing and idiomatic code practices.
  */
 class HeartRate(private val mCameraSupport: CameraSupport) : HeartSupport, PreviewListener {
+    
     private var mTimerListener: TimerListener? = null
     private var mPulseListener: PulseListener? = null
-    private var mFingerListener: FingerListener? = null
+    
     private var timeLimit: Long = 0
-    private var isTimeRunning = false
-    private var countDownTimer: CountDownTimer? = null
+    private var measurementJob: Job? = null
+    private val scope = CoroutineScope(Dispatchers.Main + SupervisorJob())
+
     private val averageArraySize = 4
     private val averageArray = IntArray(averageArraySize)
     private val beatsArraySize = 3
     private val beatsArray = DoubleArray(beatsArraySize)
+    
     private var averageIndex = 0
     private var beatsIndex = 0
     private var beats = 0.0
     private var startTime = System.currentTimeMillis()
     private var currentType = TYPE.GREEN
-    private var errorCount = 0
-    private var successCount = 0
     private val processing = AtomicBoolean(false)
-
-    val heartSupport: HeartSupport
-        get() = this
 
     override fun startPulseCheck(timeLimit: Long): HeartSupport {
         this.timeLimit = timeLimit
-        if (!mCameraSupport.isCameraInUse) {
-            reset()
-            startTimer()
-            mCameraSupport.open().addOnPreviewListener(this)
-            if (mTimerListener != null) {
-                mTimerListener?.onTimerStarted()
-            }
-        } else {
-            throw RuntimeException("Camera is already in use state")
-        }
+        startMeasurement()
         return this
     }
 
     override fun startPulseCheck(): HeartSupport {
+        startMeasurement()
+        return this
+    }
+
+    private fun startMeasurement() {
         if (!mCameraSupport.isCameraInUse) {
             reset()
-            startTimer()
             mCameraSupport.open().addOnPreviewListener(this)
-            if (mTimerListener != null) {
-                mTimerListener?.onTimerStarted()
-            }
+            mTimerListener?.onTimerStarted()
+            startTimer()
         } else {
-            throw RuntimeException("Camera is already in use state")
+            Log.e(TAG, "Camera is already in use")
         }
-        return this
     }
 
     override fun addOnResultListener(pulseListener: PulseListener): HeartSupport {
         mPulseListener = pulseListener
-        return this
-    }
-
-    override fun addOnFingerListener(fingerListener: FingerListener): HeartSupport {
-        mFingerListener = fingerListener
         return this
     }
 
@@ -80,20 +66,13 @@ class HeartRate(private val mCameraSupport: CameraSupport) : HeartSupport, Previ
     override fun stopPulseCheck() {
         if (mCameraSupport.isCameraInUse) {
             mCameraSupport.close()
-            if (isTimeRunning) {
-                countDownTimer?.cancel()
-                isTimeRunning = false
-            }
-            if (mTimerListener != null) {
-                mTimerListener?.onTimerStopped()
-            }
-        } else {
-            throw RuntimeException("Camera is already in close state")
+            measurementJob?.cancel()
+            mTimerListener?.onTimerStopped()
         }
     }
 
     override fun onPreviewData(data: ByteArray?) {
-
+        // Not used in current implementation
     }
 
     override fun onPreviewCount(count: Int) {
@@ -101,116 +80,82 @@ class HeartRate(private val mCameraSupport: CameraSupport) : HeartSupport, Previ
     }
 
     private fun reset() {
-        errorCount = 0
-        successCount = 0
         averageIndex = 0
         beatsIndex = 0
         beats = 0.0
         currentType = TYPE.GREEN
         startTime = System.currentTimeMillis()
+        averageArray.fill(0)
+        beatsArray.fill(0.0)
     }
 
     private fun startTimer() {
-        if (timeLimit != 0L) {
-            countDownTimer = object : CountDownTimer(timeLimit, 500) {
-                override fun onTick(millisUntilFinished: Long) {
-                    isTimeRunning = true
-                    if (mTimerListener != null) {
-                        mTimerListener?.onTimerRunning(millisUntilFinished)
-                    }
-                }
+        if (timeLimit <= 0) return
 
-                override fun onFinish() {
-                    isTimeRunning = false
-                    stopPulseCheck()
-                }
+        measurementJob?.cancel()
+        measurementJob = scope.launch {
+            var remaining = timeLimit
+            while (remaining > 0) {
+                mTimerListener?.onTimerRunning(remaining)
+                delay(500)
+                remaining -= 500
             }
-            countDownTimer?.start()
+            withContext(Dispatchers.Main) {
+                stopPulseCheck()
+            }
         }
     }
 
     private fun calculatePulse(pixelAverage: Int) {
-        Log.e(TAG, "pixel === $pixelAverage")
-        if (!processing.compareAndSet(false, true)) {
-            return
-        }
-        if (pixelAverage == 0 || pixelAverage >= 255) {
+        if (!processing.compareAndSet(false, true)) return
+        
+        if (pixelAverage !in 1..<255) {
             processing.set(false)
             return
         }
 
-        /*if (pixelAverage < 200) {
-            errorCount++;
-            if (mFingerListener != null) {
-                mFingerListener.OnFingerDetectFailed(errorCount);
-            }
-            processing.set(false);
-        } else {
-            successCount++;
-            if (mFingerListener != null) {
-                mFingerListener.OnFingerDetected(successCount);
-            }
-        }*/
-        var averageArrayAvg = 0
-        var averageArrayCnt = 0
-        for (anAverageArray in averageArray) {
-            if (anAverageArray > 0) {
-                averageArrayAvg += anAverageArray
-                averageArrayCnt++
-            }
-        }
-        val rollingAverage =
-            if (averageArrayCnt > 0) averageArrayAvg / averageArrayCnt else 0
+        // Calculate rolling average using idiomatic Kotlin
+        val validAverages = averageArray.filter { it > 0 }
+        val rollingAverage = if (validAverages.isNotEmpty()) validAverages.average().toInt() else 0
+        
         var newType = currentType
         if (pixelAverage < rollingAverage) {
             newType = TYPE.RED
-            if (newType !== currentType) {
+            if (newType != currentType) {
                 beats++
             }
         } else if (pixelAverage > rollingAverage) {
             newType = TYPE.GREEN
         }
-        if (averageIndex == averageArraySize) averageIndex = 0
-        averageArray[averageIndex] = pixelAverage
-        averageIndex++
-        if (newType !== currentType) {
-            currentType = newType
-        }
-        val endTime = System.currentTimeMillis()
-        val totalTimeInSecs = (endTime - startTime) / 1000.0
+
+        if (averageIndex >= averageArraySize) averageIndex = 0
+        averageArray[averageIndex++] = pixelAverage
+        
+        currentType = newType
+
+        val totalTimeInSecs = (System.currentTimeMillis() - startTime) / 1000.0
         if (totalTimeInSecs >= 5) {
-            val bps = beats / totalTimeInSecs
-            val dpm = bps * 60.0
-            if (dpm < 30 || dpm > 180) {
-                startTime = System.currentTimeMillis()
-                beats = 0.0
-                processing.set(false)
-                return
+            val dpm = (beats / totalTimeInSecs) * 60.0
+            
+            if (dpm in 30.0..180.0) {
+                if (beatsIndex >= beatsArraySize) beatsIndex = 0
+                beatsArray[beatsIndex++] = dpm
+                
+                val validBeats = beatsArray.filter { it > 0 }
+                val beatsAvg = if (validBeats.isNotEmpty()) validBeats.average().toInt() else 0
+                
+                mPulseListener?.onPulseResult(beatsAvg.toString())
             }
-            if (beatsIndex == beatsArraySize) beatsIndex = 0
-            beatsArray[beatsIndex] = dpm
-            beatsIndex++
-            var beatsArrayAvg = 0
-            var beatsArrayCnt = 0
-            for (aBeatsArray in beatsArray) {
-                if (aBeatsArray > 0) {
-                    beatsArrayAvg += aBeatsArray.toInt()
-                    beatsArrayCnt++
-                }
-            }
-            val beatsAvg = beatsArrayAvg / beatsArrayCnt
-            val beatsPerMinuteValue = beatsAvg.toString()
-            if (mPulseListener != null) {
-                mPulseListener?.onPulseResult(beatsPerMinuteValue)
-            }
+            
+            // Reset for next window
             startTime = System.currentTimeMillis()
             beats = 0.0
         }
+        
         processing.set(false)
     }
 
     companion object {
         private val TAG = HeartRate::class.java.simpleName
     }
-
 }

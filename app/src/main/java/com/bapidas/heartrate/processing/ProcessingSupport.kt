@@ -3,10 +3,17 @@ package com.bapidas.heartrate.processing
 import android.media.Image
 
 /**
- * Created by bapidas on 12/10/17.
+ * Interface for image processing tasks related to heart rate detection.
  */
 interface ProcessingSupport {
-    fun yuvToNv(image: Image): ByteArray
+    /**
+     * Converts an [Image] (typically YUV_420_888) to a standard NV21 byte array.
+     */
+    fun toNv21(image: Image): ByteArray
 
-    fun yuvSpToRedAvg(yuv420sp: ByteArray?, width: Int, height: Int): Int
+    /**
+     * Calculates the average red intensity from an NV21 formatted image buffer.
+     * This is used to detect the pulse by monitoring changes in red light absorption.
+     */
+    fun calculateAverageRed(nv21: ByteArray, width: Int, height: Int): Int
 }

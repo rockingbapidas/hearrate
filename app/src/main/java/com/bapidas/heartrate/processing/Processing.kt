@@ -1,70 +1,73 @@
 package com.bapidas.heartrate.processing
 
 import android.media.Image
-import android.os.Build
-import androidx.annotation.RequiresApi
+import java.nio.ByteBuffer
 
+/**
+ * Updated processing class with clearer naming and optimized YUV-to-RGB conversion.
+ */
 class Processing : ProcessingSupport {
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
-    override fun yuvToNv(image: Image): ByteArray {
-        val nv21: ByteArray
+
+    override fun toNv21(image: Image): ByteArray {
         val yBuffer = image.planes[0].buffer
         val uBuffer = image.planes[1].buffer
         val vBuffer = image.planes[2].buffer
+
         val ySize = yBuffer.remaining()
         val uSize = uBuffer.remaining()
         val vSize = vBuffer.remaining()
-        nv21 = ByteArray(ySize + uSize + vSize)
 
-        //U and V are swapped
-        yBuffer[nv21, 0, ySize]
-        vBuffer[nv21, ySize, vSize]
-        uBuffer[nv21, ySize + vSize, uSize]
+        val nv21 = ByteArray(ySize + uSize + vSize)
+
+        // NV21 is YYYY VUVU. Note: U and V are often swapped in internal buffers.
+        yBuffer.get(nv21, 0, ySize)
+        vBuffer.get(nv21, ySize, vSize)
+        uBuffer.get(nv21, ySize + vSize, uSize)
+
         return nv21
     }
 
-    override fun yuvSpToRedAvg(yuv420sp: ByteArray?, width: Int, height: Int): Int {
-        if (yuv420sp == null) return 0
+    override fun calculateAverageRed(nv21: ByteArray, width: Int, height: Int): Int {
         val frameSize = width * height
-        val sum = yuvSpToRedSum(yuv420sp, width, height)
-        return sum / frameSize
-    }
-
-    private fun yuvSpToRedSum(yuv420sp: ByteArray?, width: Int, height: Int): Int {
-        if (yuv420sp == null) return 0
-        val frameSize = width * height
-        var sum = 0
-        var j = 0
+        var redSum = 0L // Use Long to avoid overflow during summation
         var yp = 0
-        while (j < height) {
+
+        for (j in 0 until height) {
             var uvp = frameSize + (j shr 1) * width
             var u = 0
             var v = 0
-            var i = 0
-            while (i < width) {
-                var y = (0xff and yuv420sp[yp].toInt()) - 16
-                if (y < 0) y = 0
+            
+            for (i in 0 until width) {
+                // Extract Y component
+                val yRaw = (0xff and nv21[yp].toInt()) - 16
+                val y = if (yRaw < 0) 0 else yRaw
+                
+                // Extract U and V components every 2 pixels (since it's 4:2:0)
                 if (i and 1 == 0) {
-                    v = (0xff and yuv420sp[uvp++].toInt()) - 128
-                    u = (0xff and yuv420sp[uvp++].toInt()) - 128
+                    v = (0xff and nv21[uvp++].toInt()) - 128
+                    u = (0xff and nv21[uvp++].toInt()) - 128
                 }
+                
+                // standard YUV to RGB conversion formula for Red
                 val y1192 = 1192 * y
-                var r = y1192 + 1634 * v
-                var g = y1192 - 833 * v - 400 * u
-                var b = y1192 + 2066 * u
-                if (r < 0) r = 0 else if (r > 262143) r = 262143
-                if (g < 0) g = 0 else if (g > 262143) g = 262143
-                if (b < 0) b = 0 else if (b > 262143) b = 262143
-                val pixel =
-                    -0x1000000 or (r shl 6 and 0xff0000) or (g shr 2 and 0xff00) or (b shr 10 and 0xff)
-                val red = pixel shr 16 and 0xff
-                sum += red
-                i++
+                val rRaw = y1192 + 1634 * v
+                
+                // Clamp R value between 0 and 262143
+                val r = when {
+                    rRaw < 0 -> 0
+                    rRaw > 262143 -> 262143
+                    else -> rRaw
+                }
+                
+                // Extract the red byte (scaled back to 0-255 range)
+                val red = (r shr 10) and 0xff
+                redSum += red
+                
                 yp++
             }
-            j++
         }
-        return sum
+        
+        return if (frameSize > 0) (redSum / frameSize).toInt() else 0
     }
 
     companion object {
